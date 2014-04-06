@@ -25,7 +25,7 @@ import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 public class WikiFilter {
 
 //A list of useful keywords that will define if an article is relevant or not (if the category contains one of those words).
-public static String[] keywords = {"blizzard","cyclone","hurricane", "typhoon" ,"derecho","drought","nor'easter","storm","tornado","heat wave", "cold wave", "weather event"};
+public static String[] keywords = {"blizzard","cyclone","hurricane", "typhoon" ,"derecho","drought","nor'easter","storm","tornado","heat wave", "cold wave", "flood","weather event"};
 
 //Regex to check if category contains one of the keywords
 public static Pattern categoryIsRelevantRegex = createRegexFromKeywords();
@@ -141,10 +141,11 @@ public static class WFMap extends MapReduceBase implements Mapper<LongWritable, 
 		conf.setReducerClass(WFReduce.class);
 
 		conf.setInputFormat(XMLInputFormat.class);
-		
-		conf.setOutputFormat(MultiFileOutput.class);
 		conf.set("xmlinput.start", "<page>");
 		conf.set("xmlinput.end", "</page>");
+		
+		conf.setOutputFormat(MultiFileOutput.class);
+		
 		
 		FileInputFormat.setInputPaths(conf, new Path(args[0]));
 		FileOutputFormat.setOutputPath(conf,  new Path(args[1]));

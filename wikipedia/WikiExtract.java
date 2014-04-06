@@ -20,6 +20,7 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 
 
@@ -27,40 +28,43 @@ import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 public class WikiExtract {
 
 //A list of useful keywords that will define if an article is relevant or not (if the category contains one of those words).
-public static String[] months = {"january","february","march", "april" ,"may","june","july","august","september","october", "november", "december"};
+public static String[] months = {"january","february","march", "april" ,"may","june","july","august","september","october", "november", "december", "winter", "spring", "summer", "autumn"};
 
 //Regex to check if category contains one of the keywords
 public static Pattern monthRegex = createRegexForMonths();
 
 //Regex for years
-public static Pattern yearRegex = Pattern.compile(".*(\\d\\d\\d\\d).*");
-
-//Regex to extract title from article
-public static Pattern titleRegex = Pattern.compile("<title>(.*)</title>");
+public static Pattern yearRegex = Pattern.compile("\\d\\d\\d\\d");
 
 //Regex for countries/continents
 public static Pattern countryRegex = createRegexForCountries();
 
+//Regex to extract title from article
+public static Pattern titleRegex = Pattern.compile("<title>(.*)</title>");
 
-//Create a regex of the form ".*(keyword1|keyword2|...|keywordn).*"
+//Regex to extract infobox from article
+public static Pattern infoboxRegex = Pattern.compile("\\{\\{Infobox.*\n(.?\\|.*\n?)*\\}\\}");
+
+
+
+
+//Create a regex of the form "(keyword1|keyword2|...|keywordn)"
 static Pattern createRegexForMonths(){
-	String regex = ".*(";
+	String regex = "(";
 	
 	for(int i = 0; i < months.length - 1; i++){
 		regex += months[i]+"|";
 	}
 	regex += months[months.length - 1];
-	regex = regex + ").*";
+	regex = regex + ")";
 	
 	return Pattern.compile(regex);
 }
 
 
-//Create a regex to extract country, from a predifined list
+//Create a regex to extract country, from a predefined list
 static Pattern createRegexForCountries(){
-	String regex = ".*(";
-	
-	//TODO
+	String regex = "((north|west|east|south)(ern)? ?)*(";
 	
 	String countryFile = "resources/demonyms.txt";
 	BufferedReader br = null;
@@ -91,7 +95,7 @@ static Pattern createRegexForCountries(){
 	}
 	
 	regex = regex.substring(0, regex.length()-1);
-	regex = regex + ").*";
+	regex = regex + ")";
 	
 	return Pattern.compile(regex);
 }
@@ -103,8 +107,6 @@ public static class WEMap extends MapReduceBase implements Mapper<LongWritable, 
 		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
 			String XMLString = value.toString();
 			
-		
-			
 			// Extracting stuff from title
 			Matcher matcherTitle = titleRegex.matcher(XMLString);
 			matcherTitle.find();
@@ -114,28 +116,68 @@ public static class WEMap extends MapReduceBase implements Mapper<LongWritable, 
 			
 			Matcher matcherMonth = monthRegex.matcher(title.toLowerCase());
 			if(matcherMonth.find()){
-				month = matcherMonth.group(1);
+				month = matcherMonth.group(0);
 			}
 			
 			String year = "";
 			
 			Matcher matcherYear = yearRegex.matcher(title.toLowerCase());
 			if(matcherYear.find()){
-				year = matcherYear.group(1);
+				year = matcherYear.group(0);
 			}
 			
 			String country = "";
 			
 			Matcher matcherCountry = countryRegex.matcher(title.toLowerCase());
 			if(matcherCountry.find()){
-				country = matcherCountry.group(1);
+				country = matcherCountry.group(0);
 			}
 			
 			
 			System.out.println(title+": "+country+" "+month+" "+year);
 			
-			//Extracting stuff from infobox
+			//Extracting stuff from infobox (maybe there is no need to extract infobox, and extract info directly)
 			//TODO
+			
+			String infobox = "";
+			
+			Matcher matcherInfobox = infoboxRegex.matcher(XMLString);
+			if(matcherInfobox.find()){
+				infobox = matcherInfobox.group(0);
+			}
+			
+			if(!infobox.equals("")){
+				//System.out.println(title+": \n"+infobox);
+				
+				Pattern startDate = Pattern.compile("formed.*=(.*)\n");
+				String start = "";
+				
+				Matcher matcherStart = startDate.matcher(infobox.toLowerCase());
+				if(matcherStart.find()){
+					start = matcherStart.group(1);
+				}
+				
+				Pattern endDate = Pattern.compile("dissipated.*=(.*)\n");
+				String end = "";
+				
+				Matcher matcherEnd = endDate.matcher(infobox.toLowerCase());
+				if(matcherEnd.find()){
+					end = matcherEnd.group(1);
+				}
+				
+				Pattern areasReg = Pattern.compile("areas.*=(.*)\n?");
+				String areas = "";
+				
+				Matcher matcherAreas = areasReg.matcher(infobox.toLowerCase());
+				if(matcherAreas.find()){
+					areas = matcherAreas.group(1);
+				}
+				
+				System.out.println(title+": "+areas+"|"+start+" - "+end);
+			}
+			
+			//output.collect(new Text(), new Text(infobox));
+	
 			
 			//Extracting stuff from article's body
 			//TODO
@@ -149,10 +191,11 @@ public static class WEMap extends MapReduceBase implements Mapper<LongWritable, 
 	public static class WEReduce extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
 		
 		@Override
-		public void reduce(Text key, Iterator<Text> articles, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+		public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
 			
-				while(articles.hasNext()){
-					output.collect(key, articles.next());	
+				while(values.hasNext()){
+					//TODO	Add result to a database or something (or store everything in a csv, i don't know)
+					//output.collect(key, values.next());
 				}	
 
 		}
@@ -195,10 +238,12 @@ public static class WEMap extends MapReduceBase implements Mapper<LongWritable, 
 		conf.setReducerClass(WEReduce.class);
 
 		conf.setInputFormat(XMLInputFormat.class);
-		
-		conf.setOutputFormat(MultiFileOutput.class);
 		conf.set("xmlinput.start", "<page>");
 		conf.set("xmlinput.end", "</page>");
+		
+		//conf.setOutputFormat(MultiFileOutput.class);
+		conf.setOutputFormat(TextOutputFormat.class);
+		
 		
 		FileInputFormat.setInputPaths(conf, new Path(args[0]));
 		FileOutputFormat.setOutputPath(conf,  new Path(args[1]));
