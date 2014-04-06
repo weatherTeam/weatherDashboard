@@ -1,5 +1,10 @@
 package ch.epfl.data.bigdata.weather.temperature.anomalies;
 
+/*
+ * This mapper is a code example from
+ * Hadoop: The Definitive Guide, Second
+ * Edition, by Tom White. Copyright 2011 Tom White, 978-1-449-38973-4.
+ */
 import java.io.IOException;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -21,8 +26,7 @@ public class AverageMonthTemperatureMapper extends MapReduceBase implements
 		String station = line.substring(4, 10);
 		String month = line.substring(19, 21);
 		int airTemperature;
-		if (line.charAt(87) == '+') { // parseInt doesn't like leading plus
-										// signs
+		if (line.charAt(87) == '+') {
 			airTemperature = Integer.parseInt(line.substring(88, 92));
 		} else {
 			airTemperature = Integer.parseInt(line.substring(87, 92));

@@ -9,6 +9,11 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
+/*
+ * This mapper is a code example from
+ * Hadoop: The Definitive Guide, Second
+ * Edition, by Tom White. Copyright 2011 Tom White, 978-1-449-38973-4.
+ */
 public class AverageMonthYearTemperatureMapper extends MapReduceBase implements
 		Mapper<LongWritable, Text, Text, IntWritable> {
 	private static final int MISSING = 9999;
