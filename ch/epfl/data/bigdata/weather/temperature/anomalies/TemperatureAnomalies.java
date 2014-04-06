@@ -13,14 +13,16 @@ import org.apache.hadoop.mapred.lib.MultipleInputs;
 
 public class TemperatureAnomalies {
 	public static void main(String[] args) throws IOException {
-		if (args.length != 2) {
+		if (args.length != 6) {
 			System.err
-					.println("Usage: MaxTemperature <input path> <output path>");
+					.println("Usage: Temperature anomalies <input path> <output path> <first year of reference period> <last year of reference period> <first year of period to analyse> <last year of period to analyse>");
 			System.exit(-1);
 		}
 
 		JobConf avgMonthTemp = new JobConf(TemperatureAnomalies.class);
 		avgMonthTemp.setJobName("AverageMonthTemperature");
+		avgMonthTemp.set("firstYear", args[2]);
+		avgMonthTemp.set("lastYear", args[3]);
 		FileInputFormat.addInputPath(avgMonthTemp, new Path(args[0]));
 		FileOutputFormat.setOutputPath(avgMonthTemp, new Path("tmp1"));
 
@@ -32,6 +34,8 @@ public class TemperatureAnomalies {
 		
 		JobConf avgMonthYearTemp = new JobConf(TemperatureAnomalies.class);
 		avgMonthYearTemp.setJobName("AverageMonthYearTemperature");
+		avgMonthYearTemp.set("firstYear", args[4]);
+		avgMonthYearTemp.set("lastYear", args[5]);
 		FileInputFormat.addInputPath(avgMonthYearTemp, new Path(args[0]));
 		FileOutputFormat.setOutputPath(avgMonthYearTemp, new Path("tmp2"));
 
@@ -43,6 +47,8 @@ public class TemperatureAnomalies {
 		
 		JobConf temperatureAnomalies = new JobConf(TemperatureAnomalies.class);
 		temperatureAnomalies.setJobName("temperatureAnomalies");
+		temperatureAnomalies.set("firstYear", args[4]);
+		temperatureAnomalies.set("lastYear", args[5]);
 		MultipleInputs.addInputPath(temperatureAnomalies, new Path("tmp2"),KeyValueTextInputFormat.class);
 		MultipleInputs.addInputPath(temperatureAnomalies, new Path("tmp1"),KeyValueTextInputFormat.class);
 		
