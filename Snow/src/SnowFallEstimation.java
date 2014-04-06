@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.Iterator;
-import java.util.Scanner;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
@@ -9,11 +8,7 @@ import org.apache.hadoop.mapred.*;
 /**
  * Created by Jo on 01.04.14.
  */
-/*
-* INPUT: raw data form NOAA
-* OUTPUT: each station that contains information with the given identifier + number of records of this information for each station
- */
-public class FindSnowStations {
+public class SnowFallEstimation {
 
 
 	public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
@@ -23,12 +18,20 @@ public class FindSnowStations {
 
 			String input = value.toString();
 
-			//for generalization, just replace AJ1 by the desired identifier
-			//AA101 for precipitation hourly
+			//for position: if in document there is 13-15, in java, we write 12-15.
+			//the first changes because in java the index begin at 0 and in document at 1.
+			//the second changes because in java, substring(a,b) is: from a included to b excluded
+			String stationID = input.substring(4,10);
 
-			if(input.contains("AA103")){
-				String stationID = input.substring(4,10);
+			String tempString = input.substring(87,92);
+
+
+			if(input.contains("AJ1")){
+				//output existing snow data
 				output.collect(new Text(stationID), new IntWritable(1));
+			}
+			else {
+				//estimate snow
 			}
 
 		}
@@ -83,10 +86,8 @@ public class FindSnowStations {
 		conf1.setInputFormat(TextInputFormat.class);
 		conf1.setOutputFormat(TextOutputFormat.class);
 
-		conf1.setNumMapTasks(3);
-		conf1.setNumReduceTasks(3);
-
-		System.out.println("arg0" + args[0]);
+		conf1.setNumMapTasks(2);
+		conf1.setNumReduceTasks(2);
 
 		FileInputFormat.setInputPaths(conf1, new Path(args[0]));
 		FileOutputFormat.setOutputPath(conf1, tempPath);
