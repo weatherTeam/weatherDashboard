@@ -9,6 +9,10 @@ import org.apache.hadoop.mapred.*;
 /**
  * Created by Jo on 01.04.14.
  */
+/*
+* INPUT: raw data form NOAA
+* OUTPUT: each station that contains information with the given identifier + number of records of this information for each station
+ */
 public class FindSnowStations {
 
 
@@ -19,15 +23,12 @@ public class FindSnowStations {
 
 			String input = value.toString();
 
+			//for generalization, just replace AJ1 by the desired identifier
 
 			if(input.contains("AJ1")){
 				String stationID = input.substring(4,10);
 				output.collect(new Text(stationID), new IntWritable(1));
 			}
-
-
-
-
 
 		}
 	}
@@ -81,8 +82,10 @@ public class FindSnowStations {
 		conf1.setInputFormat(TextInputFormat.class);
 		conf1.setOutputFormat(TextOutputFormat.class);
 
-		conf1.setNumMapTasks(2);
-		conf1.setNumReduceTasks(2);
+		conf1.setNumMapTasks(3);
+		conf1.setNumReduceTasks(3);
+
+		System.out.println("arg0" + args[0]);
 
 		FileInputFormat.setInputPaths(conf1, new Path(args[0]));
 		FileOutputFormat.setOutputPath(conf1, tempPath);
