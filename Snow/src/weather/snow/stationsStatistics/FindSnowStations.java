@@ -1,11 +1,12 @@
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.*;
+package weather.snow.stationsStatistics;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.Iterator;
+import java.util.Scanner;
+
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapred.*;
 
 /**
  * Created by Jo on 01.04.14.
@@ -14,7 +15,7 @@ import java.util.Iterator;
 * INPUT: raw data form NOAA
 * OUTPUT: each station that contains information with the given identifier + number of records of this information for each station
  */
-public class FindHourlyPrecipitationStations {
+public class FindSnowStations {
 
 
 	public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
@@ -24,9 +25,9 @@ public class FindHourlyPrecipitationStations {
 
 			String input = value.toString();
 
-			//AA101 for precipitation hourly
-			//AA1XX => XX periodicity of measurements. 01-02-03 are sufficient to estimate snow falls.
-			if(input.contains("AA101") || input.contains("AA101") || input.contains("AA103")){
+			//for generalization, replace AJ1 by the desired identifier
+			//AJ1: identifier for snow depth (if any)
+			if(input.contains("AJ1")){
 				String stationID = input.substring(4,10);
 				output.collect(new Text(stationID), new IntWritable(1));
 			}

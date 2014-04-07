@@ -1,3 +1,5 @@
+package weather.snow.snowfall;
+
 import java.io.*;
 import java.util.Iterator;
 
