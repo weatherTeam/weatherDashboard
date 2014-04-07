@@ -1,3 +1,0 @@
-Austria: ~5GB, 2000 snow record per year at most
-Switzerland: ~5GB, 5000 snow records per year
-US - a lot of information, more type of information
