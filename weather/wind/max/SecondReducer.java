@@ -1,4 +1,4 @@
-package ch.epfl.data.bigdata.project.wind;
+package weather.wind.max;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -23,7 +23,8 @@ public class SecondReducer extends MapReduceBase implements Reducer<Text, Text, 
 			String tmp = inputValue.next().toString();
 			String[] dateAndWind = tmp.toString().split("\t");
 			int wind = Integer.parseInt(dateAndWind[0]);
-			if (wind > maxWind)
+			
+			if (wind > 28)
 			{
 				maxWind = wind;
 				maxDate = dateAndWind[1];

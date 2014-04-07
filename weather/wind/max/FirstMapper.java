@@ -1,4 +1,4 @@
-package ch.epfl.data.bigdata.project.wind;
+package weather.wind.max;
 
 import java.io.IOException;
 
