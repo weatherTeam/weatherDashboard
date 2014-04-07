@@ -30,30 +30,9 @@ public class Run
 		conf1.setOutputFormat(TextOutputFormat.class);
  	
 		FileInputFormat.setInputPaths(conf1, new Path(args[0]));
-		FileOutputFormat.setOutputPath(conf1, new Path("tmp/"));
-		
-//		JobConf conf2 = new JobConf(Run.class);
-//		conf2.setJobName("Triangles Run 2");
-//		conf2.setNumMapTasks(80);
-//		conf2.setNumReduceTasks(1);
-//		
-//		conf2.setMapOutputKeyClass(Text.class);
-//		conf2.setMapOutputValueClass(Text.class);
-//		
-//		conf2.setOutputKeyClass(Text.class);
-//		conf2.setOutputValueClass(IntWritable.class);
-// 	
-//		conf2.setMapperClass(SecondMapper.class);
-//		conf2.setReducerClass(SecondReducer.class);
-// 	
-//		conf2.setInputFormat(TextInputFormat.class);
-//		conf2.setOutputFormat(TextOutputFormat.class);
-// 	
-//		FileInputFormat.setInputPaths(conf2, new Path("tmp/"));
-//		FileOutputFormat.setOutputPath(conf2, new Path(args[1]));
- 	
+		FileOutputFormat.setOutputPath(conf1, new Path(args[1]));
+
 		JobClient.runJob(conf1);
-//		JobClient.runJob(conf2);
 
 	}
 }

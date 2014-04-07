@@ -12,17 +12,28 @@ import org.apache.hadoop.mapred.Reporter;
 
 public class FirstMapper extends MapReduceBase implements Mapper<LongWritable, Text, IntWritable, Text>
 {
+	private static final int MISSING = 9999;
+	
 	@Override
 	public void map(LongWritable inputKey, Text inputValue,
 			OutputCollector<IntWritable, Text> output, Reporter arg3) throws IOException
 	{
-		String[] dateAndWind = inputValue.toString().split(",");
-		String month = (dateAndWind[0].substring(4, 5));
+		// wind 65-68
+		// geoloc 28-40
+		// date 15-26
+		// ID 4-9
 		
+		String quality = inputValue.toString().substring(69, 70);
+		String id = inputValue.toString().substring(4, 10);
+		String date = inputValue.toString().substring(15, 27);
+		String month = (date.substring(4, 6));
+		String geoloc = inputValue.toString().substring(28, 40);
+		String wind = inputValue.toString().substring(65, 69);
+
 		IntWritable outputKey = new IntWritable(Integer.parseInt(month));
-		IntWritable outputValue = new IntWritable(Integer.parseInt(dateAndWind[1]));
+		Text outputValue = new Text(id + date + geoloc + wind);
 		
-		output.collect(outputKey, new Text(dateAndWind[0]+","+outputValue));
-		
+		if(Integer.parseInt(wind) != MISSING && quality.matches("[01459]"))
+			output.collect(outputKey, outputValue);
 	}
 }

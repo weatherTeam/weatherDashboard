@@ -12,28 +12,29 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
 public class FirstReducer extends MapReduceBase implements Reducer<IntWritable, Text, IntWritable, Text> {
+
+	private static final int WIND_TRESHOLD = 280;
+
 	@Override
 	public void reduce(IntWritable inputKey, Iterator<Text> inputValue, OutputCollector<IntWritable, Text> output, Reporter arg3)
 			throws IOException
 	{	
-		ArrayList<String> xtremWindAndDate = new ArrayList<String>();
+		ArrayList<String> xtremWindInfo = new ArrayList<String>();
 		
 		while(inputValue.hasNext())
 		{
-			String tmp = inputValue.next().toString();
-			String[] dateAndWind = tmp.toString().split(",");
-			int wind = Integer.parseInt(dateAndWind[1]);
+			String infoString = inputValue.next().toString();
+			int wind = Integer.parseInt(infoString.substring(30, 34));
 			
-			if (wind > 28)
-				xtremWindAndDate.add(dateAndWind[0]+","+dateAndWind[1]);
+			if (wind > WIND_TRESHOLD)
+				xtremWindInfo.add(infoString);
 		}
 		
-		String[] dateAndWind = new String[xtremWindAndDate.size()];
-		
-		for(int i=0; i<xtremWindAndDate.size(); i++)
+		for(int i=0; i<xtremWindInfo.size(); i++)
 		{
-			dateAndWind = xtremWindAndDate.get(i).split(",");
-			output.collect(new IntWritable(Integer.parseInt(dateAndWind[1])), new Text(dateAndWind[0]));
+			IntWritable outputKey = new IntWritable(Integer.parseInt(xtremWindInfo.get(i).substring(30, 34)));
+			Text outputValue = new Text(xtremWindInfo.get(i).substring(0, 29));
+			output.collect(outputKey, outputValue);
 		}
 	}
 }
