@@ -1,4 +1,4 @@
-package ch.epfl.data.bigdata.weather.temperature.anomalies;
+package weather.temperature.anomalies;
 
 /*
  * This mapper is inspired by a code example from

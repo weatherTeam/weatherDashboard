@@ -1,4 +1,4 @@
-package ch.epfl.data.bigdata.weather.temperature.anomalies;
+package weather.temperature.anomalies;
 
 import java.io.IOException;
 import org.apache.hadoop.io.IntWritable;
