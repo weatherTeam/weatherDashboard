@@ -1,3 +1,5 @@
+package weather.wikipedia.infoExtraction;
+
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -22,6 +24,8 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
+
+import weather.wikipedia.inputFormat.XMLInputFormat;
 
 
 /*For a more detailed explanation see wiki: https://github.com/weatherTeam/weatherDashboard/wiki/Wikipedia*/

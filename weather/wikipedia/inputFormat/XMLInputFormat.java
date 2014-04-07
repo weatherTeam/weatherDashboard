@@ -14,6 +14,8 @@
  * permissions and limitations under the License.
  */
 
+package weather.wikipedia.inputFormat;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 

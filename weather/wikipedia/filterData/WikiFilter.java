@@ -1,4 +1,6 @@
 
+package weather.wikipedia.filterData;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -19,6 +21,8 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
+
+import weather.wikipedia.inputFormat.XMLInputFormat;
 
 
 /*For a more detailed explanation see wiki: https://github.com/weatherTeam/weatherDashboard/wiki/Wikipedia*/
