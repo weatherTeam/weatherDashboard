@@ -107,7 +107,7 @@ public class SnowFallEstimation {
 		//Path p = new Path(args[1]);
 		Path tempPath = new Path(args[1]);
 
-		JobConf conf1 = new JobConf(Run.class);
+		JobConf conf1 = new JobConf(SnowFallEstimation.class);
 		conf1.setJobName("find snow stations");
 
 		conf1.setOutputKeyClass(Text.class);

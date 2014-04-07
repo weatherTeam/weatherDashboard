@@ -1,3 +1,5 @@
+package weather.snow.stationsStatistics;
+
 import java.io.IOException;
 import java.util.Iterator;
 

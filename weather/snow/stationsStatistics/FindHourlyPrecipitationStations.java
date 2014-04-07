@@ -28,7 +28,7 @@ public class FindHourlyPrecipitationStations {
 
 			//AA101 for precipitation hourly
 			//AA1XX => XX periodicity of measurements. 01-02-03 are sufficient to estimate snow falls.
-			if(input.contains("AA101") || input.contains("AA101") || input.contains("AA103")){
+			if(input.contains("AA101") || input.contains("AA101") || input.contains("AA101")){
 				String stationID = input.substring(4,10);
 				output.collect(new Text(stationID), new IntWritable(1));
 			}
@@ -73,7 +73,7 @@ public class FindHourlyPrecipitationStations {
 		//Path p = new Path(args[1]);
 		Path tempPath = new Path(args[1]);
 
-		JobConf conf1 = new JobConf(Run.class);
+		JobConf conf1 = new JobConf(FindHourlyPrecipitationStations.class);
 		conf1.setJobName("find snow stations");
 
 		conf1.setOutputKeyClass(Text.class);
