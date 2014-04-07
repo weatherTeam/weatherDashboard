@@ -6,7 +6,7 @@ import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapred.*;
 
 /**
- * Created by Jo on 01.04.14.
+ * Created by Jonathan Duss on 01.04.14.
  */
 public class SnowFallEstimation {
 
@@ -26,14 +26,45 @@ public class SnowFallEstimation {
 			String tempString = input.substring(87,92);
 
 
-			if(input.contains("AJ1")){
+
+			//estimation
+
+
+			if(input.contains("AA1")){
+				//measure every hour
 				//output existing snow data
-				output.collect(new Text(stationID), new IntWritable(1));
-			}
-			else {
-				//estimate snow
+				//utput.collect(new Text(stationID), new IntWritable(1));
+				int startPosition = input.indexOf("AA101");
+				int endPosition = startPosition+10;
+
+				String precipitationData = input.substring(startPosition,endPosition);
+
+				//Which weather? Can help find snow condition between -1 and 3 °C, where it can rain or snow (or  both)
+				//See ish-format-document.pdf pages 26 to 32
+				String precipitationTypePresentAutomated = ""; // TODO
+				String precipitationTypePresentManual = ""; // TODO
+				String precipitationTypePastManual = ""; // TODO
+				String precipitationTypePastAutomated = ""; // TODO
+
+
+
+
+
+				float precipitationAmount = Float.parseFloat(precipitationData.substring(5,9));
+				int precipitationMeasureInterval = Integer.parseInt(precipitationData.substring(3, 5));
+
 			}
 
+
+			//no precipitation data
+
+		}
+
+		public float estimateSnowFall(float temperature, float hourlyPrecipitation, int precipitationType ){
+			//will use or temperature, or precipitation type to see if it is snow.
+			//then will compute the equivalent amount of snow based on the temperature
+
+			return 0;
 		}
 	}
 
