@@ -13,22 +13,24 @@ import org.apache.hadoop.mapred.*;
  */
 /*
 * INPUT: raw data form NOAA
-* OUTPUT: each station that contains information with the given identifier + number of records of this information for each station
+* OUTPUT: each station that contains information with the given identifier + number of records of this information
+* for each station
  */
 public class FindSnowStations {
 
 
 	public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
 
-		public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
+		public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output,
+		                Reporter reporter) throws IOException {
 
 
 			String input = value.toString();
 
 			//for generalization, replace AJ1 by the desired identifier
 			//AJ1: identifier for snow depth (if any)
-			if(input.contains("AJ1")){
-				String stationID = input.substring(4,10);
+			if (input.contains("AJ1")) {
+				String stationID = input.substring(4, 10);
 				output.collect(new Text(stationID), new IntWritable(1));
 			}
 
@@ -38,17 +40,17 @@ public class FindSnowStations {
 	public static class Reduce extends MapReduceBase implements Reducer<Text, IntWritable, Text, Text> {
 
 
-
-		public void reduce(Text key, Iterator<IntWritable> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+		public void reduce(Text key, Iterator<IntWritable> values, OutputCollector<Text, Text> output,
+		                   Reporter reporter) throws IOException {
 
             /*
-             * Each key-value pair is of kind: "year-month" - {43, 50, 60, 30, 20, 0}. Values are all measured depth in the time period given by the key
+             * Each key-value pair is of kind: "year-month" - {43, 50, 60, 30, 20, 0}. Values are all measured depth
+             * in the time period given by the key
              */
 
 			int nb = 0;
 
-			while(values.hasNext())
-			{
+			while (values.hasNext()) {
 				values.next();
 				nb++;
 			}
@@ -62,11 +64,10 @@ public class FindSnowStations {
 	}
 
 
-
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) throws Exception{
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 
 		//Path p = new Path(args[1]);
@@ -95,7 +96,6 @@ public class FindSnowStations {
 
 		JobClient.runJob(conf1);
 	}
-
 
 
 }
