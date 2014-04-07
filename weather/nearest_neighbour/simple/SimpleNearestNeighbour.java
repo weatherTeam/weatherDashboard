@@ -7,7 +7,7 @@ import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapred.*;
 
-public class SimpleNearestNeighbour {
+public class NearestNeighbourSimple {
     
     public static class NNMapper1 extends MapReduceBase implements Mapper<LongWritable, Text, Text, DoubleWritable> {
         
@@ -27,6 +27,22 @@ public class SimpleNearestNeighbour {
     }
     
     public static class NNReducer1 extends MapReduceBase implements Reducer<Text, DoubleWritable, Text, DoubleWritable> {   
+
+        private double mean;
+        private int count;
+        
+        public void reduce(Text key, Iterator<DoubleWritable> values, OutputCollector<Text, DoubleWritable> output, Reporter reporter)
+                     throws IOException {
+                mean = 0;
+                count = 0;
+                while (values.hasNext()){
+                    mean += values.next().get();
+                    count++;
+                }
+                mean = mean/count;
+                output.collect(key, new DoubleWritable(mean));
+            }
+        }
     
     public static class NNMapper2 extends MapReduceBase implements Mapper<LongWritable, Text, IntWritable, Text> {
         
@@ -42,7 +58,9 @@ public class SimpleNearestNeighbour {
             date = lineArray[0].split("\\p{Punct}");
 
             year = Integer.parseInt(date[1]);
+
             month = date[0];
+            
             temp = lineArray[1];
             
             output.collect(new IntWritable(year), new Text(month+";" +temp));
@@ -50,8 +68,7 @@ public class SimpleNearestNeighbour {
     }
     
     public static class NNReducer2 extends MapReduceBase implements Reducer<IntWritable, Text, IntWritable, DoubleWritable> {   
-       
-        // Year to compare with. Just hardcoded for now 
+        
         private double[] year2013 = {-10.683333333333332, -7.933333333333334, -7.883333333333334, -0.6666666666666666, 
                 7.8166666666666655, 10.383333333333333, 13.700000000000001, 11.450000000000001, 7.716666666666666, 2.766666666666667,
                 -2.066666666666667, -2.6142857142857143};
@@ -59,7 +76,7 @@ public class SimpleNearestNeighbour {
         private int month;
         private String[] textArray;
         
-        private double distance; 
+        private double distance;
         
         public void reduce(IntWritable key, Iterator<Text> values, OutputCollector<IntWritable, DoubleWritable> output, Reporter reporter)
                      throws IOException {
@@ -101,6 +118,9 @@ public class SimpleNearestNeighbour {
           
           JobConf conf2 = new JobConf(NearestNeighbourSimple.class);
           conf2.setJobName("NN simple phase 2");
+
+          //conf2.setMapOutputKeyClass(IntWritable.class);
+          //conf2.setMapOutputKeyClass(Text.class);
           
           conf2.setOutputKeyClass(IntWritable.class);
           conf2.setOutputValueClass(Text.class);
@@ -124,3 +144,4 @@ public class SimpleNearestNeighbour {
     }
 
 }
+
