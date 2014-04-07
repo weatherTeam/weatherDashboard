@@ -18,8 +18,8 @@ public class FirstReducer extends MapReduceBase implements Reducer<IntWritable, 
 	
 	public void configure(JobConf job) {
 		WIND_TRESHOLD = Integer.parseInt(job.get("WIND_TRESHOLD"));
-	*/
-	}
+	
+	}*/
 	@Override
 	public void reduce(IntWritable inputKey, Iterator<Text> inputValue, OutputCollector<IntWritable, Text> output, Reporter arg3)
 			throws IOException
