@@ -76,7 +76,8 @@ public class WikiFilter {
 				Matcher matcherKeyword = categoryIsRelevantRegex
 						.matcher(currentCategory.toLowerCase());
 				if (matcherKeyword.find()) {
-					output.collect(new Text(matcherKeyword.group(1)), new Text(
+					int random = (int) (Math.random() * 10);
+					output.collect(new Text(matcherKeyword.group(1)+""+random), new Text(
 							XMLString));
 					break;
 				}
