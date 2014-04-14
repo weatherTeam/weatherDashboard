@@ -21,7 +21,6 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 
 import weather.wikipedia.inputFormat.XMLInputFormat;
@@ -104,18 +103,28 @@ public class WikiExtract {
 
 	// Takes an article as an XML fragment as input, output it only if relevant.
 	public static class WEMap extends MapReduceBase implements
-			Mapper<LongWritable, Text, Text, Text> {
+			Mapper<LongWritable, Text, Text, WeatherEvent> {
 
 		@Override
 		public void map(LongWritable key, Text value,
-				OutputCollector<Text, Text> output, Reporter reporter)
+				OutputCollector<Text, WeatherEvent> output, Reporter reporter)
 				throws IOException {
+			
+			
+			//Info we have to find:
+			String title = "";
+			String category = "";
+			String startDate = "";
+			String endDate = "";
+			String location = "";
+			
+			
 			String XMLString = value.toString();
 
 			// Extracting stuff from title
 			Matcher matcherTitle = titleRegex.matcher(XMLString);
 			matcherTitle.find();
-			String title = matcherTitle.group(1);
+			title = matcherTitle.group(1);
 
 			String month = "";
 
@@ -155,18 +164,18 @@ public class WikiExtract {
 			if (!infobox.equals("")) {
 				// System.out.println(title+": \n"+infobox);
 
-				Pattern startDate = Pattern.compile("formed.*=(.*)\n");
+				Pattern startDatePattern = Pattern.compile("formed.*=(.*)\n");
 				String start = "";
 
-				Matcher matcherStart = startDate.matcher(infobox.toLowerCase());
+				Matcher matcherStart = startDatePattern.matcher(infobox.toLowerCase());
 				if (matcherStart.find()) {
 					start = matcherStart.group(1);
 				}
 
-				Pattern endDate = Pattern.compile("dissipated.*=(.*)\n");
+				Pattern endDatePattern = Pattern.compile("dissipated.*=(.*)\n");
 				String end = "";
 
-				Matcher matcherEnd = endDate.matcher(infobox.toLowerCase());
+				Matcher matcherEnd = endDatePattern.matcher(infobox.toLowerCase());
 				if (matcherEnd.find()) {
 					end = matcherEnd.group(1);
 				}
@@ -188,23 +197,25 @@ public class WikiExtract {
 			// Extracting stuff from article's body
 			// TODO
 
+			
+			output.collect(new Text(category), new WeatherEvent(title, category, startDate, endDate, location));
 		}
 	}
 
 	// Combine all XML format of articles from a category in a valid XML
 	// document
 	public static class WEReduce extends MapReduceBase implements
-			Reducer<Text, Text, Text, Text> {
+			Reducer<Text, WeatherEvent, Text, WeatherEvent> {
 
 		@Override
-		public void reduce(Text key, Iterator<Text> values,
-				OutputCollector<Text, Text> output, Reporter reporter)
+		public void reduce(Text key, Iterator<WeatherEvent> values,
+				OutputCollector<Text, WeatherEvent> output, Reporter reporter)
 				throws IOException {
 
 			while (values.hasNext()) {
 				// TODO Add result to a database or something (or store
 				// everything in a csv, i don't know)
-				// output.collect(key, values.next());
+				output.collect(key, values.next());
 			}
 
 		}
@@ -218,13 +229,9 @@ public class WikiExtract {
 		@Override
 		protected String generateFileNameForKeyValue(Text key, Text value,
 				String name) {
-			return key.toString() + ".xml";
+			return key.toString() + ".csv";
 		}
-
-		@Override
-		protected Text generateActualKey(Text key, Text value) {
-			return new Text("");
-		}
+		
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -239,7 +246,7 @@ public class WikiExtract {
 		conf.setJobName("Wikipedia filtering");
 		// TODO check how many available on server
 		conf.setNumMapTasks(88);
-		conf.setNumReduceTasks(176);
+		conf.setNumReduceTasks(1);
 
 		conf.setMapOutputKeyClass(Text.class);
 		conf.setMapOutputValueClass(Text.class);
@@ -252,7 +259,7 @@ public class WikiExtract {
 		conf.set("xmlinput.end", "</page>");
 
 		// conf.setOutputFormat(MultiFileOutput.class);
-		conf.setOutputFormat(TextOutputFormat.class);
+		conf.setOutputFormat(MultiFileOutput.class);
 
 		FileInputFormat.setInputPaths(conf, new Path(args[0]));
 		FileOutputFormat.setOutputPath(conf, new Path(args[1]));
