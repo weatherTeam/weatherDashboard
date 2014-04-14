@@ -13,7 +13,7 @@ public class OutputTemperatureAnomaliesReducer extends MapReduceBase implements
 	public void reduce(Text key, Iterator<Text> values,
 			OutputCollector<Text, Text> output, Reporter reporter)
 			throws IOException {
-		// TODO : is sorting necessary here ?
+		// TODO : is sorting necessary here ? -> Yes
 		while (values.hasNext()) {
 			output.collect(key, values.next());
 		}
