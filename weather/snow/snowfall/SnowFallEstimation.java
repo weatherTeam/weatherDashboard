@@ -151,8 +151,8 @@ public class SnowFallEstimation {
 
 						try {
 							int indexOfAA1 = input.indexOf("AA1");
-							precipitationAmount = Float.parseFloat(
-									input.substring(indexOfAA1 + 3 + 2, indexOfAA1 + 3 + 2 + 4)) / 10;
+							String precipitationString = input.substring(indexOfAA1 + 3 + 2, indexOfAA1 + 3 + 2 + 4);
+							precipitationAmount = Float.parseFloat(precipitationString) / 10;
 							cumulationFromRain = estimateSnowFall(temperature, precipitationAmount);
 							containsDataFromRain = cumulationFromRain > 0;
 						} catch (NumberFormatException e) {
@@ -363,7 +363,7 @@ class SnowData {
 	}
 
 	public void setTemperature(float temp) {
-		if (temp < 0) {
+		if (temp == NO_TEMPERATURE_PROVIDED) {
 			temperature = "**";
 		} else {
 			temperature = "" + temp;
