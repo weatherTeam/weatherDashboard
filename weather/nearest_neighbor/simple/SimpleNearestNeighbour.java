@@ -1,4 +1,4 @@
-package weather.nearest_neighbour.simple;
+package weather.nearest_neighbor.simple;
 
 import java.io.IOException;
 import java.util.*;
@@ -7,7 +7,7 @@ import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapred.*;
 
-public class NearestNeighbourSimple {
+public class SimpleNearestNeighbour {
     
     public static class NNMapper1 extends MapReduceBase implements Mapper<LongWritable, Text, Text, DoubleWritable> {
         
@@ -97,7 +97,7 @@ public class NearestNeighbourSimple {
         }
     
     public static void main(String[] args) throws Exception {
-          JobConf conf1 = new JobConf(NearestNeighbourSimple.class);
+          JobConf conf1 = new JobConf(SimpleNearestNeighbour.class);
           conf1.setJobName("NN simple phase 1");
 
           
@@ -116,7 +116,7 @@ public class NearestNeighbourSimple {
           conf1.setNumMapTasks(1);
           conf1.setNumReduceTasks(1);
           
-          JobConf conf2 = new JobConf(NearestNeighbourSimple.class);
+          JobConf conf2 = new JobConf(SimpleNearestNeighbour.class);
           conf2.setJobName("NN simple phase 2");
 
           //conf2.setMapOutputKeyClass(IntWritable.class);
