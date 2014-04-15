@@ -30,16 +30,19 @@ public class SnowFallEstimation {
 
 			String input = value.toString();
 
+			//as soon as data are computed / found, it is set to true
+			//This is used to avoid emiting a key/value in case all string to number conversions fail.
+			boolean containsData = false;
 
 			//for position: if in document there is 13-15, in java, we write 12-15.
 			//the first changes because in java the index begin at 0 and in document at 1.
 			//the second changes because in java, substring(a,b) is: from a included to b excluded
 
 
-			//First check if there enough data.
+			//First check if there enough data. (Need snowdepth OR precipitation amount)
 			//We need at least the snowDepth (AJ1) or precipitation (AA1). Otherwise,
 			// it is not possible to compute anything
-			if (input.contains("AJ1") || input.contains("AA1")) {
+			if ((input.indexOf("AJ1") != -1) || (input.indexOf("AA1") != -1)) {
 
 
 				String stationID = input.substring(4, 10);
@@ -61,7 +64,7 @@ public class SnowFallEstimation {
 				String tempString = input.substring(87, 92);
 				float temperature = 0;
 				try {
-					temperature = Float.parseFloat(tempString);
+					temperature = Float.parseFloat(tempString) / 10; //divide by 10 because of scaling factor (see ish)
 				} catch (NumberFormatException e) {
 					temperature = SnowData.NO_TEMPERATURE_PROVIDED;
 				}
@@ -73,7 +76,7 @@ public class SnowFallEstimation {
 				int cumulationFromSnowDepth = SnowData.NO_SNOW_INFO;
 				int cumulationFromRain = SnowData.NO_SNOW_INFO;
 				int snowDepth = SnowData.NO_SNOW_INFO;
-				int precipitationAmount = SnowData.NO_SNOW_INFO;
+				float precipitationAmount = SnowData.NO_SNOW_INFO;
 
 				//Snow depth is given: compare with the last known snow depth
 				if (input.contains("AJ1")) {
@@ -86,6 +89,7 @@ public class SnowFallEstimation {
 						int newDepth = Integer.parseInt(input.substring(startPosition, endPosition));
 
 						cumulationFromSnowDepth = newDepth - lastDepth;
+						containsData = true;
 
 					} catch (NumberFormatException e) {
 						cumulationFromSnowDepth = SnowData.NO_SNOW_INFO;
@@ -121,9 +125,10 @@ public class SnowFallEstimation {
 
 						try {
 							int indexOfAA1 = input.indexOf("AA1");
-							precipitationAmount = Integer.parseInt(
-									input.substring(indexOfAA1 + 3 + 2, indexOfAA1 + 3 + 2 + 4));
+							precipitationAmount = Float.parseFloat(
+									input.substring(indexOfAA1 + 3 + 2, indexOfAA1 + 3 + 2 + 4)) / 10;
 							cumulationFromRain = estimateSnowFall(temperature, precipitationAmount);
+							containsData = true;
 						} catch (NumberFormatException e) {
 							cumulationFromRain = SnowData.NO_SNOW_INFO;
 							precipitationAmount = SnowData.NO_SNOW_INFO;
@@ -131,18 +136,20 @@ public class SnowFallEstimation {
 					}
 
 
-
-
-
 				} //end if (input.contains("AA101") || input.contains("AA102") || input.contains("AA101"))
 
-				SnowData sd = new SnowData();
-				sd.setSnowDepth(snowDepth);
-				sd.setSnowFallFromRain(cumulationFromRain);
-				sd.setSnowFallFromSnowDepth(cumulationFromSnowDepth);
-				sd.setPrecipitation(precipitationAmount);
+				if(containsData) {
+					SnowData sd = new SnowData();
+					sd.setSnowDepth(snowDepth);
+					sd.setSnowFallFromRain(cumulationFromRain);
+					sd.setSnowFallFromSnowDepth(cumulationFromSnowDepth);
+					sd.setPrecipitation(precipitationAmount);
+					sd.setTemperature(temperature);
 
-				output.collect(new Text(outKey), new Text(sd.toString()));
+					output.collect(new Text(outKey), new Text(sd.toString()));
+
+					System.out.println(outKey + "\t" + input.contains("AJ1") + "\t" + input.contains("AA1"));
+				}
 
 			} //end if (input.contains("AJ1") || input.contains("AA1"))
 
@@ -152,7 +159,7 @@ public class SnowFallEstimation {
 		/*
 			Estimate how much snow fall during the last precipitation, knowing the amount in water
 		 */
-		public int estimateSnowFall(float temperature, int precipitationAmount) {
+		public int estimateSnowFall(float temperature, float precipitationAmount) {
 			//will use or temperature, or precipitation type to see if it is snow.
 			//then will compute the equivalent amount of snow based on the temperature
 
@@ -195,8 +202,6 @@ public class SnowFallEstimation {
 				nb++;
 				output.collect(key, v);
 			}
-
-
 
 
 		}
@@ -256,37 +261,38 @@ class SnowData {
 	private String snowFallFromSnowDepth;
 	private String snowFallFromRain;
 	private String precipitation;
+	private String temperature;
 
 	//CONSTRUCTOR
 
-	public SnowData(String snowDepth, String snowFalFromDepth,
-	                String snowFallFromRain) {
-		try {
-
-			if (NumberUtils.isNumber(snowDepth)) {
-				this.snowDepth = snowDepth;
-			} else {
-				//no temperature provided, set it to 30000;
-				this.snowDepth = "**";
-			}
-
-			if (NumberUtils.isNumber(snowFalFromDepth)) {
-				this.snowFallFromSnowDepth = snowFalFromDepth;
-			} else {
-				//no temperature provided, set it to 30000;
-				this.snowFallFromSnowDepth = "**";
-			}
-
-			if (NumberUtils.isNumber(snowFallFromRain)) {
-				this.snowFallFromRain = snowFallFromRain;
-			} else {
-				//no temperature provided, set it to 30000;
-				this.snowFallFromRain = "**";
-			}
-		} catch (NumberFormatException e) {
-
-		}
-	}
+//	public SnowData(String snowDepth, String snowFalFromDepth,
+//	                String snowFallFromRain) {
+//		try {
+//
+//			if (NumberUtils.isNumber(snowDepth)) {
+//				this.snowDepth = snowDepth;
+//			} else {
+//				//no temperature provided, set it to 30000;
+//				this.snowDepth = "**";
+//			}
+//
+//			if (NumberUtils.isNumber(snowFalFromDepth)) {
+//				this.snowFallFromSnowDepth = snowFalFromDepth;
+//			} else {
+//				//no temperature provided, set it to 30000;
+//				this.snowFallFromSnowDepth = "**";
+//			}
+//
+//			if (NumberUtils.isNumber(snowFallFromRain)) {
+//				this.snowFallFromRain = snowFallFromRain;
+//			} else {
+//				//no temperature provided, set it to 30000;
+//				this.snowFallFromRain = "**";
+//			}
+//		} catch (NumberFormatException e) {
+//
+//		}
+//	}
 
 	public SnowData() {
 	}
@@ -317,6 +323,21 @@ class SnowData {
 		}
 	}
 
+	public String getTemperature() {
+		return temperature;
+	}
+
+	public void setTemperature(String temperature) {
+		this.temperature = temperature;
+	}
+
+	public void setTemperature(float temp) {
+		if (temp < 0) {
+			temperature = "**";
+		} else {
+			temperature = "" + temp;
+		}
+	}
 
 	public String getSnowDepth() {
 		return snowDepth;
@@ -350,19 +371,18 @@ class SnowData {
 		this.precipitation = precipitation;
 	}
 
-	public void setPrecipitation(int p){
-		if(p < 0){
+	public void setPrecipitation(float p) {
+		if (p < 0) {
 			this.precipitation = "**";
-		}
-		else {
+		} else {
 			this.precipitation = "" + p;
 		}
 	}
 
 
-
-	public String toString(){
-		return snowDepth + "\t"+ snowFallFromSnowDepth + "\t" + precipitation +" \t" +  snowFallFromRain;
+	public String toString() {
+		return temperature + "\t" + snowDepth + "\t" + snowFallFromSnowDepth + "\t" + precipitation + " \t" +
+				snowFallFromRain;
 	}
 
 
