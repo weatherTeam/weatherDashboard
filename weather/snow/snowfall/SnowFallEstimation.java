@@ -97,6 +97,8 @@ public class SnowFallEstimation {
 
 				}
 
+
+
 				//RAIN: AA1
 				//estimate from rain (AA1xx, is rain, measure during interval xx hours
 				//unity: mm
@@ -128,7 +130,7 @@ public class SnowFallEstimation {
 							precipitationAmount = Float.parseFloat(
 									input.substring(indexOfAA1 + 3 + 2, indexOfAA1 + 3 + 2 + 4)) / 10;
 							cumulationFromRain = estimateSnowFall(temperature, precipitationAmount);
-							containsData = true;
+							containsData = cumulationFromRain > 0;
 						} catch (NumberFormatException e) {
 							cumulationFromRain = SnowData.NO_SNOW_INFO;
 							precipitationAmount = SnowData.NO_SNOW_INFO;
