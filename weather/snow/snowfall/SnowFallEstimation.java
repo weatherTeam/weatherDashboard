@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Iterator;
 
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapred.*;
@@ -23,6 +22,10 @@ public class SnowFallEstimation {
 	public static class MapPreprocessing extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
 		int lastDepth = -1;
+		//number of hours since the s
+		int lastDepthTime = 0;
+		//Number of hours after which the lastDepth is not considered to compute the snow cumulation. After that, we condider that it is not enough precise any more (melt, wind, etc may decrease the snow depth)
+		final int SNOW_DEPTH_DISCARD_TIME = 12;
 
 		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output,
 		                Reporter reporter) throws IOException {
@@ -30,9 +33,13 @@ public class SnowFallEstimation {
 
 			String input = value.toString();
 
+			//increase counter
+			lastDepthTime ++;
+
 			//as soon as data are computed / found, it is set to true
 			//This is used to avoid emiting a key/value in case all string to number conversions fail.
-			boolean containsData = false;
+			boolean containsDataFromSnowDepth = false;
+			boolean containsDataFromRain = false;
 
 			//for position: if in document there is 13-15, in java, we write 12-15.
 			//the first changes because in java the index begin at 0 and in document at 1.
@@ -79,20 +86,26 @@ public class SnowFallEstimation {
 				float precipitationAmount = SnowData.NO_SNOW_INFO;
 
 				//Snow depth is given: compare with the last known snow depth
-				if (input.contains("AJ1")) {
-					//System.out.println(input);
+				if (input.indexOf("AJ1") != -1) {
+					System.out.println("AJ1");
 					int startPosition = input.indexOf("AJ1") + 3; //start of depth value AJ1xxxx, xxxx is the depth
 					int endPosition = startPosition + 4;
 
 
 					try {
+						System.out.println("SNOW DEPTH : "  + input.substring(startPosition, endPosition));
 						int newDepth = Integer.parseInt(input.substring(startPosition, endPosition));
 
-						cumulationFromSnowDepth = newDepth - lastDepth;
-						containsData = true;
+						if(lastDepth != SnowData.NO_SNOW_INFO && lastDepthTime <= SNOW_DEPTH_DISCARD_TIME) {
+							cumulationFromSnowDepth = newDepth - lastDepth;
+							containsDataFromSnowDepth = true;
+						}
+						lastDepth = newDepth;
+						lastDepthTime = 0;
 
 					} catch (NumberFormatException e) {
 						cumulationFromSnowDepth = SnowData.NO_SNOW_INFO;
+						lastDepth = SnowData.NO_SNOW_INFO;
 					}
 
 				}
@@ -103,7 +116,7 @@ public class SnowFallEstimation {
 				//estimate from rain (AA1xx, is rain, measure during interval xx hours
 				//unity: mm
 
-				if (input.contains("AA101") || input.contains("AA102") || input.contains("AA101")) {
+				if (input.indexOf("AA101") != -1 || input.indexOf("AA102")!=-1 || input.indexOf("AA101") != -1) {
 
 					//Which weather? Can help find snow condition between -1 and 3 °C, where it can rain or snow (or
 					// both)
@@ -130,7 +143,7 @@ public class SnowFallEstimation {
 							precipitationAmount = Float.parseFloat(
 									input.substring(indexOfAA1 + 3 + 2, indexOfAA1 + 3 + 2 + 4)) / 10;
 							cumulationFromRain = estimateSnowFall(temperature, precipitationAmount);
-							containsData = cumulationFromRain > 0;
+							containsDataFromRain = cumulationFromRain > 0 ;
 						} catch (NumberFormatException e) {
 							cumulationFromRain = SnowData.NO_SNOW_INFO;
 							precipitationAmount = SnowData.NO_SNOW_INFO;
@@ -140,7 +153,7 @@ public class SnowFallEstimation {
 
 				} //end if (input.contains("AA101") || input.contains("AA102") || input.contains("AA101"))
 
-				if(containsData) {
+				if(containsDataFromSnowDepth || containsDataFromRain) {
 					SnowData sd = new SnowData();
 					sd.setSnowDepth(snowDepth);
 					sd.setSnowFallFromRain(cumulationFromRain);
