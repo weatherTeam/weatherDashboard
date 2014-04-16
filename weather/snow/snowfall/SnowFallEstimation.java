@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Iterator;
 
+import org.apache.commons.collections.bag.SynchronizedSortedBag;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapred.*;
@@ -86,7 +87,7 @@ public class SnowFallEstimation {
 
 
 				int cumulationFromSnowDepth = SnowData.NO_SNOW_INFO;
-				int cumulationFromRain = SnowData.NO_SNOW_INFO;
+				float cumulationFromRain = SnowData.NO_SNOW_INFO;
 				int snowDepth = SnowData.NO_SNOW_INFO;
 				float precipitationAmount = SnowData.NO_SNOW_INFO;
 
@@ -175,6 +176,7 @@ public class SnowFallEstimation {
 					output.collect(new Text(outKey), new Text(sd.toString()));
 
 					System.out.println(outKey + "\t" + input.contains("AJ1") + "\t" + input.contains("AA1"));
+					System.out.println(sd.toString());
 				}
 
 			} //end if (input.contains("AJ1") || input.contains("AA1"))
@@ -185,7 +187,7 @@ public class SnowFallEstimation {
 		/*
 			Estimate how much snow fall during the last precipitation, knowing the amount in water
 		 */
-		public int estimateSnowFall(float temperature, float precipitationAmount) {
+		public float estimateSnowFall(float temperature, float precipitationAmount) {
 			//will use or temperature, or precipitation type to see if it is snow.
 			//then will compute the equivalent amount of snow based on the temperature
 
@@ -197,8 +199,9 @@ public class SnowFallEstimation {
 			// 	-12.2 t -17.8   => 40
 			// -17.8 to -28.9   => 50
 			// 	-28.9 to -40    => 100
-			float tempTest[] = {1.1f, -2.2f, -6.7f, -9.4f, -12.2f, -17.8f, -29, -40};
-			int ratioTab[] = {0, 10, 15, 20, 30, 40, 50, 100};
+			//lower => suppose also 100 (but this case should be rare)
+			float tempTest[] = {1.1f, -2.2f, -6.7f, -9.4f, -12.2f, -17.8f, -29};
+			int ratioTab[] = {10, 15, 20, 30, 40, 50, 100};
 			int ratio = 0;
 			for (int i = 0; i < tempTest.length; i++) {
 				if (temperature < tempTest[i]) {
@@ -206,7 +209,7 @@ public class SnowFallEstimation {
 				}
 			}
 
-			return Math.round(precipitationAmount * ratio);
+			return precipitationAmount * ratio;
 
 		}
 	}
@@ -346,7 +349,7 @@ class SnowData {
 		}
 	}
 
-	public void setSnowFallFromRain(int sn) {
+	public void setSnowFallFromRain(float sn) {
 		if (sn < 0) {
 			snowFallFromRain = "**";
 		} else {
