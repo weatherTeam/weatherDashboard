@@ -25,8 +25,8 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(averageMonth, new Path(args[0]));
           FileOutputFormat.setOutputPath(averageMonth, new Path("/tmp/averageMonth"));
           
-          averageMonth.setNumMapTasks(1);
-          averageMonth.setNumReduceTasks(1);
+          averageMonth.setNumMapTasks(2);
+          averageMonth.setNumReduceTasks(2);
           
           // Get averages for reference year (filter on one year)
           JobConf averageMonthYear = new JobConf(AdvancedNearestNeighbor.class);
@@ -42,7 +42,7 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(averageMonthYear, new Path("/tmp/averageMonth"));
           FileOutputFormat.setOutputPath(averageMonthYear, new Path("/tmp/averageMonthYear"));
           
-          averageMonthYear.setNumMapTasks(1);
+          averageMonthYear.setNumMapTasks(2);
           
 
           // Calculate distances job configuration
@@ -64,8 +64,8 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(calculateDistances, new Path("/tmp/averageMonth"));
           FileOutputFormat.setOutputPath(calculateDistances, new Path(args[1]));
           
-          calculateDistances.setNumMapTasks(1);
-          calculateDistances.setNumReduceTasks(1);
+          calculateDistances.setNumMapTasks(2);
+          calculateDistances.setNumReduceTasks(2);
   
           
           // Run jobs
