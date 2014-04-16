@@ -12,9 +12,10 @@ public class utils {
     // Read in reference year average values
 	static public int[] readInReferenceYear(String path_to_file) throws IOException{
 
-		Path pt = new Path("hdfs://localhost:54310"+path_to_file);
+		Path pt = new Path("hdfs://localhost:50070"+path_to_file);
 		FileSystem fs = FileSystem.get(new Configuration());
-		FileReader inputFile = new FileReader(path_to_file);
+		
+		//FileReader inputFile = new FileReader(path_to_file);
 		
 	    // BufferedReader bufferReader = new BufferedReader(inputFile);
 		BufferedReader bufferReader = new BufferedReader(new InputStreamReader(fs.open(pt)));
@@ -28,7 +29,6 @@ public class utils {
 	  	  month++;
 	    }
 	    bufferReader.close();
-	    inputFile.close();
 	    return referenceYearValues;
 
 	}
