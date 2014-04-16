@@ -69,8 +69,8 @@ public class AdvancedNearestNeighbor {
   
           
           // Run jobs
-          //JobClient.runJob(averageMonth);
-          //JobClient.runJob(averageMonthYear);
+          JobClient.runJob(averageMonth);
+          JobClient.runJob(averageMonthYear);
           JobClient.runJob(calculateDistances);
           
     }
