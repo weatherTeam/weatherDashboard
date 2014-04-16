@@ -21,7 +21,6 @@ public class AverageMonthReducer extends MapReduceBase implements
 		int t;
 		while (values.hasNext()) {
 			t = values.next().get();
-			System.out.println(t);
 			temperature += t;
 			nbRecords++;
 		}

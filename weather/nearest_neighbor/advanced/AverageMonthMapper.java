@@ -23,7 +23,7 @@ public class AverageMonthMapper extends MapReduceBase implements
 	String year = line.substring(15, 19);
 	int intYear = Integer.parseInt(year);
 	
-	String station = line.substring(4, 10);
+	//String station = line.substring(4, 10);
 	String month = line.substring(19, 21);
 	int airTemperature;
 	if (line.charAt(87) == '+') {

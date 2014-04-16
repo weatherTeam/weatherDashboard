@@ -37,18 +37,16 @@ public class AdvancedNearestNeighbor {
           
           averageMonthYear.set("referenceYear",args[2]);
           
-          averageMonthYear.setMapperClass(AverageMonthMapper.class);
-          averageMonthYear.setReducerClass(AverageMonthReducer.class);
+          averageMonthYear.setMapperClass(AverageMonthYearMapper.class);
 
           FileInputFormat.setInputPaths(averageMonthYear, new Path("/tmp/hadoop"));
           FileOutputFormat.setOutputPath(averageMonthYear, new Path(args[1]));
           
           averageMonthYear.setNumMapTasks(1);
-          averageMonthYear.setNumReduceTasks(1);
-          
+                    
           // Run jobs
           JobClient.runJob(averageMonth);
-          JobClient.runJob(averageMonth);
+          JobClient.runJob(averageMonthYear);
           
     }
 
