@@ -40,7 +40,6 @@ public class CalculateDistanceReducer extends MapReduceBase implements
     		station = key.toString().substring(0,6);
     		year = key.toString().substring(6,10);
             distance = 0.0;          
-    		//System.out.println(Arrays.toString(referenceYearValues));
             referenceYearValues = utils.readInReferenceYear(path_to_file);
             referenceYearStationValues = referenceYearValues.get(station);
 

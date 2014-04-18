@@ -12,7 +12,7 @@ public class utils {
 	static public Map<String,int[]> readInReferenceYear(String path_to_file) throws IOException{
 
 		//Path pt = new Path("hdfs://localhost:54310"+path_to_file);
-		Path pt = new Path("/tmp/averageMonthYear/part-00000");
+		//Path pt = new Path("/tmp/averageMonthYear/part-00000");
 		FileSystem fs = FileSystem.get(new Configuration());
 		
 		BufferedReader bufferReader = new BufferedReader(new InputStreamReader(fs.open(pt)));

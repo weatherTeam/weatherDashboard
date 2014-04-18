@@ -25,7 +25,7 @@ public class CalculateDistanceMapper extends MapReduceBase implements
 		String[] lineArray = value.toString().split("\\s+");
 		stationDate = lineArray[0];
 		temp = lineArray[1];
-		
+		System.out.println(stationDate);
 		station = stationDate.substring(0,6);
 		year = Integer.parseInt(stationDate.substring(6,10));
 		month = stationDate.substring(10,12);
