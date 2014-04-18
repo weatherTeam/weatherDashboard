@@ -11,8 +11,9 @@ public class utils {
     // Read in reference year average values
 	static public Map<String,int[]> readInReferenceYear(String path_to_file) throws IOException{
 
-		//Path pt = new Path("hdfs://localhost:54310"+path_to_file);
-		//Path pt = new Path("/tmp/averageMonthYear/part-00000");
+		//Path pt = new Path("hdfs://localhost:54310"+path_to_file); // personal server
+		Path pt = new Path("/tmp/averageMonthYear/part-00000"); // local
+		//Path pt = new Path("hdfs://icdatasrv5-priv:9000"+path_to_file); // icdataserver
 		FileSystem fs = FileSystem.get(new Configuration());
 		
 		BufferedReader bufferReader = new BufferedReader(new InputStreamReader(fs.open(pt)));

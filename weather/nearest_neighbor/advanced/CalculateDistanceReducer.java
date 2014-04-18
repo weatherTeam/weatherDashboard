@@ -42,15 +42,16 @@ public class CalculateDistanceReducer extends MapReduceBase implements
             distance = 0.0;          
             referenceYearValues = utils.readInReferenceYear(path_to_file);
             referenceYearStationValues = referenceYearValues.get(station);
-
-            while (values.hasNext()){
-                textArray = values.next().toString().split(";");
-                month = Integer.parseInt(textArray[0]);
-                temp = Double.parseDouble(textArray[1]);
+            if (referenceYearStationValues != null){
+            	while (values.hasNext() ){
+            		textArray = values.next().toString().split(";");
+            		month = Integer.parseInt(textArray[0]);
+            		temp = Double.parseDouble(textArray[1]);
                 
-                distance += Math.pow(referenceYearStationValues[month-1]-temp, 2);
+            		distance += Math.pow(referenceYearStationValues[month-1]-temp, 2);
+            	}
+            	distance = Math.sqrt(distance);
+            	output.collect(new Text(year), new DoubleWritable(distance));
             }
-            distance = Math.sqrt(distance);
-            output.collect(new Text(year), new DoubleWritable(distance));
         }
     }

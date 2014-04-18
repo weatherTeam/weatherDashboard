@@ -19,8 +19,6 @@ public class CalculateDistanceSumMapper extends MapReduceBase implements
 			OutputCollector<IntWritable, DoubleWritable> output, Reporter reporter)
 			throws IOException {
 		
-		System.out.println("foo");
-
 		String[] lineArray = value.toString().split("\\s+");
 		int year = Integer.parseInt(lineArray[0]);
 		double temp = Double.parseDouble(lineArray[1]);
