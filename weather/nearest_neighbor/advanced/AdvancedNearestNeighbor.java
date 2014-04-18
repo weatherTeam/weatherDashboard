@@ -1,6 +1,6 @@
 package weather.nearest_neighbor.advanced;
 
-import java.io.*;
+//import java.io.*;
 //import java.util.*;
 
 import org.apache.hadoop.fs.*;
@@ -14,7 +14,7 @@ public class AdvancedNearestNeighbor {
     	
     	  // All months averages
           JobConf averageMonth = new JobConf(AdvancedNearestNeighbor.class);
-          averageMonth.setJobName("NN advanced");
+          averageMonth.setJobName("Average Month Values");
 
           averageMonth.setOutputKeyClass(Text.class);
           averageMonth.setOutputValueClass(IntWritable.class);
@@ -25,12 +25,12 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(averageMonth, new Path(args[0]));
           FileOutputFormat.setOutputPath(averageMonth, new Path("/tmp/averageMonth"));
           
-          averageMonth.setNumMapTasks(176);
-          averageMonth.setNumReduceTasks(176);
+          averageMonth.setNumMapTasks(1);
+          averageMonth.setNumReduceTasks(1);
           
           // Get averages for reference year (filter on one year)
           JobConf averageMonthYear = new JobConf(AdvancedNearestNeighbor.class);
-          averageMonthYear.setJobName("NN advanced");
+          averageMonthYear.setJobName("Filter for specific year");
 
           averageMonthYear.setOutputKeyClass(Text.class);
           averageMonthYear.setOutputValueClass(IntWritable.class);
@@ -42,17 +42,17 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(averageMonthYear, new Path("/tmp/averageMonth"));
           FileOutputFormat.setOutputPath(averageMonthYear, new Path("/tmp/averageMonthYear"));
           
-          averageMonthYear.setNumMapTasks(20);
+          averageMonthYear.setNumMapTasks(1);
           
 
           // Calculate distances job configuration
           JobConf calculateDistances = new JobConf(AdvancedNearestNeighbor.class);
           calculateDistances.setJobName("Calculate Distances");
           
-          calculateDistances.setOutputKeyClass(IntWritable.class);
+          calculateDistances.setOutputKeyClass(Text.class);
           calculateDistances.setOutputValueClass(DoubleWritable.class);
           
-          calculateDistances.setMapOutputKeyClass(IntWritable.class);
+          calculateDistances.setMapOutputKeyClass(Text.class);
           calculateDistances.setMapOutputValueClass(Text.class);
           
           calculateDistances.setMapperClass(CalculateDistanceMapper.class);
@@ -64,13 +64,13 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(calculateDistances, new Path("/tmp/averageMonth"));
           FileOutputFormat.setOutputPath(calculateDistances, new Path(args[1]));
           
-          calculateDistances.setNumMapTasks(30);
+          calculateDistances.setNumMapTasks(1);
           calculateDistances.setNumReduceTasks(1);
   
           
           // Run jobs
-          JobClient.runJob(averageMonth);
-          JobClient.runJob(averageMonthYear);
+          //JobClient.runJob(averageMonth);
+          //JobClient.runJob(averageMonthYear);
           JobClient.runJob(calculateDistances);
           
     }
