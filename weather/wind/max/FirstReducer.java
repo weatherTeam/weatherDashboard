@@ -18,27 +18,37 @@ public class FirstReducer extends MapReduceBase implements Reducer<IntWritable, 
 	
 	public void configure(JobConf job) {
 		WIND_TRESHOLD = Integer.parseInt(job.get("WIND_TRESHOLD"));
-	
 	}*/
+	
 	@Override
-	public void reduce(IntWritable inputKey, Iterator<Text> inputValue, OutputCollector<IntWritable, Text> output, Reporter arg3)
+	public void reduce(IntWritable inputKey, Iterator<Text> inputValue,
+			OutputCollector<IntWritable, Text> output, Reporter arg3)
 			throws IOException
 	{	
-		ArrayList<String> xtremWindInfo = new ArrayList<String>();
+		// substring infos:
+		// ID 0-6
+		// date 6-18
+		// geoloc 18-30
+		// wind 30-34
+		// rain 34-??
+		
+		// input = id + date + geoloc + wind + rain
+
+		final ArrayList<String> xtremWindInfo = new ArrayList<String>();
 		
 		while(inputValue.hasNext())
 		{
 			String infoString = inputValue.next().toString();
 			int wind = Integer.parseInt(infoString.substring(30, 34));
 			
-			if (wind > WIND_TRESHOLD)
+			if (wind > WIND_TRESHOLD) // rainFall > RAIN_TRESHOLD
 				xtremWindInfo.add(infoString);
 		}
 		
 		for(int i=0; i<xtremWindInfo.size(); i++)
 		{
-			IntWritable outputKey = new IntWritable(Integer.parseInt(xtremWindInfo.get(i).substring(30, 34)));
-			Text outputValue = new Text(xtremWindInfo.get(i).substring(0, 29));
+			IntWritable outputKey = new IntWritable(Integer.parseInt(xtremWindInfo.get(i).substring(6, 14)));
+			Text outputValue = new Text(xtremWindInfo.get(i));
 			output.collect(outputKey, outputValue);
 		}
 	}
