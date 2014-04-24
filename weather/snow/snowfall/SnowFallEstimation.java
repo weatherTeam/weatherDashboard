@@ -98,6 +98,8 @@ public class SnowFallEstimation {
 				float precipitationAmount = SnowData.NO_SNOW_INFO;
 
 				//SNOW_DEPTH is given: compare with the last known snow depth
+				//UNIT: cm
+				//SCALING FACTOR: 1
 				if (input.indexOf("AJ1") != -1) {
 					//System.out.println("AJ1");
 					int startPosition = input.indexOf("AJ1") + 3; //start of depth value AJ1xxxx, xxxx is the depth
@@ -107,21 +109,26 @@ public class SnowFallEstimation {
 					try {
 						System.out.println("SNOW DEPTH : " + input.substring(startPosition, endPosition));
 						int newDepth = Integer.parseInt(input.substring(startPosition, endPosition));
-						snowDepth = newDepth;
 
-						if (lastDepth != SnowData.NO_SNOW_INFO) {
-							cumulationFromSnowDepth = newDepth - lastDepth;
+						//9999 = missing (ish-format-document)
+						if(newDepth != 9999) {
+							snowDepth = newDepth;
 
-							//snow cumulation is >= 0, otherwise, it is only melt, which should not decrease the snow
-							// cumulation. We just update the lastSnowDepth value
-							//TODO: if data starts from lets say 1st september, then we can consider snow depth = 0
-							//if start from 1st january, then we do not consider the first day, which will serve as an initial value
-							if (cumulationFromSnowDepth >= 0) {
-								containsDataFromSnowDepth = true;
+							if (lastDepth != SnowData.NO_SNOW_INFO) {
+								cumulationFromSnowDepth = newDepth - lastDepth;
+
+								//snow cumulation is >= 0, otherwise, it is only melt, which should not decrease the snow
+
+								// cumulation. We just update the lastSnowDepth value
+								//TODO: if data starts from lets say 1st september, then we can consider snow depth = 0
+								//if start from 1st january, then we do not consider the first day, which will serve as an initial value
+								if (cumulationFromSnowDepth >= 0) {
+									containsDataFromSnowDepth = true;
+								}
 							}
+							lastDepth = newDepth;
+							lastDepthTime = 0;
 						}
-						lastDepth = newDepth;
-						lastDepthTime = 0;
 
 					} catch (NumberFormatException e) {
 						cumulationFromSnowDepth = SnowData.NO_SNOW_INFO;
@@ -132,9 +139,10 @@ public class SnowFallEstimation {
 
 
 				//RAIN: AA1
-				//estimate from rain (AA1xx, is rain, measure during interval xx hours
-				//unity: mm
-				if (input.indexOf("AA101") != -1 || input.indexOf("AA102") != -1 || input.indexOf("AA101") != -1) {
+				//estimate from rain (AA1xx, is rain, measure during interval xx hours)
+				//UNIT: mm
+				//SCALING FACTOR: 10
+				if (input.indexOf("AA101") != -1 || input.indexOf("AA102") != -1 || input.indexOf("AA103") != -1) {
 
 					//Which weather? Can help find snow condition between -1 and 3 °C, where it can rain or snow (or
 					// both)
@@ -168,9 +176,17 @@ public class SnowFallEstimation {
 									precipitationType.equals("08")) && temperature > 1.1){
 								temperature = 1.1f;
 							}
-							precipitationAmount = Float.parseFloat(precipitationString) / 10;
-							cumulationFromRain = estimateSnowFall(temperature, precipitationAmount);
-							containsDataFromRain = cumulationFromRain > 0;
+
+							if(precipitationString.equals("9999") == false ) {
+								precipitationAmount = Float.parseFloat(precipitationString) / 10; //scaling factor inverse
+								cumulationFromRain = estimateSnowFall(temperature, precipitationAmount);
+								containsDataFromRain = cumulationFromRain > 0;
+							}
+							else
+							{
+								cumulationFromRain = SnowData.NO_SNOW_INFO;
+								precipitationAmount = SnowData.NO_SNOW_INFO;
+							}
 						} catch (NumberFormatException e) {
 							cumulationFromRain = SnowData.NO_SNOW_INFO;
 							precipitationAmount = SnowData.NO_SNOW_INFO;
