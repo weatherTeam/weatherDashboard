@@ -1,14 +1,14 @@
 package weather.snow.snowfall;
 
-import java.io.*;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.*;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Iterator;
-
-import org.apache.commons.collections.bag.SynchronizedSortedBag;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapred.*;
 
 
 /**
@@ -17,10 +17,15 @@ import org.apache.hadoop.mapred.*;
 public class SnowFallEstimation {
 
 
-	/*
+
+	/**
 		Preprocess the data: if snow depth is given, it may be measured each XX hours.
+
+		output:
+		key: stationID_year/month/day
+		value: temperature  snowDepth snow_cum_from_depth rain snowDepth snow_cum_from_rain
 	 */
-	public static class MapPreprocessing extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+	public static class MapperDailySnowComputation extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
 		int lastDepth = -1;
 		//number of hours since the s
@@ -68,7 +73,7 @@ public class SnowFallEstimation {
 						Integer.parseInt(input.substring(21, 23)), //day
 						Integer.parseInt(input.substring(23, 25)), //hour
 						Integer.parseInt(input.substring(25, 27))); //minutes
-				SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd-HH:mm");
+				SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/WW"); //"yyyy/MM/dd-HH:mm"
 
 				String time = dateFormatter.format(c.getTime());
 
@@ -80,6 +85,7 @@ public class SnowFallEstimation {
 				try {
 					temperature = Float.parseFloat(tempString) / 10; //divide by 10 because of scaling factor (see ish)
 				} catch (NumberFormatException e) {
+					SnowData d;
 					temperature = SnowData.NO_TEMPERATURE_PROVIDED;
 				}
 
@@ -93,7 +99,7 @@ public class SnowFallEstimation {
 
 				//SNOW_DEPTH is given: compare with the last known snow depth
 				if (input.indexOf("AJ1") != -1) {
-					System.out.println("AJ1");
+					//System.out.println("AJ1");
 					int startPosition = input.indexOf("AJ1") + 3; //start of depth value AJ1xxxx, xxxx is the depth
 					int endPosition = startPosition + 4;
 
@@ -153,6 +159,15 @@ public class SnowFallEstimation {
 						try {
 							int indexOfAA1 = input.indexOf("AA1");
 							String precipitationString = input.substring(indexOfAA1 + 3 + 2, indexOfAA1 + 3 + 2 + 4);
+							//fix temperature according to the conversion table which only convert if temperature is
+							// under 1.1. So if it the weather observation says it is snowing and the temperature is 2
+							// (or more general, is over 1.1), we set it to 1.1
+							if ((precipitationType.equals("03") ||
+									precipitationType.equals("04") ||
+									precipitationType.equals("05") ||
+									precipitationType.equals("08")) && temperature > 1.1){
+								temperature = 1.1f;
+							}
 							precipitationAmount = Float.parseFloat(precipitationString) / 10;
 							cumulationFromRain = estimateSnowFall(temperature, precipitationAmount);
 							containsDataFromRain = cumulationFromRain > 0;
@@ -175,13 +190,14 @@ public class SnowFallEstimation {
 
 					output.collect(new Text(outKey), new Text(sd.toString()));
 
-					System.out.println(outKey + "\t" + input.contains("AJ1") + "\t" + input.contains("AA1"));
-					System.out.println(sd.toString());
+					//System.out.println(outKey + "\t" + input.contains("AJ1") + "\t" + input.contains("AA1"));
+					//System.out.println(sd.toString());
 				}
 
 			} //end if (input.contains("AJ1") || input.contains("AA1"))
 
 		}
+
 
 
 		/*
@@ -204,7 +220,7 @@ public class SnowFallEstimation {
 			int ratioTab[] = {10, 15, 20, 30, 40, 50, 100};
 			int ratio = 0;
 			for (int i = 0; i < tempTest.length; i++) {
-				if (temperature < tempTest[i]) {
+				if (temperature <= tempTest[i]) {
 					ratio = ratioTab[i];
 				}
 			}
@@ -224,13 +240,17 @@ public class SnowFallEstimation {
              * Each key-value pair is of kind: "year-month" - {43, 50, 60, 30, 20, 0}. Values are all measured depth
              * in the time period given by the key
              */
-			int nb = 0;
+			Text outKey = key;
+			float total = 0;
+			float total2 = 0;
 
 			while (values.hasNext()) {
-				Text v = values.next();
-				nb++;
-				output.collect(key, v);
+				SnowData d = new SnowData(values.next().toString());
+				total2 += d.getSnowFallFromRain();
+				total += d.getSnowFallFromSnowDepth();
 			}
+
+			output.collect(outKey, new Text("" + total + " " + total2));
 
 
 		}
@@ -245,6 +265,8 @@ public class SnowFallEstimation {
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 
+		SnowData d2;
+
 		//Path p = new Path(args[1]);
 		Path outPath = new Path(args[1]);
 		Path inPath = new Path(args[0]);
@@ -253,7 +275,7 @@ public class SnowFallEstimation {
 		JobConf conf1 = new JobConf(SnowFallEstimation.class);
 		conf1.setJobName("find snow stations");
 
-		conf1.setMapperClass(MapPreprocessing.class);
+		conf1.setMapperClass(MapperDailySnowComputation.class);
 		conf1.setReducerClass(Reduce.class);
 
 		conf1.setInputFormat(TextInputFormat.class);
@@ -276,148 +298,3 @@ public class SnowFallEstimation {
 }
 
 
-/*
-	Class storing snow data, and allowing to quickly pass these data through the mapper into a "standard" format and
-	recover quickly in the reducer
- */
-class SnowData {
-	public final static float NO_TEMPERATURE_PROVIDED = 30000f; //just need a fake number to notify that there is no
-	// temperature that is provided (due to an error)
-	public final static int NO_SNOW_INFO = -1;
-	public final int NO_SNOW_FALL_PROVIDED = -1;
-
-	private String snowDepth;
-	private String snowFallFromSnowDepth;
-	private String snowFallFromRain;
-	private String precipitation;
-	private String temperature;
-
-	//CONSTRUCTOR
-
-//	public SnowData(String snowDepth, String snowFalFromDepth,
-//	                String snowFallFromRain) {
-//		try {
-//
-//			if (NumberUtils.isNumber(snowDepth)) {
-//				this.snowDepth = snowDepth;
-//			} else {
-//				//no temperature provided, set it to 30000;
-//				this.snowDepth = "**";
-//			}
-//
-//			if (NumberUtils.isNumber(snowFalFromDepth)) {
-//				this.snowFallFromSnowDepth = snowFalFromDepth;
-//			} else {
-//				//no temperature provided, set it to 30000;
-//				this.snowFallFromSnowDepth = "**";
-//			}
-//
-//			if (NumberUtils.isNumber(snowFallFromRain)) {
-//				this.snowFallFromRain = snowFallFromRain;
-//			} else {
-//				//no temperature provided, set it to 30000;
-//				this.snowFallFromRain = "**";
-//			}
-//		} catch (NumberFormatException e) {
-//
-//		}
-//	}
-
-	public SnowData() {
-		snowDepth = "**";
-		snowFallFromRain = "**";
-		snowFallFromSnowDepth = "**";
-		temperature = "**";
-		precipitation = "**";
-	}
-
-
-	//GETTER AND SETTER
-	public void setSnowDepth(int sn) {
-		if (sn < 0) {
-			snowDepth = "**";
-		} else {
-			snowDepth = "" + sn;
-		}
-	}
-
-	public void setSnowFallFromSnowDepth(int sn) {
-		if (sn < 0) {
-			snowFallFromSnowDepth = "**";
-		} else {
-			snowFallFromSnowDepth = "" + sn;
-		}
-	}
-
-	public void setSnowFallFromRain(float sn) {
-		if (sn < 0) {
-			snowFallFromRain = "**";
-		} else {
-			snowFallFromRain = "" + sn;
-		}
-	}
-
-	public String getTemperature() {
-		return temperature;
-	}
-
-	public void setTemperature(String temperature) {
-		this.temperature = temperature;
-	}
-
-	public void setTemperature(float temp) {
-		if (temp == NO_TEMPERATURE_PROVIDED) {
-			temperature = "**";
-		} else {
-			temperature = "" + temp;
-		}
-	}
-
-	public String getSnowDepth() {
-		return snowDepth;
-	}
-
-	public void setSnowDepth(String snowDepth) {
-		this.snowDepth = snowDepth;
-	}
-
-	public String getSnowFallFromSnowDepth() {
-		return snowFallFromSnowDepth;
-	}
-
-	public void setSnowFallFromSnowDepth(String snowFallFromSnowDepth) {
-		this.snowFallFromSnowDepth = snowFallFromSnowDepth;
-	}
-
-	public String getSnowFallFromRain() {
-		return snowFallFromRain;
-	}
-
-	public void setSnowFallFromRain(String snowFallFromRain) {
-		this.snowFallFromRain = snowFallFromRain;
-	}
-
-	public String getPrecipitation() {
-		return precipitation;
-	}
-
-	public void setPrecipitation(String precipitation) {
-		this.precipitation = precipitation;
-	}
-
-	public void setPrecipitation(float p) {
-		if (p < 0) {
-			this.precipitation = "**";
-		} else {
-			this.precipitation = "" + p;
-		}
-	}
-
-
-	public String toString() {
-		return temperature + "\t" + snowDepth + "\t" + snowFallFromSnowDepth + "\t" + precipitation + " \t" +
-				snowFallFromRain;
-	}
-
-
-}
