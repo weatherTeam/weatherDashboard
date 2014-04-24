@@ -20,7 +20,8 @@ public class OutputTemperatureAnomaliesMapper extends MapReduceBase implements
 		String year = keyString.substring(10,12);
 		
 			
-		output.collect(new Text(station), new Text(year+","+month+","+value));
+		//output.collect(new Text(station), new Text(year+","+month+","+value));
+		output.collect(new Text(year+","+month), new Text(station+","+value));
 
 	}
 }
