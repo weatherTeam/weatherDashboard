@@ -6,8 +6,11 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 
 
@@ -17,22 +20,25 @@ import java.util.Iterator;
 public class SnowFallEstimation {
 
 
-
 	/**
-		Preprocess the data: if snow depth is given, it may be measured each XX hours.
-
-		output:
-		key: stationID_year/month/day
-		value: temperature  snowDepth snow_cum_from_depth rain snowDepth snow_cum_from_rain
+	 * Preprocess the data: if snow depth is given, it may be measured each XX hours.
+	 * <p/>
+	 * output:
+	 * key: stationID_year/month/day
+	 * value: temperature  snowDepth snow_cum_from_depth rain snowDepth snow_cum_from_rain
 	 */
-	public static class MapperDailySnowComputation extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+	public static class MapperDailySnowComputation extends MapReduceBase implements Mapper<LongWritable, Text, Text,
+			Text> {
 
 		int lastDepth = -1;
-		//number of hours since the s
-		int lastDepthTime = 0;
 
-		//After an amount of time, if there is no value, we consider there is no more snow
+		//store the last time they was information about snow depth.
+		Calendar lastDepthTime = Calendar.getInstance();
+		final long MILIS_IN_2_DAYS = 2 * 24 * 3600 * 1000;
+
+		//After an amount of time, if there is no value, we consider there is no more snow.
 		// (generally, if there is no measure after some time, it means there is no more snow at all)
+		// generally the snow depth is measured 2 times a day
 		final int SNOW_DEPTH_DISCARD_TIME = 48;
 
 		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output,
@@ -41,12 +47,6 @@ public class SnowFallEstimation {
 
 			String input = value.toString();
 
-			//increase counter
-			lastDepthTime++;
-			//We consider no more snow, so snowDepth = 0
-			if( lastDepthTime > SNOW_DEPTH_DISCARD_TIME){
-				lastDepth = 0;
-			}
 
 			//as soon as data are computed / found, it is set to true
 			//This is used to avoid emiting a key/value in case all string to number conversions fail.
@@ -66,16 +66,27 @@ public class SnowFallEstimation {
 
 				String stationID = input.substring(4, 10);
 
-				//get and format DATE (for the key)
+				//get and format DATE
 				Calendar c = Calendar.getInstance();
-				c.set(Integer.parseInt(input.substring(15, 19)), //year
-						Integer.parseInt(input.substring(19, 21)),  //month
-						Integer.parseInt(input.substring(21, 23)), //day
-						Integer.parseInt(input.substring(23, 25)), //hour
-						Integer.parseInt(input.substring(25, 27))); //minutes
-				SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/WW"); //"yyyy/MM/dd-HH:mm"
+				SimpleDateFormat dateFormatterReader = new SimpleDateFormat("yyyyMMddHHmm");
+				Date date = dateFormatterReader.parse(input.substring(15, 27), new ParsePosition(0));
 
-				String time = dateFormatter.format(c.getTime());
+				c.setTime(date);
+
+				//After 2 days without any news, we consider no more snow, so snowDepth = 0
+				if(c.getTimeInMillis() - lastDepthTime.getTimeInMillis() > MILIS_IN_2_DAYS){
+					lastDepth = 0;
+				}
+
+
+
+				//format date that will use for the key
+				SimpleDateFormat dateFormatterForKey = new SimpleDateFormat("yyyy/MM/WW"); //"yyyy/MM/dd-HH:mm"
+
+				SimpleDateFormat dateFormatterForSyso = new SimpleDateFormat("yyyy/MM/dd-HH:mm"); //"yyyy/MM/dd-HH:mm"
+
+
+				String time = dateFormatterForKey.format(c.getTime());
 
 				String outKey = stationID + "\t" + time;
 
@@ -83,13 +94,12 @@ public class SnowFallEstimation {
 				String tempString = input.substring(87, 92);
 				float temperature = 0;
 				try {
-					temperature = Float.parseFloat(tempString) / 10; //divide by 10 because of scaling factor (see ish)
+					//divide by 10 because of scaling factor (see  ish)
+					temperature = Float.parseFloat(tempString) / 10;
 				} catch (NumberFormatException e) {
 					SnowData d;
 					temperature = SnowData.NO_TEMPERATURE_PROVIDED;
 				}
-
-
 
 
 				int cumulationFromSnowDepth = SnowData.NO_SNOW_INFO;
@@ -111,23 +121,25 @@ public class SnowFallEstimation {
 						int newDepth = Integer.parseInt(input.substring(startPosition, endPosition));
 
 						//9999 = missing (ish-format-document)
-						if(newDepth != 9999) {
+						if (newDepth != 9999) {
 							snowDepth = newDepth;
 
 							if (lastDepth != SnowData.NO_SNOW_INFO) {
 								cumulationFromSnowDepth = newDepth - lastDepth;
 
-								//snow cumulation is >= 0, otherwise, it is only melt, which should not decrease the snow
+								//snow cumulation is >= 0, otherwise, it is only melt, which should not decrease the
+								// snow
 
 								// cumulation. We just update the lastSnowDepth value
 								//TODO: if data starts from lets say 1st september, then we can consider snow depth = 0
-								//if start from 1st january, then we do not consider the first day, which will serve as an initial value
+								//if start from 1st january, then we do not consider the first day,
+								// which will serve as an initial value
 								if (cumulationFromSnowDepth >= 0) {
 									containsDataFromSnowDepth = true;
 								}
 							}
 							lastDepth = newDepth;
-							lastDepthTime = 0;
+							lastDepthTime.setTime(c.getTime()); // new snow information for today
 						}
 
 					} catch (NumberFormatException e) {
@@ -173,17 +185,18 @@ public class SnowFallEstimation {
 							if ((precipitationType.equals("03") ||
 									precipitationType.equals("04") ||
 									precipitationType.equals("05") ||
-									precipitationType.equals("08")) && temperature > 1.1){
+									precipitationType.equals("08")) && temperature > 1.1) {
 								temperature = 1.1f;
 							}
 
-							if(precipitationString.equals("9999") == false ) {
-								precipitationAmount = Float.parseFloat(precipitationString) / 10; //scaling factor inverse
+							if (precipitationString.equals("9999") == false) {
+								//divide by 10 (scaling factor) and by 10 again for mm -> cm
+								precipitationAmount = Float.parseFloat(precipitationString) / 100.0f ; //scaling factor
+
+								// inverse
 								cumulationFromRain = estimateSnowFall(temperature, precipitationAmount);
 								containsDataFromRain = cumulationFromRain > 0;
-							}
-							else
-							{
+							} else {
 								cumulationFromRain = SnowData.NO_SNOW_INFO;
 								precipitationAmount = SnowData.NO_SNOW_INFO;
 							}
@@ -196,6 +209,14 @@ public class SnowFallEstimation {
 
 				} //end if (input.contains("AA101") || input.contains("AA102") || input.contains("AA101"))
 
+				SnowData sd2 = new SnowData();
+				sd2.setSnowDepth(snowDepth);
+				sd2.setSnowFallFromRain(cumulationFromRain);
+				sd2.setSnowFallFromSnowDepth(cumulationFromSnowDepth);
+				sd2.setPrecipitation(precipitationAmount);
+				sd2.setTemperature(temperature);
+				System.out.println("HELLO " + dateFormatterForSyso.format(c.getTime()) + " - " + sd2.toString());
+
 				if (containsDataFromSnowDepth || containsDataFromRain) {
 					SnowData sd = new SnowData();
 					sd.setSnowDepth(snowDepth);
@@ -203,6 +224,7 @@ public class SnowFallEstimation {
 					sd.setSnowFallFromSnowDepth(cumulationFromSnowDepth);
 					sd.setPrecipitation(precipitationAmount);
 					sd.setTemperature(temperature);
+
 
 					output.collect(new Text(outKey), new Text(sd.toString()));
 
@@ -213,7 +235,6 @@ public class SnowFallEstimation {
 			} //end if (input.contains("AJ1") || input.contains("AA1"))
 
 		}
-
 
 
 		/*
@@ -241,8 +262,12 @@ public class SnowFallEstimation {
 				}
 			}
 
+			//ratio : alway use 10 for average ( 90% of the time it is between 8 and 12)
+//			float ratio = 0f;
+//			if(temperature < 1){
+//				ratio = 10f;
+//			}
 			return precipitationAmount * ratio;
-
 		}
 	}
 
@@ -266,7 +291,11 @@ public class SnowFallEstimation {
 				total += d.getSnowFallFromSnowDepth();
 			}
 
-			output.collect(outKey, new Text("" + total + " " + total2));
+			//final: round snow cumulation to integer value
+			DecimalFormat df = new DecimalFormat("###"); //
+
+
+			output.collect(outKey, new Text("" + df.format(total) + " " + df.format(total2)));
 
 
 		}

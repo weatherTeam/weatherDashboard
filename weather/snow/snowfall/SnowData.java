@@ -1,10 +1,16 @@
 package weather.snow.snowfall;
 
+import java.text.DecimalFormat;
 import java.util.StringTokenizer;
 
 /*
 	Class storing snow data, and allowing to quickly pass these data through the mapper into a "standard" format and
-	recover quickly in the reducer
+	recover quickly in the reducer.
+
+	Snow cumulation and depth are integers
+	Precipitation is 2 decimals float
+
+	Tempe
  */
 class SnowData {
 
@@ -18,6 +24,9 @@ class SnowData {
 	private String snowFallFromRain;
 	private String precipitation;
 	private String temperature;
+
+	DecimalFormat snowCumulationNumberFormatter = new DecimalFormat("###"); //
+
 
 	//CONSTRUCTOR
 
@@ -42,7 +51,6 @@ class SnowData {
 			snowFallFromSnowDepth = st.nextToken();
 			precipitation = st.nextToken();
 			snowFallFromRain = st.nextToken();
-			System.out.println("HELLO " + this.toString());
 		}
 	}
 
