@@ -66,11 +66,10 @@ public class SnowFallEstimation {
 
 				String stationID = input.substring(4, 10);
 
-				//get and format DATE
+				//read and format DATE
 				Calendar c = Calendar.getInstance();
 				SimpleDateFormat dateFormatterReader = new SimpleDateFormat("yyyyMMddHHmm");
 				Date date = dateFormatterReader.parse(input.substring(15, 27), new ParsePosition(0));
-
 				c.setTime(date);
 
 				//After 2 days without any news, we consider no more snow, so snowDepth = 0
@@ -79,15 +78,11 @@ public class SnowFallEstimation {
 				}
 
 
-
 				//format date that will use for the key
 				SimpleDateFormat dateFormatterForKey = new SimpleDateFormat("yyyy/MM/WW"); //"yyyy/MM/dd-HH:mm"
-
-				SimpleDateFormat dateFormatterForSyso = new SimpleDateFormat("yyyy/MM/dd-HH:mm"); //"yyyy/MM/dd-HH:mm"
-
+				SimpleDateFormat dateFormatterForSyso = new SimpleDateFormat("yyyy/MM/dd-HH:mm"); // for syso
 
 				String time = dateFormatterForKey.format(c.getTime());
-
 				String outKey = stationID + "\t" + time;
 
 
@@ -261,12 +256,6 @@ public class SnowFallEstimation {
 					ratio = ratioTab[i];
 				}
 			}
-
-			//ratio : alway use 10 for average ( 90% of the time it is between 8 and 12)
-//			float ratio = 0f;
-//			if(temperature < 1){
-//				ratio = 10f;
-//			}
 			return precipitationAmount * ratio;
 		}
 	}
