@@ -17,7 +17,7 @@ class SnowData {
 	public final static float NO_TEMPERATURE_PROVIDED = 30000f; //just need a fake number to notify that there is no
 	// temperature that is provided (due to an error)
 	public final static int NO_SNOW_INFO = -1;
-	public final int NO_SNOW_FALL_PROVIDED = -1;
+	//public final int NO_SNOW_FALL_PROVIDED = -1;
 
 	private String snowDepth;
 	private String snowFallFromSnowDepth;
@@ -110,7 +110,7 @@ class SnowData {
 
 	public float getSnowFallFromSnowDepth(){
 		if(snowFallFromSnowDepth.equals("**")){
-			return 0;
+			return NO_SNOW_INFO;
 		}
 		else return Float.parseFloat(snowFallFromSnowDepth);
 	}
@@ -125,7 +125,7 @@ class SnowData {
 
 	public float getSnowFallFromRain(){
 		if(snowFallFromRain.equals("**")){
-			return 0;
+			return NO_SNOW_INFO;
 		}
 		else return Float.parseFloat(snowFallFromRain);
 	}
