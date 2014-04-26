@@ -49,6 +49,8 @@ public class DailySnowFallEstimation {
 		// generally the snow depth is measured 2 times a day
 		final int SNOW_DEPTH_DISCARD_TIME = 48;
 
+		private Text outKey = new Text();
+
 		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output,
 		                Reporter reporter) throws IOException {
 
@@ -76,8 +78,8 @@ public class DailySnowFallEstimation {
 				String stationID = input.substring(4, 10);
 
 				//location of the station
-				String latitude = input.substring(28,34);
-				String longitude = input.substring(34,41);
+				String latitude = input.substring(28, 34);
+				String longitude = input.substring(34, 41);
 
 
 				//read and format DATE
@@ -87,7 +89,7 @@ public class DailySnowFallEstimation {
 				c.setTime(date);
 
 				//After 2 days without any news, we consider no more snow, so snowDepth = 0
-				if(c.getTimeInMillis() - lastDepthTime.getTimeInMillis() > MILIS_IN_2_DAYS){
+				if (c.getTimeInMillis() - lastDepthTime.getTimeInMillis() > MILIS_IN_2_DAYS) {
 					lastDepth = 0;
 				}
 
@@ -97,7 +99,8 @@ public class DailySnowFallEstimation {
 				SimpleDateFormat dateFormatterForSyso = new SimpleDateFormat("yyyy/MM/dd-HH:mm"); // for syso
 
 				String time = dateFormatterForKey.format(c.getTime());
-				String outKey = stationID + "\t"+latitude + "\t" + longitude + "\t" + time;
+				//String outKey = stationID + "\t"+latitude + "\t" + longitude + "\t" + time;
+				outKey = new Text(stationID + "\t" + time);
 
 
 				String tempString = input.substring(87, 92);
@@ -197,7 +200,7 @@ public class DailySnowFallEstimation {
 							//9999 => means missing data
 							if (precipitationString.equals("9999") == false) {
 								//divide by 10 (scaling factor) and by 10 again for mm -> cm
-								precipitationAmount = Float.parseFloat(precipitationString) / 100.0f ; //scaling factor
+								precipitationAmount = Float.parseFloat(precipitationString) / 100.0f; //scaling factor
 
 								// inverse
 								cumulationFromRain = estimateSnowFall(temperature, precipitationAmount);
@@ -297,11 +300,11 @@ public class DailySnowFallEstimation {
 			while (values.hasNext()) {
 				SnowData d = new SnowData(values.next().toString());
 
-				if(d.getSnowFallFromRain() != SnowData.NO_SNOW_INFO){
+				if (d.getSnowFallFromRain() != SnowData.NO_SNOW_INFO) {
 					totalFromRain += d.getSnowFallFromRain();
 					containSnowFallFromRain = true;
 				}
-				if(d.getSnowFallFromSnowDepth() != SnowData.NO_SNOW_INFO) {
+				if (d.getSnowFallFromSnowDepth() != SnowData.NO_SNOW_INFO) {
 					totalFromSnowDepth += d.getSnowFallFromSnowDepth();
 					containsSnowFallFromSnowDepth = true;
 				}
@@ -310,15 +313,15 @@ public class DailySnowFallEstimation {
 			//final: round snow cumulation to integer value
 			DecimalFormat df = new DecimalFormat("###"); //
 
-			//for debug to test accuracy for station where rain and snow depth is known, so it is possible to see if the
+			//for debug to test accuracy for station where rain and snow depth is known,
+			// so it is possible to see if the
 			// cumulation computed using the snowdepth is same as the one computed with rain
 			//output.collect(outKey, new Text("" + df.format(total) + " " + df.format(total2)));
 
 			//Priority: use data from snow depth if exists (more precise), otherwise, use the one computed from rain
-			if(containsSnowFallFromSnowDepth){
+			if (containsSnowFallFromSnowDepth) {
 				output.collect(outKey, new Text("" + df.format(totalFromSnowDepth)));
-			}
-			else if(containSnowFallFromRain){
+			} else if (containSnowFallFromRain) {
 				output.collect(outKey, new Text("" + df.format(totalFromRain)));
 			}
 
