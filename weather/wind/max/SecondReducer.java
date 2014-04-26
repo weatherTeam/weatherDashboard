@@ -32,7 +32,7 @@ public class SecondReducer extends MapReduceBase implements
 		while (inputValue.hasNext())
 		{
 			String inputValueString = inputValue.next().toString();
-			locationTmp = inputValueString.substring(19, 30).split("[\\+|\\-]");
+			locationTmp = inputValueString.substring(24, 35).split("[\\+|\\-]");
 			
 			closeLocation.add(new Location(Integer.parseInt(locationTmp[0]), Integer.parseInt(locationTmp[1])));
 			inputValueArray.add(inputValueString);
@@ -40,7 +40,7 @@ public class SecondReducer extends MapReduceBase implements
 		
 		Location[] closeLocArray = closeLocation.toArray(new Location[closeLocation.size()]);
 		
-		if (closeLocArray.length > 10)
+		if (closeLocArray.length > 5)
 			for (int i = 0; i < closeLocArray.length; i++)
 				for (int j = i; j < closeLocArray.length; j++)
 					if ((closeLocArray[i].LAT - closeLocArray[j].LAT) < 1000			

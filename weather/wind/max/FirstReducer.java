@@ -13,8 +13,8 @@ import org.apache.hadoop.mapred.Reporter;
 
 public class FirstReducer extends MapReduceBase implements Reducer<IntWritable, Text, IntWritable, Text> {
 
-	private static final int WIND_TRESHOLD = 100;
-	private static final int RAIN_TRESHOLD = 50;
+	private static final int WIND_TRESHOLD = 280;
+//	private static final int RAIN_TRESHOLD = 50;
 	/*private static final int WIND_TRESHOLD;
 	
 	public void configure(JobConf job) {
@@ -42,17 +42,19 @@ public class FirstReducer extends MapReduceBase implements Reducer<IntWritable, 
 		while(inputValue.hasNext())
 		{
 			String infoString = inputValue.next().toString();
-			int wind = Integer.parseInt(infoString.substring(30, 34));
-			int rainPeriodQuantityInHours = Integer.parseInt(infoString.substring(34, 36));
-			int rainMillimeters = Integer.parseInt(infoString.substring(36, 40));
+			int wind = Integer.parseInt(infoString.substring(35, 39));
+//			int rainPeriodQuantityInHours = Integer.parseInt(infoString.substring(34, 36));
+//			int rainMillimeters = Integer.parseInt(infoString.substring(36, 40));
 			
-			if (wind > WIND_TRESHOLD && ((rainMillimeters/rainPeriodQuantityInHours) > RAIN_TRESHOLD)) // rainFall > RAIN_TRESHOLD
+			if (wind > WIND_TRESHOLD
+//					&& ((rainMillimeters/rainPeriodQuantityInHours) > RAIN_TRESHOLD)
+					) // rainFall > RAIN_TRESHOLD
 				xtremWindInfo.add(infoString);
 		}
 		
 		for(int i=0; i<xtremWindInfo.size(); i++)
 		{
-			IntWritable outputKey = new IntWritable(Integer.parseInt(xtremWindInfo.get(i).substring(6, 14)));
+			IntWritable outputKey = new IntWritable(Integer.parseInt(xtremWindInfo.get(i).substring(11, 19)));
 			Text outputValue = new Text(xtremWindInfo.get(i));
 			output.collect(outputKey, outputValue);
 		}
