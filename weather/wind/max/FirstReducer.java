@@ -52,7 +52,7 @@ public class FirstReducer extends MapReduceBase implements Reducer<IntWritable, 
 				xtremWindInfo.add(infoString);
 		}
 		
-		for(int i=0; i<xtremWindInfo.size(); i++)
+		for(int i=0; i<xtremWindInfo.size(); ++i)
 		{
 			IntWritable outputKey = new IntWritable(Integer.parseInt(xtremWindInfo.get(i).substring(11, 19)));
 			Text outputValue = new Text(xtremWindInfo.get(i));
