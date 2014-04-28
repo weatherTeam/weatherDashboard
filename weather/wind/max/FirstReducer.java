@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
@@ -13,13 +14,13 @@ import org.apache.hadoop.mapred.Reporter;
 
 public class FirstReducer extends MapReduceBase implements Reducer<IntWritable, Text, IntWritable, Text> {
 
-	private static final int WIND_TRESHOLD = 280;
+	//private static final int WIND_TRESHOLD = 280;
 //	private static final int RAIN_TRESHOLD = 50;
-	/*private static final int WIND_TRESHOLD;
+	private static int WIND_TRESHOLD;
 	
 	public void configure(JobConf job) {
 		WIND_TRESHOLD = Integer.parseInt(job.get("WIND_TRESHOLD"));
-	}*/
+	}
 	
 	@Override
 	public void reduce(IntWritable inputKey, Iterator<Text> inputValue,
