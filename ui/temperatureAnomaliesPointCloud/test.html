@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Plain Leaflet API</title>
+
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js'></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />
+
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:25%; bottom:25%; width:100%; }
+</style>
+</head>
+<body>
+
+
+<div id='map'></div>
+<div id='map'></div>
+<script>
+// This example will run with just Leaflet, without the Mapbox.js
+// dependency. Use Leaflet v0.6.3 or newer.
+
+// In the URL below, replace 'examples.map-zr0njcqy' with your map id.
+var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/aubry.i3j7cknp/{z}/{x}/{y}.png', {
+    attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+});
+var map = L.map('map')
+    .addLayer(mapboxTiles)
+    .setView([46.552, 6.429], 9);
+
+$.getJSON("data/anom.json", function(data) {
+	//When GeoJSON is loaded
+	geojson = L.geoJson(data, {
+		style: function(feature) {
+			return {
+				color:getColor(feature.properties.value),
+				fillOpacity:0.9
+			}
+		},
+		pointToLayer: function (feature, latlng) {
+        	return L.circleMarker(latlng);
+    	},
+
+        //onEachFeature: onEachFeature,
+        });//.addTo(map);
+	//var geojsonLayer = new L.GeoJSON(data);	//New GeoJSON layer
+	map.addLayer(geojson);	//Add layer to map	
+
+});
+
+function getColor(anomaly){
+	var gradient = ["#B33409", "#B83E07", "#BE4806", "#C35204", "#C95C03", "#CE6601", "#D47100", "#D7870C", "#DA9D19", "#DDB326", "#E0C932", "#E3DF3F", "#E7F54C", "#D4EE46", "#C1E840", "#AFE23A", "#9CDB34", "#89D52E", "#77CF29", "#70D141", "#69D459", "#62D771", "#5BDA89", "#54DDA1", "#4EE0B9", "#3FB9C3", "#3092CD", "#216BD8", "#1144E2", "#031EED"];
+	return anomaly > 300 ? gradient[0] :
+			anomaly > 250 ? gradient[1] :
+			anomaly > 200 ? gradient[2] :
+			anomaly > 150 ? gradient[3] :
+			anomaly > 100 ? gradient[4] :
+			anomaly > 90 ? gradient[5] :
+			anomaly > 80 ? gradient[6] :
+			anomaly > 70 ? gradient[7] :
+			anomaly > 60 ? gradient[8] :
+			anomaly > 50 ? gradient[9] :
+			anomaly > 40 ? gradient[10] :
+			anomaly > 30 ? gradient[11] :
+			anomaly > 20 ? gradient[12] :
+			anomaly > 10 ? gradient[13] :
+			anomaly > 5 ? gradient[14] :
+			anomaly > 0 ? gradient[15] :
+			anomaly > -5 ? gradient[16] :
+			anomaly > -10 ? gradient[17] :
+			anomaly > -20 ? gradient[18] :
+			anomaly > -30 ? gradient[19] :
+			anomaly > -40 ? gradient[20] :
+			anomaly > -50 ? gradient[21] :
+			anomaly > -60 ? gradient[22] :
+			anomaly > -70 ? gradient[23] :
+			anomaly > -80 ? gradient[24] :
+			anomaly > -90 ? gradient[25] :
+			anomaly > -100 ? gradient[26] :
+			anomaly > -150 ? gradient[27] :
+			anomaly > -200 ? gradient[28] :
+			anomaly > -250 ? gradient[29] :
+		'#267cc4';
+
+}
+
+</script>
+
+
+</body>
+</html>
