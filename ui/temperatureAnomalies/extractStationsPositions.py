@@ -4,7 +4,7 @@ import ogr, osr
 # http://gis.stackexchange.com/questions/78838/how-to-convert-projected-coordinates-to-lat-lon-using-python
 
 inputEPSG = 4326
-outputEPSG = 3857
+outputEPSG = 4326#3857
 inSpatialRef = osr.SpatialReference()
 inSpatialRef.ImportFromEPSG(inputEPSG)
 
@@ -27,6 +27,9 @@ for line in inputfile:
 	ctry = line[43:48]
 	
 	if ctry == "SW SZ":
+	#if ctry == "US US":
+		if id == "999999":
+			continue
 		if lat[:1] != "-" and lat[:1] != "+":
 			continue
 		if lon[:1] != "-" and lon[:1] != "+":
@@ -36,6 +39,14 @@ for line in inputfile:
 		lat = float(lat)/1000
 		lon = float(lon)/1000
 		alt = float(alt)/10
+		if lat == -99.999 or lon == -999.999 or lat == 0 or lon == 0:
+			continue
+		#if lon>-62.629 or lon<-127.8955 or lat<22.490 or lat>51.109:
+		#	continue
+
+
+
+
 		#lat = int(lat)
 		#lon = int(lon)
 
