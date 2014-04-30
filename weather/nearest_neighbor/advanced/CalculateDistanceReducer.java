@@ -19,8 +19,9 @@ public class CalculateDistanceReducer extends MapReduceBase implements
     
 	private String station;
 	private String year;
+	private String month;
     private double temp;
-    private int month;
+    private int day;
     private String[] textArray;
     
     private double distance;
@@ -34,21 +35,23 @@ public class CalculateDistanceReducer extends MapReduceBase implements
 		path_to_file = job.get("path_to_file");
 	}
 	    
-    public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, DoubleWritable> output, Reporter reporter)
-                 throws IOException {
+    public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, DoubleWritable> output, 
+    		Reporter reporter) throws IOException {
     		
-    		station = key.toString().substring(0,6);
-    		year = key.toString().substring(6,10);
+    		String keyString = key.toString();
+    		station = keyString.substring(0,6);
+    		year = keyString.substring(6,10);
+    		month = keyString.substring(10,12);
             distance = 0.0;          
             referenceYearValues = utils.readInReferenceYear(path_to_file);
             referenceYearStationValues = referenceYearValues.get(station);
             if (referenceYearStationValues != null){
             	while (values.hasNext() ){
             		textArray = values.next().toString().split(";");
-            		month = Integer.parseInt(textArray[0]);
+            		day = Integer.parseInt(textArray[0]);
             		temp = Double.parseDouble(textArray[1]);
                 
-            		distance += Math.pow(referenceYearStationValues[month-1]-temp, 2);
+            		distance += Math.pow(referenceYearStationValues[day-1]-temp, 2);
             	}
             	distance = Math.sqrt(distance);
             	output.collect(new Text(year), new DoubleWritable(distance));
