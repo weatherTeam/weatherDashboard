@@ -20,9 +20,9 @@ public class CalculateDistanceSumMapper extends MapReduceBase implements
 			throws IOException {
 		
 		String[] lineArray = value.toString().split("\\s+");
-		int year = Integer.parseInt(lineArray[0]);
+		int yearMonth = Integer.parseInt(lineArray[0]);
 		double temp = Double.parseDouble(lineArray[1]);
-		output.collect(new IntWritable(year), new DoubleWritable(temp));
+		output.collect(new IntWritable(yearMonth), new DoubleWritable(temp));
 	}
 
 }
