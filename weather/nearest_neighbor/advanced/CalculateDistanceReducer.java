@@ -54,7 +54,7 @@ public class CalculateDistanceReducer extends MapReduceBase implements
             		distance += Math.pow(referenceYearStationValues[day-1]-temp, 2);
             	}
             	distance = Math.sqrt(distance);
-            	output.collect(new Text(year), new DoubleWritable(distance));
+            	output.collect(new Text(year+month), new DoubleWritable(distance));
             }
         }
     }

@@ -23,22 +23,22 @@ public class utils {
 	    
 		//int[] referenceYearValues = new int[12];
 
-		String station_id = new String();
-		
-		int month = 1;
-    	int[] referenceYearStationValues = new int[12];
+		String station_id;
+		int day;
+    	int[] referenceYearStationValues;
 
 		while((line = bufferReader.readLine()) != null){
-
-	  	  	referenceYearStationValues[month-1] = Integer.parseInt(line.split("\\s+")[1]);
-	  	  	month++;
-
-			if (month == 13){
-				station_id = line.substring(0,6);
-				referenceYearValues.put(station_id, referenceYearStationValues);
-				referenceYearStationValues = new int[12];
-				month = 1;
+			
+			station_id = line.substring(0,6);
+			day = Integer.parseInt(line.substring(12,14));
+			
+			if (!referenceYearValues.containsKey(station_id)){
+				referenceYearValues.put(station_id, new int[31]);
 			}
+			
+			referenceYearStationValues = referenceYearValues.get(station_id); 
+	  	  	referenceYearStationValues[day-1] = Integer.parseInt(line.split("\\s+")[1]);
+
 	    }
 	    bufferReader.close();
 	    return referenceYearValues;
