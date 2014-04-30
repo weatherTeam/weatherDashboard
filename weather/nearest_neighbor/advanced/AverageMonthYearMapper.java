@@ -16,7 +16,7 @@ public class AverageMonthYearMapper extends MapReduceBase implements
 	
 	private static Integer referenceYear;
 	private static int temp;
-	private static String stationYearMonth;
+	private static String stationYearMonthDay;
 	
 	public void configure(JobConf job) {
 		referenceYear = Integer.parseInt(job.get("referenceYear"));
@@ -27,12 +27,11 @@ public class AverageMonthYearMapper extends MapReduceBase implements
 			throws IOException {
 		
 		String[] lineArray = value.toString().split("\\s+");
-		System.out.println(referenceYear);
 		temp = Integer.parseInt(lineArray[1]);
-		stationYearMonth = lineArray[0];
+		stationYearMonthDay = lineArray[0];
 		
-		if (stationYearMonth.substring(6,10).equals(referenceYear.toString())){
-			output.collect(new Text(stationYearMonth), new IntWritable(temp));
+		if (stationYearMonthDay.substring(6,10).equals(referenceYear.toString())){
+			output.collect(new Text(stationYearMonthDay), new IntWritable(temp));
 		}
 	}
 }
