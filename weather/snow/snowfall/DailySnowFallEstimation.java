@@ -340,7 +340,7 @@ public class DailySnowFallEstimation {
 
 
 		JobConf conf1 = new JobConf(DailySnowFallEstimation.class);
-		conf1.setJobName("find snow stations");
+		conf1.setJobName("Compute daily snow cumulation");
 
 		conf1.setMapperClass(MapperDailySnowComputation.class);
 		conf1.setReducerClass(Reduce.class);
