@@ -135,8 +135,8 @@ public class DailyToWeeklySnowFallEstimation {
 		conf1.setInputFormat(TextInputFormat.class);
 		conf1.setOutputFormat(TextOutputFormat.class);
 
-		conf1.setNumMapTasks(20);
-		conf1.setNumReduceTasks(20);
+		conf1.setNumMapTasks(80);
+		conf1.setNumReduceTasks(80);
 
 		conf1.setMapOutputKeyClass(Text.class);
 		conf1.setMapOutputValueClass(Text.class);
