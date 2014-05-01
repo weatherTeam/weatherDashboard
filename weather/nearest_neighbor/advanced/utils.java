@@ -24,20 +24,20 @@ public class utils {
 		//int[] referenceYearValues = new int[12];
 
 		String station_id;
-		int day;
+		int period;
     	int[] referenceYearStationValues;
 
 		while((line = bufferReader.readLine()) != null){
 			
 			station_id = line.substring(0,6);
-			day = Integer.parseInt(line.substring(12,14));
+			period = Integer.parseInt(line.substring(12,13));
 			
 			if (!referenceYearValues.containsKey(station_id)){
-				referenceYearValues.put(station_id, new int[31]);
+				referenceYearValues.put(station_id, new int[6]);
 			}
 			
 			referenceYearStationValues = referenceYearValues.get(station_id); 
-	  	  	referenceYearStationValues[day-1] = Integer.parseInt(line.split("\\s+")[1]);
+	  	  	referenceYearStationValues[period] = Integer.parseInt(line.split("\\s+")[1]);
 
 	    }
 	    bufferReader.close();

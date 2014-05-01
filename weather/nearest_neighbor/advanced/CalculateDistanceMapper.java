@@ -17,7 +17,7 @@ public class CalculateDistanceMapper extends MapReduceBase implements
     private String stationDate;
     private int year;
     private String month;
-    private String day;
+    private String period;
     private String station;
 
 	public void map(LongWritable key, Text value,
@@ -29,8 +29,8 @@ public class CalculateDistanceMapper extends MapReduceBase implements
 		station = stationDate.substring(0,6);
 		year = Integer.parseInt(stationDate.substring(6,10));
 		month = stationDate.substring(10,12);
-		day = stationDate.substring(12,14);
+		period = stationDate.substring(12,13);
 		
-		output.collect(new Text(station+year+month), new Text(day+";"+temp));
+		output.collect(new Text(station+year+month), new Text(period+";"+temp));
 	}
 }

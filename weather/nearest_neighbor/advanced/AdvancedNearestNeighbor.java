@@ -19,14 +19,16 @@ public class AdvancedNearestNeighbor {
           averageMonth.setOutputKeyClass(Text.class);
           averageMonth.setOutputValueClass(IntWritable.class);
           
+          averageMonth.set("referenceMonth",args[3]);
+          
           averageMonth.setMapperClass(AverageMonthMapper.class);
           averageMonth.setReducerClass(AverageMonthReducer.class);
 
           FileInputFormat.setInputPaths(averageMonth, new Path(args[0]));
           FileOutputFormat.setOutputPath(averageMonth, new Path("/tmp/averageMonth"));
           
-          averageMonth.setNumMapTasks(176);
-          averageMonth.setNumReduceTasks(176);
+          averageMonth.setNumMapTasks(1);
+          averageMonth.setNumReduceTasks(1);
           
           // Get averages for reference year (filter on one year)
           JobConf averageMonthYear = new JobConf(AdvancedNearestNeighbor.class);
@@ -42,7 +44,7 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(averageMonthYear, new Path("/tmp/averageMonth"));
           FileOutputFormat.setOutputPath(averageMonthYear, new Path("/tmp/averageMonthYear"));
           
-          averageMonthYear.setNumMapTasks(176);
+          averageMonthYear.setNumMapTasks(1);
           
 
           // Calculate distances job configuration
@@ -64,8 +66,8 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(calculateDistances, new Path("/tmp/averageMonth"));
           FileOutputFormat.setOutputPath(calculateDistances, new Path("/tmp/calculateDistances"));
           
-          calculateDistances.setNumMapTasks(176);
-          calculateDistances.setNumReduceTasks(176);
+          calculateDistances.setNumMapTasks(1);
+          calculateDistances.setNumReduceTasks(1);
           
           
           // Sum up results for each year and station
@@ -84,13 +86,13 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(calculateDistancesSum, new Path("/tmp/calculateDistances"));
           FileOutputFormat.setOutputPath(calculateDistancesSum, new Path(args[1]));
           
-          calculateDistancesSum.setNumMapTasks(176);
-          calculateDistancesSum.setNumReduceTasks(100);
+          calculateDistancesSum.setNumMapTasks(1);
+          calculateDistancesSum.setNumReduceTasks(1);
           
           // Run jobs
-          JobClient.runJob(averageMonth);
-          JobClient.runJob(averageMonthYear);
-          JobClient.runJob(calculateDistances);
+          //JobClient.runJob(averageMonth);
+          //JobClient.runJob(averageMonthYear);
+          //JobClient.runJob(calculateDistances);
           JobClient.runJob(calculateDistancesSum);
           
     }

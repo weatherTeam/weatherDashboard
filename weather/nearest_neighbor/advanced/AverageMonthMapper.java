@@ -32,7 +32,14 @@ public class AverageMonthMapper extends MapReduceBase implements
 	
 	String station = line.substring(4, 10);
 	String month = line.substring(19, 21);
-	String day = line.substring(21,23);
+	
+	// Divide into periods in stead of days
+	int day = Integer.parseInt(line.substring(21,23));
+	int period = (day-1)/5;
+	if (day==31){
+		period = 5;
+	}
+	
 	int airTemperature;
 	if (line.charAt(87) == '+') {
 		airTemperature = Integer.parseInt(line.substring(88, 92));
@@ -41,7 +48,7 @@ public class AverageMonthMapper extends MapReduceBase implements
 	}
 	String quality = line.substring(92, 93);
 	if (airTemperature != MISSING && quality.matches("[01459]") && referenceMonth.equals(month)) {
-		output.collect(new Text(station+intYear+month+day), new IntWritable(airTemperature));
+		output.collect(new Text(station+intYear+month+period), new IntWritable(airTemperature));
 	}
 	}
 }
