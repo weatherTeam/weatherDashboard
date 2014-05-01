@@ -24,6 +24,14 @@ class WeatherEvent implements Writable {
 		this.location = new Text(location);
 	}
 
+	public WeatherEvent() {
+		this.title = new Text("");
+		this.category = new Text("");
+		this.startDate = new Text("");
+		this.endDate = new Text("");
+		this.location = new Text("");
+	}
+
 	@Override
 	public void readFields(DataInput in) throws IOException {
 		title.readFields(in);
@@ -40,6 +48,13 @@ class WeatherEvent implements Writable {
 		startDate.write(out);
 		endDate.write(out);
 		location.write(out);
+	}
+
+	@Override
+	public String toString() {
+		return title.toString() + "\t" + category.toString() + "\t"
+				+ startDate.toString() + "\t" + endDate.toString() + "\t"
+				+ location.toString();
 	}
 
 }
