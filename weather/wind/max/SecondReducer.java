@@ -14,7 +14,7 @@ import org.apache.hadoop.mapred.Reporter;
 public class SecondReducer extends MapReduceBase implements
 		Reducer<IntWritable, Text, Text, Text>
 {
-
+	static final int closeLocationTreshold = 250;
 	static final ArrayList<Location> closeLocation = new ArrayList<Location>();
 	static final ArrayList<ArrayList<String>> infoToOutput = new ArrayList<ArrayList<String>>();
 	
@@ -63,7 +63,7 @@ public class SecondReducer extends MapReduceBase implements
 		ArrayList<Location> locationToRecall = new ArrayList<Location>();
 		
 		for (int i = 0; i < len; ++i)
-			if (closeTo(loc, closeLocation.get(i)))
+			if (closeTo(loc, closeLocation.get(i), closeLocationTreshold))
 				locationToRecall.add(closeLocation.get(i));
 	
 		if (!locationToRecall.isEmpty())
@@ -78,9 +78,9 @@ public class SecondReducer extends MapReduceBase implements
 		infoToOutput.get(index).add(loc.infos);
 	}
 	
-	public static boolean closeTo(Location a, Location b)
+	public static boolean closeTo(Location a, Location b, int treshold)
 	{
-		return (Math.abs(a.LAT - b.LAT) < 1000 && Math.abs(a.LON - b.LON) < 1000);
+		return (Math.abs(a.LAT - b.LAT) < treshold && Math.abs(a.LON - b.LON) < treshold);
 	}
 	
 	public static class Location

@@ -17,7 +17,7 @@ public class Run
 		JobConf conf1 = new JobConf(Run.class);
 		conf1.setJobName("Wind");
 		
-		conf1.set("WIND_TRESHOLD", args[2]);
+		//conf1.set("WIND_TRESHOLD", args[2]);
 		
 		conf1.setMapOutputKeyClass(IntWritable.class);
 		conf1.setMapOutputValueClass(Text.class);
@@ -32,11 +32,13 @@ public class Run
 		conf1.setOutputFormat(TextOutputFormat.class);
  	
 		FileInputFormat.setInputPaths(conf1, new Path(args[0]));
-		FileOutputFormat.setOutputPath(conf1, new Path("/team11/tmp/CedricAlexis"));
-//		FileOutputFormat.setOutputPath(conf1, new Path("tmp"));
+//		FileOutputFormat.setOutputPath(conf1, new Path("/team11/tmp/CedricAlexis_250"));
+		FileOutputFormat.setOutputPath(conf1, new Path("tmp"));
 
 		JobConf conf2 = new JobConf(Run.class);
 		conf2.setJobName("Wind");
+		
+		//conf1.set("WIND_TRESHOLD", args[2]);
 		
 		conf2.setMapOutputKeyClass(IntWritable.class);
 		conf2.setMapOutputValueClass(Text.class);
@@ -51,8 +53,8 @@ public class Run
 		conf2.setOutputFormat(TextOutputFormat.class);
  	
 		
-		FileInputFormat.setInputPaths(conf2, new Path("/team11/tmp/CedricAlexis"));
-//		FileInputFormat.setInputPaths(conf2, new Path("tmp"));
+//		FileInputFormat.setInputPaths(conf2, new Path("/team11/tmp/CedricAlexis_250"));
+		FileInputFormat.setInputPaths(conf2, new Path("tmp"));
 		FileOutputFormat.setOutputPath(conf2, new Path(args[1]));
 
 		JobClient.runJob(conf1);

@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
@@ -14,13 +13,14 @@ import org.apache.hadoop.mapred.Reporter;
 
 public class FirstReducer extends MapReduceBase implements Reducer<IntWritable, Text, IntWritable, Text> {
 
-	//private static final int WIND_TRESHOLD = 280;
-//	private static final int RAIN_TRESHOLD = 50;
-	private static int WIND_TRESHOLD;
-	
-	public void configure(JobConf job) {
-		WIND_TRESHOLD = Integer.parseInt(job.get("WIND_TRESHOLD"));
-	}
+	private static final int WIND_TRESHOLD = 200;
+//	private static final int RAIN_TRESHOLD = 20;
+
+//	private static final int WIND_TRESHOLD;
+//
+//	public void configure(JobConf job) {
+//		WIND_TRESHOLD = Integer.parseInt(job.get("WIND_TRESHOLD"));
+//	}
 	
 	@Override
 	public void reduce(IntWritable inputKey, Iterator<Text> inputValue,
@@ -43,13 +43,13 @@ public class FirstReducer extends MapReduceBase implements Reducer<IntWritable, 
 		while(inputValue.hasNext())
 		{
 			String infoString = inputValue.next().toString();
-			int wind = Integer.parseInt(infoString.substring(35, 39));
-//			int rainPeriodQuantityInHours = Integer.parseInt(infoString.substring(34, 36));
-//			int rainMillimeters = Integer.parseInt(infoString.substring(36, 40));
+			int wind = Integer.parseInt(infoString.substring(36, 40));
+//			int rainPeriodQuantityInHours = Integer.parseInt(infoString.substring(40, 42));
+//			int rainMillimeters = Integer.parseInt(infoString.substring(42, 44));
 			
-			if (wind > WIND_TRESHOLD
-//					&& ((rainMillimeters/rainPeriodQuantityInHours) > RAIN_TRESHOLD)
-					) // rainFall > RAIN_TRESHOLD
+			if (wind > WIND_TRESHOLD)
+//				&& ((rainMillimeters/rainPeriodQuantityInHours) > RAIN_TRESHOLD)
+				
 				xtremWindInfo.add(infoString);
 		}
 		
