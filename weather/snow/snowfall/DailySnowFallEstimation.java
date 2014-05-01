@@ -129,7 +129,7 @@ public class DailySnowFallEstimation {
 
 
 					try {
-						System.out.println("SNOW DEPTH : " + input.substring(startPosition, endPosition));
+						//System.out.println("SNOW DEPTH : " + input.substring(startPosition, endPosition));
 						int newDepth = Integer.parseInt(input.substring(startPosition, endPosition));
 
 						//9999 = missing data (ish-format-document)
@@ -224,7 +224,7 @@ public class DailySnowFallEstimation {
 				sd2.setSnowFallFromSnowDepth(cumulationFromSnowDepth);
 				sd2.setPrecipitation(precipitationAmount);
 				sd2.setTemperature(temperature);
-				System.out.println("HELLO " + dateFormatterForSyso.format(c.getTime()) + " - " + sd2.toString());
+				//System.out.println("HELLO " + dateFormatterForSyso.format(c.getTime()) + " - " + sd2.toString());
 
 				if (containsDataFromSnowDepth || containsDataFromRain) {
 					SnowData sd = new SnowData();
@@ -236,9 +236,6 @@ public class DailySnowFallEstimation {
 
 
 					output.collect(new Text(outKey), new Text(sd.toString()));
-
-					//System.out.println(outKey + "\t" + input.contains("AJ1") + "\t" + input.contains("AA1"));
-					//System.out.println(sd.toString());
 				}
 
 			} //end if (input.contains("AJ1") || input.contains("AA1"))
@@ -278,7 +275,7 @@ public class DailySnowFallEstimation {
 	/* OUTPUT:
 	*
 	* key: stationID TAB latitude TAB longitude TAB year/month/day
-	 * value: snow_cumulation
+	 * value: daily snow_cumulation
 	 */
 	public static class Reduce extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
 
