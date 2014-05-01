@@ -10,16 +10,68 @@
 <link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />
 
 <style>
-  body { margin:0; padding:0; }
-  #map { position:absolute; top:25%; bottom:25%; width:100%; }
+  body { 
+  	margin:0; 
+  	padding:0; 
+  	background: url(graphy/graphy.png) repeat;
+  }
+  #map { 
+  	position:absolute; top:20%; 
+  	bottom:25%; 
+  	width:100%; 
+  }
+   #title { 
+   	font-family: Georgia;
+  	position:absolute; 
+  	top:0%; 
+  	bottom:80%; 
+  	width:100%; 
+  	text-align: center;
+  	font-size: 30px;
+
+  }
+  #form { 
+  	position:absolute;top:75%; 
+  	bottom:0; 
+  	width:100%; 
+  	text-align: center;
+  	margin-top:1%;
+  }
+  .box {
+  	font-family: Georgia;
+  font-size: 29px;
+  margin:1%;
+
+  }
+.btn {
+  font-family: Georgia;
+  color: #ffffff;
+  font-size: 39px;
+  background: #3498db;
+  padding: 18px 25px 18px 25px;
+  border: solid #1f628d 0px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #146191;
+  text-decoration: none;
+}
 </style>
 </head>
 <body>
 
-
+<div id='title'><h1>Temperature Anomalies</h1></div>
 <div id='map'></div>
-<div id='map'></div>
+<div id='form'>
+<form id='formcontent'>
+<input type="month" name="holidays" id="period" value="2013-12" class="box"><br \>
+<input type="submit" name="submit" value="Display" class="btn">
+</form>
+</div>
 <script>
+
+
 // This example will run with just Leaflet, without the Mapbox.js
 // dependency. Use Leaflet v0.6.3 or newer.
 
@@ -29,15 +81,16 @@ var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/aubry.i3j7cknp/{z
 });
 var map = L.map('map')
     .addLayer(mapboxTiles)
-    .setView([46.552, 6.429], 9);
+    .setView([39.82, -98.57], 4);
 
-$.getJSON("data/anom.json", function(data) {
+$.getJSON("dataJson/122013.json", function(data) {
 	//When GeoJSON is loaded
 	geojson = L.geoJson(data, {
 		style: function(feature) {
 			return {
 				color:getColor(feature.properties.value),
-				fillOpacity:0.9
+				fillOpacity:0.7,
+				size:0.1
 			}
 		},
 		pointToLayer: function (feature, latlng) {
@@ -51,9 +104,37 @@ $.getJSON("data/anom.json", function(data) {
 
 });
 
+ $("#formcontent").submit(function(event) {
+ 	event.preventDefault();
+ 	var date = $('#period').val().split('-');
+ 	var fileName = date[1]+date[0]+".json";
+ 	//alert(fileName);
+ 	map.removeLayer(geojson);
+
+ 	$.getJSON("dataJson/"+fileName, function(data) {
+	//When GeoJSON is loaded
+	geojson = L.geoJson(data, {
+		style: function(feature) {
+			return {
+				color:getColor(feature.properties.value),
+				fillOpacity:0.7
+			}
+		},
+		pointToLayer: function (feature, latlng) {
+        	return L.circleMarker(latlng);
+    	},
+
+        //onEachFeature: onEachFeature,
+        });//.addTo(map);
+	//var geojsonLayer = new L.GeoJSON(data);	//New GeoJSON layer
+	map.addLayer(geojson);	//Add layer to map	
+	});
+ });
+
 function getColor(anomaly){
-	var gradient = ["#B33409", "#B83E07", "#BE4806", "#C35204", "#C95C03", "#CE6601", "#D47100", "#D7870C", "#DA9D19", "#DDB326", "#E0C932", "#E3DF3F", "#E7F54C", "#D4EE46", "#C1E840", "#AFE23A", "#9CDB34", "#89D52E", "#77CF29", "#70D141", "#69D459", "#62D771", "#5BDA89", "#54DDA1", "#4EE0B9", "#3FB9C3", "#3092CD", "#216BD8", "#1144E2", "#031EED"];
-	return anomaly > 300 ? gradient[0] :
+	//var gradient = ["#B33409", "#B83E07", "#BE4806", "#C35204", "#C95C03", "#CE6601", "#D47100", "#D7870C", "#DA9D19", "#DDB326", "#E0C932", "#E3DF3F", "#E7F54C", "#D4EE46", "#C1E840", "#AFE23A", "#9CDB34", "#89D52E", "#77CF29", "#70D141", "#69D459", "#62D771", "#5BDA89", "#54DDA1", "#4EE0B9", "#3FB9C3", "#3092CD", "#216BD8", "#1144E2", "#031EED"];
+	//var gradient = ["#FF0000", "#E90115", "#D4022A", "#BF033F", "#AA0455", "#94056A", "#7F067F", "#6A0794", "#5508AA", "#3F09BF", "#2A0AD4", "#150BE9", "#000DFF"];
+	/*return anomaly > 300 ? gradient[0] :
 			anomaly > 250 ? gradient[1] :
 			anomaly > 200 ? gradient[2] :
 			anomaly > 150 ? gradient[3] :
@@ -83,7 +164,35 @@ function getColor(anomaly){
 			anomaly > -150 ? gradient[27] :
 			anomaly > -200 ? gradient[28] :
 			anomaly > -250 ? gradient[29] :
-		'#267cc4';
+		'#267cc4';*/
+var gradient = ["#FA0000", "#F0000A", "#E60014", "#DC011E", "#D20128", "#C80133", "#BE023D", "#B40247", "#A90251", "#A0035B", "#960366", "#8C0370", "#82047A", "#780484", "#6D058E", "#640599", "#5A05A3", "#4F06AD", "#4606B7", "#3C06C1", "#3107CC", "#2807D6", "#1E07E0", "#1308EA", "#0A08F4", "#0009FF"]
+
+		return anomaly > 50 ? gradient[0] :
+			anomaly > 45 ? gradient[1] :
+			anomaly > 40 ? gradient[2] :
+			anomaly > 35 ? gradient[3] :
+			anomaly > 30 ? gradient[4] :
+			anomaly > 25 ? gradient[5] :
+			anomaly > 20 ? gradient[6] :
+			anomaly > 15 ? gradient[7] :
+			anomaly > 10 ? gradient[8] :
+			anomaly > 7.5 ? gradient[9] :
+			anomaly > 5 ? gradient[10] :
+			anomaly > 2.5 ? gradient[11] :
+			anomaly > 0 ? gradient[12] :
+			anomaly > -2.5 ? gradient[13] :
+			anomaly > -5 ? gradient[14] :
+			anomaly > -7.5 ? gradient[15] :
+			anomaly > -10 ? gradient[16] :
+			anomaly > -15 ? gradient[17] :
+			anomaly > -20 ? gradient[18] :
+			anomaly > -25 ? gradient[19] :
+			anomaly > -30 ? gradient[20] :
+			anomaly > -35 ? gradient[21] :
+			anomaly > -40 ? gradient[22] :
+			anomaly > -45 ? gradient[23] :
+			anomaly > -50 ? gradient[24] :
+		gradient[25];
 
 }
 
