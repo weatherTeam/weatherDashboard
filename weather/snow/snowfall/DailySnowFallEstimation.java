@@ -94,13 +94,13 @@ public class DailySnowFallEstimation {
 				}
 
 
-				//format date that will use for the key
+				//format date that will use for the KEY
 				SimpleDateFormat dateFormatterForKey = new SimpleDateFormat("yyyy/MM/dd"); //"yyyy/MM/dd-HH:mm"
 				SimpleDateFormat dateFormatterForSyso = new SimpleDateFormat("yyyy/MM/dd-HH:mm"); // for syso
 
 				String time = dateFormatterForKey.format(c.getTime());
-				//String outKey = stationID + "\t"+latitude + "\t" + longitude + "\t" + time;
-				outKey = new Text(stationID + "\t" + time);
+				outKey = new Text(stationID + "\t"+latitude + "\t" + longitude + "\t" + time);
+				//outKey = new Text(stationID + "\t" + time);
 
 
 				String tempString = input.substring(87, 92);

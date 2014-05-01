@@ -1,11 +1,14 @@
 package weather.snow.stationsStatistics;
 
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.FloatWritable;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.*;
+
 import java.io.IOException;
 import java.util.Iterator;
-
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapred.*;
 
 
 /**
@@ -37,7 +40,7 @@ import org.apache.hadoop.mapred.*;
  */
 
 
-public class Run {
+public class OldSnowDepthAnalyseTest {
 
 
 	public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
@@ -137,14 +140,13 @@ public class Run {
 		//Path p = new Path(args[1]);
 		Path tempPath = new Path(args[1]);
 
-		JobConf conf1 = new JobConf(Run.class);
+		JobConf conf1 = new JobConf(OldSnowDepthAnalyseTest.class);
 		conf1.setJobName("hw2");
 
 		conf1.setOutputKeyClass(Text.class);
 		conf1.setOutputValueClass(FloatWritable.class);
 
 		conf1.setMapperClass(Map.class);
-////		conf.setCombinerClass(Reduce.class);
 		conf1.setReducerClass(Reduce.class);
 
 		conf1.setInputFormat(TextInputFormat.class);

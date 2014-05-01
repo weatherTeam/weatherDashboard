@@ -50,8 +50,10 @@ public class DailyToWeeklySnowFallEstimation {
 			String split[] = input.split("\\s+");
 
 			String stationID = split[0];
-			String dateString = split[1];
-			String cumulationString = split[2];
+			String latitude = split[1];
+			String longitude = split[2];
+			String dateString = split[3];
+			String cumulationString = split[4];
 
 
 			//read and format DATE
@@ -66,7 +68,7 @@ public class DailyToWeeklySnowFallEstimation {
 
 			String time = dateFormatterForKey.format(c.getTime());
 
-			outKey = new Text(stationID + "\t" + time);
+			outKey = new Text(stationID + "\t" + latitude + "\t" + longitude + "\t" + time);
 			outVal = new Text(cumulationString);
 
 			output.collect(outKey, outVal);

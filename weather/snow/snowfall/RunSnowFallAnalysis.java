@@ -2,8 +2,11 @@ package weather.snow.snowfall;
 
 /**
  * Created by Jonathan Duss on 26.04.14.
+ *
+ * This class run the DailySnowFallEstimation, and uses its output to convert it to weekly snowfall. The final output
+ * it the weekly snowfall, or so-called weekly cumulation
  */
-public class SnowFall {
+public class RunSnowFallAnalysis {
 
 	public static void main(String[] args){
 

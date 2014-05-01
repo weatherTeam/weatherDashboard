@@ -1,12 +1,13 @@
 package weather.snow.stationsStatistics;
 
-import java.io.*;
-import java.util.Iterator;
-import java.util.Scanner;
-
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.*;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
+
+import java.io.IOException;
+import java.util.Iterator;
 
 /**
  * Created by Jo on 01.04.14.
@@ -73,7 +74,7 @@ public class FindSnowStations {
 		//Path p = new Path(args[1]);
 		Path tempPath = new Path(args[1]);
 
-		JobConf conf1 = new JobConf(Run.class);
+		JobConf conf1 = new JobConf(OldSnowDepthAnalyseTest.class);
 		conf1.setJobName("find snow stations");
 
 		conf1.setOutputKeyClass(Text.class);
