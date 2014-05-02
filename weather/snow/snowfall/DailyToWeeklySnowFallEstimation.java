@@ -50,8 +50,8 @@ public class DailyToWeeklySnowFallEstimation {
 			String split[] = input.split("\\s+");
 
 			String stationID = split[0];
-			String latitude = split[1];
-			String longitude = split[2];
+			String latitude = "" + Float.parseFloat(split[1]) / 1000f;
+			String longitude = "" + Float.parseFloat(split[2]) / 1000f;;
 			String dateString = split[3];
 			String cumulationString = split[4];
 
