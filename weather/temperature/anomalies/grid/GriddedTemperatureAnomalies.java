@@ -2,7 +2,6 @@ package weather.temperature.anomalies.grid;
 
 import java.io.IOException;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -14,7 +13,7 @@ import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 
 
 public class GriddedTemperatureAnomalies {
-	static final boolean PROD = true;
+	static final boolean PROD = false;
 	public static void main(String[] args) throws IOException {
 		if (args.length != 8) {
 			System.err
@@ -22,9 +21,11 @@ public class GriddedTemperatureAnomalies {
 			System.exit(-1);
 		}
 		
-		Path tmp1 = new Path("tmp1");
-		Path tmp2 = new Path("tmp2");
-		Path rawOutput = new Path("rawOutput");
+		Path stationsMonthAveragePath = new Path("stationsMonthAverage");
+		Path stationsMonthYearAveragePath = new Path("stationsMonthYearAverage");
+		Path griddedMonthAveragePath = new Path("griddedMonthAverage");
+		Path griddedMonthYearAveragePath = new Path("griddedMonthYearAverage");
+		Path outputPath = new Path("output");
 		String firstRefYear = args[4];
 		String lastRefYear = args[5];
 		String firstYear = args[6];
@@ -33,101 +34,136 @@ public class GriddedTemperatureAnomalies {
 		String yStep = args[3];
 		
 		if (PROD) {
-			tmp1 = new Path("/team11/tempAnom/tmp1");
-			tmp2 = new Path("/team11/tempAnom/tmp2");
-			rawOutput = new Path("/team11/tempAnom/rawOutput");
+			stationsMonthAveragePath = new Path("/team11/temperatureAnomalies/stationsMonthAverage");
+			stationsMonthYearAveragePath = new Path("/team11/temperatureAnomalies/stationsMonthYearAverage");
+			griddedMonthAveragePath = new Path("/team11/temperatureAnomalies/griddedMonthAverage");
+			griddedMonthYearAveragePath = new Path("/team11/temperatureAnomalies/griddedMonthYearAverage");
+			outputPath = new Path("/team11/temperatureAnomalies/output");
 		}
 		
-
-		JobConf avgMonthTemp = new JobConf(GriddedTemperatureAnomalies.class);
-		avgMonthTemp.setJobName("AverageMonthTemperature");
-		avgMonthTemp.set("firstYear",firstRefYear);
-		avgMonthTemp.set("lastYear", lastRefYear);
-		avgMonthTemp.set("xStep",xStep);
-		avgMonthTemp.set("yStep", yStep);
-		FileInputFormat.addInputPath(avgMonthTemp, new Path(args[0]));
-		FileOutputFormat.setOutputPath(avgMonthTemp, tmp1);
-
-		avgMonthTemp.setMapperClass(AverageMonthTemperatureMapper.class);
-		avgMonthTemp.setReducerClass(AverageMonthTemperatureReducer.class);
-		avgMonthTemp.setOutputKeyClass(Text.class);
-		avgMonthTemp.setOutputValueClass(IntWritable.class);
+		class OneFilePerKeyOutput extends MultipleTextOutputFormat<Text, Text> {
+            protected String generateFileNameForKeyValue(Text key, Text value,String name) {
+                    return key.toString();
+            }
+        }
 		
-		avgMonthTemp.setNumMapTasks(20);
-		avgMonthTemp.setNumReduceTasks(20);
-		JobClient.runJob(avgMonthTemp);
-
-		JobConf avgMonthYearTemp = new JobConf(GriddedTemperatureAnomalies.class);
-		avgMonthYearTemp.setJobName("AverageMonthYearTemperature");
-		avgMonthYearTemp.set("firstYear", firstYear);
-		avgMonthYearTemp.set("lastYear", lastYear);
-		avgMonthYearTemp.set("xStep",xStep);
-		avgMonthYearTemp.set("yStep", yStep);
-		FileInputFormat.addInputPath(avgMonthYearTemp, new Path(args[0]));
-		FileOutputFormat.setOutputPath(avgMonthYearTemp, tmp2);
-
-		avgMonthYearTemp
-				.setMapperClass(AverageMonthYearTemperatureMapper.class);
-		avgMonthYearTemp
-				.setReducerClass(AverageMonthYearTemperatureReducer.class);
-		avgMonthYearTemp.setOutputKeyClass(Text.class);
-		avgMonthYearTemp.setOutputValueClass(IntWritable.class);
+		class OneSingleFileOutput extends MultipleTextOutputFormat<Text, Text> {
+            protected String generateFileNameForKeyValue(Text key, Text value,String name) {
+                    return "griddedTemperatureAnomalies";
+            }
+        }
 		
-		avgMonthYearTemp.setNumMapTasks(20);
-		avgMonthYearTemp.setNumReduceTasks(20);
-		JobClient.runJob(avgMonthYearTemp);
+		/*
+		 * 
+		 */
+		
+		JobConf stationsMonthAverage = new JobConf(GriddedTemperatureAnomalies.class);
+		stationsMonthAverage.setJobName("StationsAverageMonthTemperature");
+		stationsMonthAverage.set("firstYear",firstRefYear);
+		stationsMonthAverage.set("lastYear", lastRefYear);
+		FileInputFormat.addInputPath(stationsMonthAverage, new Path(args[0]));
+		FileOutputFormat.setOutputPath(stationsMonthAverage, stationsMonthAveragePath);
+
+		stationsMonthAverage.setMapperClass(StationsMonthAverageMapper.class);
+		stationsMonthAverage.setReducerClass(StationsMonthAverageReducer.class);
+		stationsMonthAverage.setOutputKeyClass(Text.class);
+		stationsMonthAverage.setOutputValueClass(Text.class);
+		stationsMonthAverage.setOutputFormat(OneFilePerKeyOutput.class);
+		
+		stationsMonthAverage.setNumMapTasks(40);
+		stationsMonthAverage.setNumReduceTasks(40);
+		
+		JobClient.runJob(stationsMonthAverage);
+		
+
+		
+		JobConf stationsMonthYearAverage = new JobConf(GriddedTemperatureAnomalies.class);
+		stationsMonthYearAverage.setJobName("StationsAverageMonthYearTemperature");
+		stationsMonthYearAverage.set("firstYear",firstYear);
+		stationsMonthYearAverage.set("lastYear", lastYear);
+		FileInputFormat.addInputPath(stationsMonthYearAverage, new Path(args[0]));
+		FileOutputFormat.setOutputPath(stationsMonthYearAverage, stationsMonthYearAveragePath);
+
+		stationsMonthYearAverage.setMapperClass(StationsMonthYearAverageMapper.class);
+		stationsMonthYearAverage.setReducerClass(StationsMonthYearAverageReducer.class);
+		stationsMonthYearAverage.setOutputKeyClass(Text.class);
+		stationsMonthYearAverage.setOutputValueClass(Text.class);
+		stationsMonthYearAverage.setOutputFormat(OneFilePerKeyOutput.class);
+		
+		stationsMonthYearAverage.setNumMapTasks(40);
+		stationsMonthYearAverage.setNumReduceTasks(40);
+		
+		JobClient.runJob(stationsMonthYearAverage);
+
+
+		
+		JobConf griddedMonthAverage = new JobConf(GriddedTemperatureAnomalies.class);
+		griddedMonthAverage.setJobName("GriddedAverageMonthTemperature");
+		griddedMonthAverage.set("xStep",xStep);
+		griddedMonthAverage.set("yStep", yStep);
+		FileInputFormat.addInputPath(griddedMonthAverage, stationsMonthAveragePath);
+		FileOutputFormat.setOutputPath(griddedMonthAverage, griddedMonthAveragePath);
+
+		griddedMonthAverage.setMapperClass(GriddedMonthAverageMapper.class);
+		griddedMonthAverage.setReducerClass(GriddedMonthAverageReducer.class);
+		griddedMonthAverage.setOutputKeyClass(Text.class);
+		griddedMonthAverage.setOutputValueClass(Text.class);
+		griddedMonthAverage.setOutputFormat(OneFilePerKeyOutput.class);
+		griddedMonthAverage
+		.setInputFormat(KeyValueTextInputFormat.class);
+		
+		griddedMonthAverage.setNumMapTasks(40);
+		griddedMonthAverage.setNumReduceTasks(40);
+		
+		JobClient.runJob(griddedMonthAverage);
+		
+
+		
+		JobConf griddedMonthYearAverage = new JobConf(GriddedTemperatureAnomalies.class);
+		griddedMonthYearAverage.setJobName("GriddedAverageMonthYearTemperature");
+		griddedMonthYearAverage.set("xStep",xStep);
+		griddedMonthYearAverage.set("yStep", yStep);
+		FileInputFormat.addInputPath(griddedMonthYearAverage, stationsMonthYearAveragePath);
+		FileOutputFormat.setOutputPath(griddedMonthYearAverage, griddedMonthYearAveragePath);
+
+		griddedMonthYearAverage.setMapperClass(GriddedMonthYearAverageMapper.class);
+		griddedMonthYearAverage.setReducerClass(GriddedMonthYearAverageReducer.class);
+		griddedMonthYearAverage.setOutputKeyClass(Text.class);
+		griddedMonthYearAverage.setOutputValueClass(Text.class);
+		griddedMonthYearAverage.setOutputFormat(OneFilePerKeyOutput.class);
+		griddedMonthYearAverage
+		.setInputFormat(KeyValueTextInputFormat.class);
+		
+		griddedMonthYearAverage.setNumMapTasks(40);
+		griddedMonthYearAverage.setNumReduceTasks(40);
+		
+		JobClient.runJob(griddedMonthYearAverage);
+		
+
 
 		JobConf temperatureAnomalies = new JobConf(GriddedTemperatureAnomalies.class);
 		temperatureAnomalies.setJobName("temperatureAnomalies");
-		temperatureAnomalies.set("firstYear", firstYear);
+		temperatureAnomalies.set("firstYear",firstYear);
 		temperatureAnomalies.set("lastYear", lastYear);
-		MultipleInputs.addInputPath(temperatureAnomalies, tmp2,
+		MultipleInputs.addInputPath(temperatureAnomalies, griddedMonthAveragePath,
 				KeyValueTextInputFormat.class);
-		MultipleInputs.addInputPath(temperatureAnomalies, tmp1,
+		MultipleInputs.addInputPath(temperatureAnomalies, griddedMonthYearAveragePath,
 				KeyValueTextInputFormat.class);
 
-		FileOutputFormat.setOutputPath(temperatureAnomalies, rawOutput);
+		FileOutputFormat.setOutputPath(temperatureAnomalies, outputPath);
 
 		temperatureAnomalies.setMapperClass(TemperatureAnomaliesMapper.class);
 		temperatureAnomalies.setReducerClass(TemperatureAnomaliesReducer.class);
 		temperatureAnomalies.setOutputKeyClass(Text.class);
 		temperatureAnomalies.setOutputValueClass(Text.class);
+		temperatureAnomalies.setOutputFormat(OneSingleFileOutput.class);
 
 		
 		temperatureAnomalies.setNumMapTasks(20);
 		temperatureAnomalies.setNumReduceTasks(20);
 		
 		JobClient.runJob(temperatureAnomalies);
-
-		JobConf OutputTemperatureAnomalies = new JobConf(
-				GriddedTemperatureAnomalies.class);
-		OutputTemperatureAnomalies.setJobName("OutputTemperatureAnomalies");
-
-		FileInputFormat.addInputPath(OutputTemperatureAnomalies, rawOutput);
-		OutputTemperatureAnomalies
-				.setInputFormat(KeyValueTextInputFormat.class);
-
 		
 		
-        class OneFilePerKeyOutput extends MultipleTextOutputFormat<Text, Text> {
-            protected String generateFileNameForKeyValue(Text key, Text value,String name) {
-                    return key.toString();
-            }
-        }
-        OutputTemperatureAnomalies.setOutputFormat(OneFilePerKeyOutput.class);
-		FileOutputFormat.setOutputPath(OutputTemperatureAnomalies, new Path(
-				args[1]));
-
-		OutputTemperatureAnomalies
-				.setMapperClass(OutputTemperatureAnomaliesMapper.class);
-		OutputTemperatureAnomalies
-				.setReducerClass(OutputTemperatureAnomaliesReducer.class);
-		OutputTemperatureAnomalies.setOutputKeyClass(Text.class);
-		OutputTemperatureAnomalies.setOutputValueClass(Text.class);
-		
-		
-		OutputTemperatureAnomalies.setNumMapTasks(20);
-		OutputTemperatureAnomalies.setNumReduceTasks(20);
-		JobClient.runJob(OutputTemperatureAnomalies);
 	}
 }

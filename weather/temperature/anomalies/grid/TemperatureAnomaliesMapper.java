@@ -21,24 +21,25 @@ public class TemperatureAnomaliesMapper extends MapReduceBase implements
 	public void map(Text key,  Text value,
 			OutputCollector<Text, Text> output, Reporter reporter)
 			throws IOException {
-		String keyString = key.toString();
 		
-		String coords = keyString.substring(0,13);
-		String month = keyString.substring(13,15);
+		String[] values = value.toString().split(",");
+		boolean reference = (values.length==2);
+		String coords = key.toString();
+		String month = values[0];
 		
-		if(keyString.length() ==15) {
+		if(reference) {
+			String val = values[1];
 			for (int i = firstYear; i <= lastYear; i++) {
-				output.collect(new Text(coords+i+month), new Text("$"+value));
+				output.collect(new Text(coords+i+month), new Text("$"+val));
 			}
 			
 		}
-		else if (keyString.length() == 19) {
-			String year = keyString.substring(15,19);
-			
-			output.collect(new Text(coords+year+month), new Text("0"+value));
-		}
 		else {
-			System.out.println("Wrong formatting");
+			String year = values[1];
+			String val = values[2];
+			
+			output.collect(new Text(coords+year+month), new Text("0"+val));
 		}
+
 	}
 }
