@@ -10,7 +10,7 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
-public class SecondMapper extends MapReduceBase implements Mapper<LongWritable, Text, IntWritable, Text>
+public class FindDateEventMapper2 extends MapReduceBase implements Mapper<LongWritable, Text, IntWritable, Text>
 {
 	
 	@Override
@@ -18,6 +18,6 @@ public class SecondMapper extends MapReduceBase implements Mapper<LongWritable, 
 			OutputCollector<IntWritable, Text> output, Reporter arg3) throws IOException
 	{
 		String[] split = inputValue.toString().split("\t");
-		output.collect(new IntWritable(Integer.parseInt(split[0])), new Text(split[1]));
+		output.collect(new IntWritable(0), new Text(split[1]));
 	}
 }
