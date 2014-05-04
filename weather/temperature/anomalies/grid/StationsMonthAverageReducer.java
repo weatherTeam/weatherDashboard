@@ -51,7 +51,7 @@ public class StationsMonthAverageReducer extends MapReduceBase implements
 		}
 		System.out.println(years.size());
 
-		if (years.size()-1 == (lastYear - firstYear)) {
+		if (years.size() > (lastYear - firstYear)/2) {
 			for (String k : monthAverage.keySet()) {
 				String coord = k.split(",")[0];
 				String month = k.split(",")[1];

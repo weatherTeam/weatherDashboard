@@ -12,12 +12,12 @@ import org.apache.hadoop.mapred.Reporter;
 public class GriddedMonthAverageMapper extends MapReduceBase implements
 		Mapper<Text, Text, Text, Text> {
 
-	private static int xStep;
-	private static int yStep;
+	private static double xStep;
+	private static double yStep;
 	
 	public void configure(JobConf job) {
-		xStep = Integer.parseInt(job.get("xStep"));
-		yStep = Integer.parseInt(job.get("yStep"));
+		xStep = Double.parseDouble(job.get("xStep"));
+		yStep = Double.parseDouble(job.get("yStep"));
 	}
 	
 	public void map(Text key, Text value,
