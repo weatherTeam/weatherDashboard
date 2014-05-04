@@ -17,23 +17,37 @@ public class GriddedMonthYearAverageReducer extends MapReduceBase implements
 		
 		HashMap<String,Integer> monthAverage = new HashMap<String, Integer>();
 		HashMap<String,Integer> nbRecords = new HashMap<String, Integer>();
+		HashMap<String,Integer> maxMonthAverage = new HashMap<String, Integer>();
+		HashMap<String,Integer> minMonthAverage = new HashMap<String, Integer>();
 
 		while (values.hasNext()) {
 			String[] value = values.next().toString().split(",");
 			String year = value[1];
 			String month = value[0];
-			int temperature = Integer.parseInt(value[2]);						
+			int temperature = Integer.parseInt(value[2]);
+			int maxTemperature = Integer.parseInt(value[3]);
+			int minTemperature = Integer.parseInt(value[4]);
+			
 			if (!monthAverage.containsKey(month+","+year)) {
 				monthAverage.put(month+","+year, 0);
 				nbRecords.put(month+","+year, 0);
+				maxMonthAverage.put(month+","+year, 0);
+				minMonthAverage.put(month+","+year, 0);
 			}
-			monthAverage.put(month+","+year,monthAverage.get(month+","+year) + temperature);
 			nbRecords.put(month+","+year,nbRecords.get(month+","+year) + 1);
+			monthAverage.put(month+","+year,monthAverage.get(month+","+year) + temperature);
+			maxMonthAverage.put(month+","+year,maxMonthAverage.get(month+","+year) + maxTemperature);
+			minMonthAverage.put(month+","+year,minMonthAverage.get(month+","+year) + minTemperature);
 
 		}
 		for (String monthyear : monthAverage.keySet()) {
-			int avg = monthAverage.get(monthyear)/nbRecords.get(monthyear);
-			output.collect(key, new Text(monthyear+","+avg));
+			if(nbRecords.get(monthyear)>0) {
+				int avg = monthAverage.get(monthyear)/nbRecords.get(monthyear);
+				int avgMax = maxMonthAverage.get(monthyear)/nbRecords.get(monthyear);
+				int avgMin = minMonthAverage.get(monthyear)/nbRecords.get(monthyear);
+	
+				output.collect(key, new Text(monthyear+","+avg+","+avgMax+","+avgMin));
+			}
 		}
 		
 	}

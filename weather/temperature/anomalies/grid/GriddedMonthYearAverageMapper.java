@@ -28,10 +28,11 @@ public class GriddedMonthYearAverageMapper extends MapReduceBase implements
 		String month = values[0];
 		String year = values[1];
 		int avgMonth = Integer.parseInt(values[2]);
-		
+		int avgMax = Integer.parseInt(values[3]);
+		int avgMin = Integer.parseInt(values[4]);
 
 		String cellCoord = Grid.getGridCoord(coords,xStep,yStep);
 		
-		output.collect(new Text(cellCoord), new Text(month+","+year+","+avgMonth));
+		output.collect(new Text(cellCoord), new Text(month+","+year+","+avgMonth+","+avgMax+","+avgMin));
 	}
 }

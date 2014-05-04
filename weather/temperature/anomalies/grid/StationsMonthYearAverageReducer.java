@@ -15,7 +15,7 @@ public class StationsMonthYearAverageReducer extends MapReduceBase implements
 			OutputCollector<Text, Text> output, Reporter reporter)
 			throws IOException {
 
-		// HashMap<String,Integer> monthAverage = new HashMap<String, Integer>();
+		//HashMap<String,Integer> monthMax = new HashMap<String, Integer>();
 		// HashMap<String,Integer> nbRecords = new HashMap<String, Integer>();
 
 		String[] keyVals = key.toString().split(",");
@@ -23,6 +23,8 @@ public class StationsMonthYearAverageReducer extends MapReduceBase implements
 		String year = keyVals[1];
 		String month = keyVals[2];
 		int temperature = 0;
+		int maxTemp = -99999;
+		int minTemp = 99999;
 		int nbRec = 0;
 		
 		while (values.hasNext()) {
@@ -30,8 +32,18 @@ public class StationsMonthYearAverageReducer extends MapReduceBase implements
 			//String year = value[0];
 			//String month = value[1];
 
-			//int temperature = Integer.parseInt(value[2]);	
-			temperature += Integer.parseInt(value[0]);
+			//int temperature = Integer.parseInt(value[2]);
+			int temp = Integer.parseInt(value[0]);
+
+			if (temp > maxTemp) {
+				maxTemp = temp;
+			}
+			
+			if (temp < minTemp) {
+				minTemp = temp;
+			}
+			
+			temperature += temp;
 			nbRec++;
 			/*
 			if (!monthAverage.containsKey(month+","+year)) {
@@ -44,7 +56,8 @@ public class StationsMonthYearAverageReducer extends MapReduceBase implements
 
 		}
 		int average = temperature/nbRec;
-		output.collect(new Text(coord), new Text(month+","+year+","+average));
+
+		output.collect(new Text(coord), new Text(month+","+year+","+average+","+maxTemp+","+minTemp));
 		/*for (String monthyear : monthAverage.keySet()) {
 			int avg = monthAverage.get(monthyear)/nbRecords.get(monthyear);
 			output.collect(key, new Text(monthyear+","+avg));

@@ -29,6 +29,8 @@ public class StationsMonthAverageReducer extends MapReduceBase implements
 		ArrayList<String> years = new ArrayList<String>();
 		HashMap<String,Integer> monthAverage = new HashMap<String, Integer>();
 		HashMap<String,Integer> nbRecords = new HashMap<String, Integer>();
+		HashMap<String,HashMap<String,Integer>> monthYearMax = new HashMap<String, HashMap<String,Integer>>();
+		HashMap<String,HashMap<String,Integer>> monthYearMin = new HashMap<String, HashMap<String,Integer>>();
 		
 
 		while (values.hasNext()) {
@@ -40,24 +42,56 @@ public class StationsMonthAverageReducer extends MapReduceBase implements
 			if (!years.contains(year)) {
 				years.add(year);
 			}
+			
+			String k = coord+","+month;
 							
-			if (!monthAverage.containsKey(month)) {
-				monthAverage.put(coord+","+month, 0);
-				nbRecords.put(coord+","+month, 0);
+			if (!monthAverage.containsKey(k)) {
+				monthAverage.put(k, 0);
+				nbRecords.put(k, 0);
+				monthYearMax.put(k, new HashMap<String,Integer>());
+				monthYearMin.put(k, new HashMap<String,Integer>());
 			}
-			monthAverage.put(coord+","+month,monthAverage.get(coord+","+month) + temperature);
-			nbRecords.put(coord+","+month,nbRecords.get(coord+","+month) + 1);
+
+			if (!monthYearMax.get(k).containsKey(year)) {
+				monthYearMax.get(k).put(year, -99999);
+			}
+			if (temperature > monthYearMax.get(k).get(year))
+				monthYearMax.get(k).put(year, temperature);
+			
+			if (!monthYearMin.get(k).containsKey(year)) {
+				monthYearMin.get(k).put(year, +99999);
+			}
+			if (temperature < monthYearMin.get(k).get(year))
+				monthYearMin.get(k).put(year, temperature);
+			
+			
+			monthAverage.put(k,monthAverage.get(k) + temperature);
+			nbRecords.put(k,nbRecords.get(k) + 1);
 
 		}
 		System.out.println(years.size());
 
-		if (years.size() > (lastYear - firstYear)/2) {
+		//if (years.size() > (lastYear - firstYear)/4) {
+		//if (years.size() > 2) {
 			for (String k : monthAverage.keySet()) {
 				String coord = k.split(",")[0];
 				String month = k.split(",")[1];
+				
+				int maxAvg = 0;
+				for (String l : monthYearMax.get(k).keySet()) {
+					maxAvg+=monthYearMax.get(k).get(l);
+				}
+				maxAvg/=monthYearMax.get(k).size();
+				
+				int minAvg = 0;
+				for (String l : monthYearMin.get(k).keySet()) {
+					minAvg+=monthYearMin.get(k).get(l);
+				}
+				minAvg/=monthYearMin.get(k).size();
+				
 				int avg = monthAverage.get(coord+","+month)/nbRecords.get(coord+","+month);
-				output.collect(new Text(coord), new Text(month+","+avg));
+				output.collect(new Text(coord), new Text(month+","+avg+","+maxAvg+","+minAvg));
 			}
-		}
+		//}
 	}
 }

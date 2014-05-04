@@ -20,10 +20,14 @@ public class OutputTemperatureAnomaliesMapper extends MapReduceBase implements
 		String lon = vals[1];
 		String month = vals[2];
 		String anomaly = vals[3];
+		String anomalyMax = vals[4];
+		String anomalyMin = vals[5];
+		String isExtreme = vals[6];
+
 		
 			
 		//output.collect(new Text(station), new Text(year+","+month+","+value));
-		output.collect(new Text(year), new Text(month+"\t"+lat+"\t"+lon+"\t"+anomaly));
+		output.collect(new Text(year+month), new Text(lat+"\t"+lon+"\t"+anomaly+"\t"+anomalyMax+"\t"+anomalyMin+"\t"+isExtreme));
 
 	}
 }

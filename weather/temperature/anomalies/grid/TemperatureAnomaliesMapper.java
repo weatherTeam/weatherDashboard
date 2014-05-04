@@ -23,22 +23,26 @@ public class TemperatureAnomaliesMapper extends MapReduceBase implements
 			throws IOException {
 		
 		String[] values = value.toString().split(",");
-		boolean reference = (values.length==2);
+		boolean reference = (values.length==4);
 		String coords = key.toString();
 		String month = values[0];
 		
 		if(reference) {
 			String val = values[1];
+			String valMax = values[2];
+			String valMin = values[3];
 			for (int i = firstYear; i <= lastYear; i++) {
-				output.collect(new Text(coords+i+month), new Text("$"+val));
+				output.collect(new Text(coords+i+month), new Text("$,"+val+","+valMax+","+valMin));
 			}
 			
 		}
 		else {
 			String year = values[1];
 			String val = values[2];
+			String valMax = values[3];
+			String valMin = values[4];
 			
-			output.collect(new Text(coords+year+month), new Text("0"+val));
+			output.collect(new Text(coords+year+month), new Text("0,"+val+","+valMax+","+valMin));
 		}
 
 	}
