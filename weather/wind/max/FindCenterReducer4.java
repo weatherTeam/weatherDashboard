@@ -21,7 +21,7 @@ public class FindCenterReducer4 extends MapReduceBase implements
 		int startDate = Integer.MAX_VALUE;
 		int endDate = 0;
 		int windMax = 0;
-		int rainMax = 0;
+//		int rainMax = 0;
 		int x = 0;
 		int y = 0;
 		long totX = 0, totY = 0;
@@ -79,10 +79,10 @@ public class FindCenterReducer4 extends MapReduceBase implements
 				windMax = wind;
 			
 			// find max rain
-			int rain = Integer.parseInt(inputValueString.substring(42, 46));
+//			int rain = Integer.parseInt(inputValueString.substring(42, 46));
 			
-			if (rainMax < rain)
-				rainMax = rain;
+//			if (rainMax < rain)
+//				rainMax = rain;
 			
 			// find start date
 			int date = Integer.parseInt(inputValueString.substring(15, 23));
@@ -125,7 +125,7 @@ public class FindCenterReducer4 extends MapReduceBase implements
 				String centreYString = centreY + ""; // 6
 				String radiusString = (int)radiusMax + ""; // 6
 				// windMax // 3
-				String rainMaxString = rainMax + ""; // 3
+//				String rainMaxString = rainMax + ""; // 3
 				
 				if (startDate < 10000000)
 					startDateString = year + "0" + startDate;
@@ -178,11 +178,13 @@ public class FindCenterReducer4 extends MapReduceBase implements
 					radiusString = "00" + (int)radiusMax;
 				else if (radiusMax < 100000)
 					radiusString = "0" + (int)radiusMax;
-				if (rainMax < 10)
-					rainMaxString = "00" + rainMax;
-				else if (rainMax < 100)
-					rainMaxString = "0" + rainMax;
-				output.collect(new Text(), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMax + rainMaxString));
+				
+//				if (rainMax < 10)
+//					rainMaxString = "00" + rainMax;
+//				else if (rainMax < 100)
+//					rainMaxString = "0" + rainMax;
+				output.collect(new Text(), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMax));
+//						+ rainMaxString));
 			}
 		}		
 	}
