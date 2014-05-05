@@ -22,7 +22,7 @@ public class OutputTemperatureAnomaliesMapper extends MapReduceBase implements
 		
 		String[] vals = value.toString().split(",");
 		String lat = vals[0];
-		String lon = vals[1];
+		String lon = vals[1]; 
 		String anomaly = vals[2];
 		String anomalyMax = vals[3];
 		String anomalyMin = vals[4];

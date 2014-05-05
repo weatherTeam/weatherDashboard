@@ -27,19 +27,25 @@ public class GriddedMonthAverageMapper extends MapReduceBase implements
 			throws IOException {
 		String[] values = value.toString().split(",");
 		String coords = key.toString();
-		String month = values[3];
+		String month = values[9];
 		String avgMonth = values[0];
-		String avgMax = values[1];
-		String avgMin = values[2];
+		String centileHigh = values[1];
+		String centileLow = values[2];
+		String avgMax = values[3];
+		String maxCentileHigh = values[4];
+		String maxCentileLow = values[5];
+		String avgMin = values[6];
+		String minCentileHigh = values[7];
+		String minCentileLow = values[8];
 		String time = month;
 		
 		if (timeGranularity == 1)
-			time = month+","+values[4];
+			time = month+","+values[10];
 			
 		
 
 		String cellCoord = Grid.getGridCoord(coords,xStep,yStep);
 		
-		output.collect(new Text(cellCoord), new Text(avgMonth+","+avgMax+","+avgMin+","+time));
+		output.collect(new Text(cellCoord), new Text(avgMonth+","+centileHigh+","+centileLow+","+avgMax+","+maxCentileHigh+","+maxCentileLow+","+avgMin+","+minCentileHigh+","+minCentileLow+","+time));
 	}
 }

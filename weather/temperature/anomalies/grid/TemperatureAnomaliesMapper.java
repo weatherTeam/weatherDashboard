@@ -25,24 +25,23 @@ public class TemperatureAnomaliesMapper extends MapReduceBase implements
 			throws IOException {
 		
 		String[] values = value.toString().split(",");
-		boolean reference = (values.length==4);
+		boolean reference = (values.length==10);
 		if (timeGranularity == 1) {
-		 reference = (values.length==5);
+		 reference = (values.length==11);
 		}
 		String coords = key.toString();
 
 		
-		String val = values[0];
-		String valMax = values[1];
-		String valMin = values[2];
+
 		if(reference) {
-			String time = values[3];
+
+			String time = values[9];
 			if (timeGranularity == 1) {
-				time += "," + values[4];
+				time += "," + values[10];
 			}
 
 			for (int i = firstYear; i <= lastYear; i++) {
-				output.collect(new Text(coords+","+i+","+time), new Text("$,"+val+","+valMax+","+valMin));
+				output.collect(new Text(coords+","+i+","+time), new Text("$,"+value.toString()));
 			}
 			
 		}
@@ -53,7 +52,7 @@ public class TemperatureAnomaliesMapper extends MapReduceBase implements
 			}
 
 			
-			output.collect(new Text(coords+","+time), new Text("0,"+val+","+valMax+","+valMin));
+			output.collect(new Text(coords+","+time), new Text("0,"+value.toString()));
 		}
 
 	}
