@@ -14,7 +14,7 @@ import org.apache.hadoop.mapred.Reporter;
 
 public class FindXtremReducer1 extends MapReduceBase implements Reducer<IntWritable, Text, IntWritable, Text> {
 
-	private static final int WIND_TRESHOLD = 100;
+	private static final int WIND_TRESHOLD = 200;
 //	private static final int RAIN_TRESHOLD = 10;
 
 //	private static int WIND_TRESHOLD;
