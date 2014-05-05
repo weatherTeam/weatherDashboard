@@ -43,7 +43,6 @@ public class AnomaliesReducer extends MapReduceBase implements
 		while (values.hasNext()) {
 
 			String[] val = values.next().toString().split(",");
-			System.out.println(val);
 			if (val[0].equals("$")) {
 				refExists = true;
 				averageDataValue = Integer.parseInt(val[1]);
@@ -63,7 +62,6 @@ public class AnomaliesReducer extends MapReduceBase implements
 			}
 		}
 		if (!refExists || !valExists) {
-			System.out.println("DO NOT EXISTS");
 			return;
 		}
 		int anomaly = dataValue - averageDataValue;

@@ -24,7 +24,7 @@ import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 
 
 public class WeatherStatistics {
-	static final boolean PROD = true;
+	static final boolean PROD = false;
 
 	public static void main(String[] args) throws IOException {
 		if (args.length != 9) {
