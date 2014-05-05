@@ -26,6 +26,7 @@ public class utils {
 		String station_id;
 		int period;
     	int[] referenceYearStationValues;
+    	String[] values;
 
 		while((line = bufferReader.readLine()) != null){
 			
@@ -33,12 +34,13 @@ public class utils {
 			period = Integer.parseInt(line.substring(12,13));
 			
 			if (!referenceYearValues.containsKey(station_id)){
-				referenceYearValues.put(station_id, new int[6]);
+				referenceYearValues.put(station_id, new int[12]);
 			}
 			
-			referenceYearStationValues = referenceYearValues.get(station_id); 
-	  	  	referenceYearStationValues[period] = Integer.parseInt(line.split("\\s+")[1]);
-
+			referenceYearStationValues = referenceYearValues.get(station_id);
+			values = line.split("\\s+")[1].split(";");
+	  	  	referenceYearStationValues[period*2] = Integer.parseInt(values[0]);
+	  	  	referenceYearStationValues[period*2+1] = Integer.parseInt(values[1]);
 	    }
 	    bufferReader.close();
 	    return referenceYearValues;
