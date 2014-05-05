@@ -64,7 +64,7 @@ public class DailyToWeeklySnowFallEstimation {
 			c.setTime(date);
 
 			//Reformat the date to Year/Week
-			SimpleDateFormat dateFormatterForKey = new SimpleDateFormat("yyyy/ww"); //"year/week in year"
+			SimpleDateFormat dateFormatterForKey = new SimpleDateFormat("yyyy-ww"); //"year/week in year"
 
 			String time = dateFormatterForKey.format(c.getTime());
 
