@@ -1,4 +1,4 @@
-package weather.statistics;
+package weather.temperature;
 
 import java.io.IOException;
 import java.util.Iterator;

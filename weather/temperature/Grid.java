@@ -1,4 +1,4 @@
-package weather.statistics;
+package weather.temperature;
 
 /*
  * Copyright (c) Aubry Cholleton

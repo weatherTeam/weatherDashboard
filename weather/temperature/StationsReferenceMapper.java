@@ -1,4 +1,4 @@
-package weather.statistics;
+package weather.temperature;
 
 import java.io.IOException;
 import org.apache.hadoop.io.LongWritable;
@@ -16,8 +16,7 @@ import org.apache.hadoop.mapred.Reporter;
  * 
  * The rest of the code is written by Aubry Cholleton
  */
-
-public class StationsMapper extends MapReduceBase implements
+public class StationsReferenceMapper extends MapReduceBase implements
 		Mapper<LongWritable, Text, Text, Text> {
 	private static final int MISSING = 9999;
 
@@ -31,6 +30,7 @@ public class StationsMapper extends MapReduceBase implements
 		timeGranularity = Integer.parseInt(job.get("timeGranularity"));
 	}
 	
+	
 	public void map(LongWritable key, Text value,
 			OutputCollector<Text, Text> output, Reporter reporter)
 			throws IOException {
@@ -43,7 +43,7 @@ public class StationsMapper extends MapReduceBase implements
 		if (intYear < firstYear || intYear > lastYear) 
 			return;
 		
-		//String station = line.substring(4, 15);
+		String station = line.substring(4, 15);
 		String coord = line.substring(28, 41);
 		String month = line.substring(19, 21);
 		String day = line.substring(21, 23);
@@ -61,8 +61,7 @@ public class StationsMapper extends MapReduceBase implements
 		}
 		String quality = line.substring(92, 93);
 		if (airTemperature != MISSING && quality.matches("[01459]")) {
-			//output.collect(new Text(coord), new Text(year+","+month+","+airTemperature));
-			output.collect(new Text(coord+","+time), new Text(""+airTemperature));
+			output.collect(new Text(station), new Text(coord+","+airTemperature+","+time));
 		}
 	}
 }
