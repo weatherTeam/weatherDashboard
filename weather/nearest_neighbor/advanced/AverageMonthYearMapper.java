@@ -12,10 +12,10 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.JobConf;
 
 public class AverageMonthYearMapper extends MapReduceBase implements
-	Mapper<LongWritable, Text, Text, IntWritable> {
+	Mapper<LongWritable, Text, Text, Text> {
 	
 	private static Integer referenceYear;
-	private static int temp;
+	private static String tempPrec;
 	private static String stationYearMonthPeriod;
 	
 	public void configure(JobConf job) {
@@ -23,15 +23,15 @@ public class AverageMonthYearMapper extends MapReduceBase implements
 	}
 
 	public void map(LongWritable key, Text value,
-			OutputCollector<Text, IntWritable> output, Reporter reporter)
+			OutputCollector<Text, Text> output, Reporter reporter)
 			throws IOException {
 		
 		String[] lineArray = value.toString().split("\\s+");
-		temp = Integer.parseInt(lineArray[1]);
+		tempPrec = lineArray[1];
 		stationYearMonthPeriod = lineArray[0];
 		
 		if (stationYearMonthPeriod.substring(6,10).equals(referenceYear.toString())){
-			output.collect(new Text(stationYearMonthPeriod), new IntWritable(temp));
+			output.collect(new Text(stationYearMonthPeriod), new Text(tempPrec));
 		}
 	}
 }
