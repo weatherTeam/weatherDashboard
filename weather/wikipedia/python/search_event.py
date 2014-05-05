@@ -15,7 +15,7 @@ def inputDateFormat(string):
 
 def gps_to_places(latitude, longitude):
 
-	url = "http://nominatim.openstreetmap.org/reverse?format=json&lon=%f&lat=%f&addressdetails=1&accept-language=en"%(longitude, latitude)
+	url = "http://nominatim.openstreetmap.org/reverse?format=json&lon=%f&lat=%f&addressdetails=1&accept-language=en&email=alpsweather@groupes.epfl.ch"%(longitude, latitude)
 	address = json.load(urllib2.urlopen(url))
 
 	if 'error' in address:

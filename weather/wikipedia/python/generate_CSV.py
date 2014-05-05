@@ -18,17 +18,24 @@ def add_to_CSV_of_month(month, year, line):
 	if year >= 1975 and year <= 2014 :
 		with open('wiki-csv/'+str_year+'-'+str_month+'.tab', 'a') as month_csv:
 			month_csv.write(line)
+
+def get_num_references(title):
+	url = "http://toolserver.org/~dispenser/cgi-bin/backlinkscount.py?title="+title
+	return urllib2.urlopen(url).read()
+
+
 	
 def main():
 
 	for line in open('events.tab'):
+		line = line.strip()
 		title, category, start_date, end_date, location = line.split('\t')
 
-		url = "http://en.wikipedia.org/wiki/"+title
-		url = url.replace(' ', '_')
+		url = title.replace(' ', '_')
+		num_ref = get_num_references(url).strip()
+		url = "http://en.wikipedia.org/wiki/"+url
 		title = "<a href=\""+url+"\">"+title+"</a>"
-	
-		line = ("%s\t%s\t%s\t%s\t%s" % (title, category, start_date, end_date, location))
+		line = ("%s\t%s\t%s\t%s\t%s\t%s\n" % (title, category, start_date, end_date, location,num_ref))
 
 		try:
 			start = strptime(start_date,"%d/%m/%Y")
