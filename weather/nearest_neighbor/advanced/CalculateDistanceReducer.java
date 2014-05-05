@@ -21,6 +21,8 @@ public class CalculateDistanceReducer extends MapReduceBase implements
 	private String year;
 	private String month;
     private double temp;
+    private double prec;
+    
     private int period;
     private String[] textArray;
     
@@ -47,11 +49,17 @@ public class CalculateDistanceReducer extends MapReduceBase implements
             referenceYearStationValues = referenceYearValues.get(station);
             if (referenceYearStationValues != null){
             	while (values.hasNext() ){
-            		textArray = values.next().toString().split(";");
+            		textArray = values.next().toString().split(":");
             		period = Integer.parseInt(textArray[0]);
-            		temp = Double.parseDouble(textArray[1]);
-                
-            		distance += Math.abs(referenceYearStationValues[period]-temp);
+            		temp = Double.parseDouble(textArray[1].split(";")[0]);
+            		prec = Double.parseDouble(textArray[1].split(";")[1]);
+            		
+            		if (prec >= 9999 || referenceYearStationValues[period*2+1]>= 9999){
+            			distance += Math.abs(referenceYearStationValues[period*2]-temp);
+            		} else {
+            			distance += Math.sqrt(Math.pow(referenceYearStationValues[period*2]-temp,2) + 
+            				Math.pow(referenceYearStationValues[period*2+1]-prec,2));
+            		}
             	}
             	//distance = Math.sqrt(distance);
             	output.collect(new Text(year+month), new DoubleWritable(distance));

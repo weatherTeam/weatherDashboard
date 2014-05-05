@@ -13,7 +13,9 @@ import org.apache.hadoop.mapred.Reporter;
 public class CalculateDistanceMapper extends MapReduceBase implements 
 	Mapper<LongWritable, Text, Text, Text> {
 	
-    private String temp;
+    private String[] values;
+	private String temp;
+    private String prec;
     private String stationDate;
     private int year;
     private String month;
@@ -25,12 +27,14 @@ public class CalculateDistanceMapper extends MapReduceBase implements
 			throws IOException {
 		String[] lineArray = value.toString().split("\\s+");
 		stationDate = lineArray[0];
-		temp = lineArray[1];
+		values = lineArray[1].split(";");
+		temp = values[0];
+		prec = values[1];
 		station = stationDate.substring(0,6);
 		year = Integer.parseInt(stationDate.substring(6,10));
 		month = stationDate.substring(10,12);
 		period = stationDate.substring(12,13);
 		
-		output.collect(new Text(station+year+month), new Text(period+";"+temp));
+		output.collect(new Text(station+year+month), new Text(period+":"+temp+";"+prec));
 	}
 }
