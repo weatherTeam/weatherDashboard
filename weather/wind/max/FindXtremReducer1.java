@@ -15,7 +15,7 @@ import org.apache.hadoop.mapred.Reporter;
 public class FindXtremReducer1 extends MapReduceBase implements Reducer<IntWritable, Text, IntWritable, Text> {
 
 	private static final int WIND_TRESHOLD = 200;
-//	private static final int RAIN_TRESHOLD = 10;
+	private static final int RAIN_TRESHOLD = 10;
 
 //	private static int WIND_TRESHOLD;
 //	private static int RAIN_TRESHOLD;
@@ -40,12 +40,15 @@ public class FindXtremReducer1 extends MapReduceBase implements Reducer<IntWrita
 		{
 			String infoString = inputValue.next().toString();
 			int wind = Integer.parseInt(infoString.substring(36, 40));
-//			int rainPeriodQuantityInHours = Integer.parseInt(infoString.substring(40, 42));
-//			int rainMillimeters = Integer.parseInt(infoString.substring(42, 46));
+			int rainPeriodQuantityInHours = Integer.parseInt(infoString.substring(40, 42));
+			int rainMillimeters = Integer.parseInt(infoString.substring(42, 46));
 
-			if (wind > WIND_TRESHOLD) //&& ((rainMillimeters/rainPeriodQuantityInHours) > RAIN_TRESHOLD)){
+			if (rainPeriodQuantityInHours != 0
+					&& wind > WIND_TRESHOLD
+					&& ((rainMillimeters/rainPeriodQuantityInHours) > RAIN_TRESHOLD))
+			{
 				xtremWindInfo.add(infoString);
-			//}
+			}
 		}
 
 		for(int i=0; i<xtremWindInfo.size(); ++i)
