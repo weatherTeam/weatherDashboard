@@ -1,10 +1,5 @@
-package weather.temperature.anomalies.grid;
+package weather.statistics;
 
-/*
- * This mapper is inspired by a code example from
- * Hadoop: The Definitive Guide, Second
- * Edition, by Tom White. Copyright 2011 Tom White, 978-1-449-38973-4.
- */
 import java.io.IOException;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -14,8 +9,15 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
+/*
+ * This mapper is inspired by a code example from
+ * Hadoop: The Definitive Guide, Second
+ * Edition, by Tom White. Copyright 2011 Tom White, 978-1-449-38973-4.
+ * 
+ * The rest of the code is written by Aubry Cholleton
+ */
 
-public class StationsMonthYearAverageMapper extends MapReduceBase implements
+public class StationsMapper extends MapReduceBase implements
 		Mapper<LongWritable, Text, Text, Text> {
 	private static final int MISSING = 9999;
 

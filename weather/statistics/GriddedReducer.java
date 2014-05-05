@@ -1,4 +1,4 @@
-package weather.temperature.anomalies.grid;
+package weather.statistics;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -10,7 +10,11 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
-public class GriddedMonthYearAverageReducer extends MapReduceBase implements
+/*
+ * Copyright (c) Aubry Cholleton
+ */
+
+public class GriddedReducer extends MapReduceBase implements
 		Reducer<Text, Text, Text, Text> {
 	
 	private static int timeGranularity;
@@ -36,9 +40,9 @@ public class GriddedMonthYearAverageReducer extends MapReduceBase implements
 			if (timeGranularity == 1) {
 				time = year+","+ month + "," + value[5];
 			}
-			int temperature = Integer.parseInt(value[0]);
-			int maxTemperature = Integer.parseInt(value[1]);
-			int minTemperature = Integer.parseInt(value[2]);
+			int dataValue = Integer.parseInt(value[0]);
+			int maxDataValue = Integer.parseInt(value[1]);
+			int minDataValue = Integer.parseInt(value[2]);
 			
 			if (!monthAverage.containsKey(time)) {
 				monthAverage.put(time, 0);
@@ -47,9 +51,9 @@ public class GriddedMonthYearAverageReducer extends MapReduceBase implements
 				minMonthAverage.put(time, 0);
 			}
 			nbRecords.put(time,nbRecords.get(time) + 1);
-			monthAverage.put(time,monthAverage.get(time) + temperature);
-			maxMonthAverage.put(time,maxMonthAverage.get(time) + maxTemperature);
-			minMonthAverage.put(time,minMonthAverage.get(time) + minTemperature);
+			monthAverage.put(time,monthAverage.get(time) + dataValue);
+			maxMonthAverage.put(time,maxMonthAverage.get(time) + maxDataValue);
+			minMonthAverage.put(time,minMonthAverage.get(time) + minDataValue);
 
 		}
 		for (String time : monthAverage.keySet()) {

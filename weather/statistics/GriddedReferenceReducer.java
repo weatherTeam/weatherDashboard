@@ -1,4 +1,4 @@
-package weather.temperature.anomalies.grid;
+package weather.statistics;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -10,7 +10,11 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
-public class GriddedMonthAverageReducer extends MapReduceBase implements
+/*
+ * Copyright (c) Aubry Cholleton
+ */
+
+public class GriddedReferenceReducer extends MapReduceBase implements
 		Reducer<Text, Text, Text, Text> {
 
 	private static int timeGranularity;
@@ -41,13 +45,13 @@ public class GriddedMonthAverageReducer extends MapReduceBase implements
 			if (timeGranularity == 1) {
 				time = month + "," + value[10];
 			}
-			int temperature = Integer.parseInt(value[0]);
+			int dataValue = Integer.parseInt(value[0]);
 			int centileHigh = Integer.parseInt(value[1]);
 			int centileLow = Integer.parseInt(value[2]);
-			int temperatureMax = Integer.parseInt(value[3]);
+			int dataValueMax = Integer.parseInt(value[3]);
 			int maxCentileHigh = Integer.parseInt(value[4]);
 			int maxCentileLow = Integer.parseInt(value[5]);
-			int temperatureMin = Integer.parseInt(value[6]);
+			int dataValueMin = Integer.parseInt(value[6]);
 			int minCentileHigh = Integer.parseInt(value[7]);
 			int minCentileLow = Integer.parseInt(value[8]);
 
@@ -65,32 +69,45 @@ public class GriddedMonthAverageReducer extends MapReduceBase implements
 
 			}
 			nbRecords.put(time, nbRecords.get(time) + 1);
-			monthAverage.put(time, monthAverage.get(time) + temperature);
-			centileHighAverage.put(time, centileHighAverage.get(time) + centileHigh);
-			centileLowAverage.put(time, centileLowAverage.get(time) + centileLow);
-			
-			monthAverageMin.put(time, monthAverageMin.get(time)
-					+ temperatureMin);
-			maxCentileHighAverage.put(time, maxCentileHighAverage.get(time) + maxCentileHigh);
-			maxCentileLowAverage.put(time, maxCentileLowAverage.get(time) + maxCentileLow);
-			monthAverageMax.put(time, monthAverageMax.get(time)
-					+ temperatureMax);
-			minCentileHighAverage.put(time, minCentileHighAverage.get(time) + minCentileHigh);
-			minCentileLowAverage.put(time, minCentileLowAverage.get(time) + minCentileLow);
+			monthAverage.put(time, monthAverage.get(time) + dataValue);
+			centileHighAverage.put(time, centileHighAverage.get(time)
+					+ centileHigh);
+			centileLowAverage.put(time, centileLowAverage.get(time)
+					+ centileLow);
+
+			monthAverageMin.put(time, monthAverageMin.get(time) + dataValueMin);
+			maxCentileHighAverage.put(time, maxCentileHighAverage.get(time)
+					+ maxCentileHigh);
+			maxCentileLowAverage.put(time, maxCentileLowAverage.get(time)
+					+ maxCentileLow);
+			monthAverageMax.put(time, monthAverageMax.get(time) + dataValueMax);
+			minCentileHighAverage.put(time, minCentileHighAverage.get(time)
+					+ minCentileHigh);
+			minCentileLowAverage.put(time, minCentileLowAverage.get(time)
+					+ minCentileLow);
 
 		}
 		for (String time : monthAverage.keySet()) {
 			if (nbRecords.get(time) > 0) {
 				int avg = monthAverage.get(time) / nbRecords.get(time);
-				int centileHigh = centileHighAverage.get(time) / nbRecords.get(time);
-				int centileLow = centileLowAverage.get(time) / nbRecords.get(time);
+				int centileHigh = centileHighAverage.get(time)
+						/ nbRecords.get(time);
+				int centileLow = centileLowAverage.get(time)
+						/ nbRecords.get(time);
 				int avgMax = monthAverageMax.get(time) / nbRecords.get(time);
-				int maxCentileHigh = maxCentileHighAverage.get(time) / nbRecords.get(time);
-				int maxCentileLow = maxCentileLowAverage.get(time) / nbRecords.get(time);
+				int maxCentileHigh = maxCentileHighAverage.get(time)
+						/ nbRecords.get(time);
+				int maxCentileLow = maxCentileLowAverage.get(time)
+						/ nbRecords.get(time);
 				int avgMin = monthAverageMin.get(time) / nbRecords.get(time);
-				int minCentileHigh = minCentileHighAverage.get(time) / nbRecords.get(time);
-				int minCentileLow = minCentileLowAverage.get(time) / nbRecords.get(time);
-				output.collect(key, new Text(avg+","+centileHigh+","+centileLow+","+avgMax+","+maxCentileHigh+","+maxCentileLow+","+avgMin+","+minCentileHigh+","+minCentileLow+","+time));
+				int minCentileHigh = minCentileHighAverage.get(time)
+						/ nbRecords.get(time);
+				int minCentileLow = minCentileLowAverage.get(time)
+						/ nbRecords.get(time);
+				output.collect(key, new Text(avg + "," + centileHigh + ","
+						+ centileLow + "," + avgMax + "," + maxCentileHigh
+						+ "," + maxCentileLow + "," + avgMin + ","
+						+ minCentileHigh + "," + minCentileLow + "," + time));
 			}
 		}
 	}

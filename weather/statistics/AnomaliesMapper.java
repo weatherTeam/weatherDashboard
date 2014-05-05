@@ -1,4 +1,4 @@
-package weather.temperature.anomalies.grid;
+package weather.statistics;
 
 import java.io.IOException;
 import org.apache.hadoop.io.Text;
@@ -8,7 +8,11 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
-public class TemperatureAnomaliesMapper extends MapReduceBase implements
+/*
+ * Copyright (c) Aubry Cholleton
+ */
+
+public class AnomaliesMapper extends MapReduceBase implements
 		Mapper<Text, Text, Text, Text> {
 	
 	private static int firstYear;
@@ -30,8 +34,6 @@ public class TemperatureAnomaliesMapper extends MapReduceBase implements
 		 reference = (values.length==11);
 		}
 		String coords = key.toString();
-
-		
 
 		if(reference) {
 

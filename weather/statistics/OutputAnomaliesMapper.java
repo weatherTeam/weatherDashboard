@@ -1,4 +1,4 @@
-package weather.temperature.anomalies.grid;
+package weather.statistics;
 
 import java.io.IOException;
 import org.apache.hadoop.io.Text;
@@ -8,7 +8,7 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
-public class OutputTemperatureAnomaliesMapper extends MapReduceBase implements
+public class OutputAnomaliesMapper extends MapReduceBase implements
 		Mapper<Text, Text, Text, Text> {
 	private static int timeGranularity;
 	public void configure(JobConf job) {

@@ -1,4 +1,8 @@
-package weather.temperature.anomalies.grid;
+package weather.statistics;
+
+/*
+ * Copyright (c) Aubry Cholleton
+ */
 
 public class Grid {
 	

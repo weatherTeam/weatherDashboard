@@ -1,4 +1,4 @@
-package weather.temperature.anomalies.grid;
+package weather.statistics;
 
 import java.io.IOException;
 import org.apache.hadoop.io.Text;
@@ -9,7 +9,11 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
 
-public class GriddedMonthYearAverageMapper extends MapReduceBase implements
+/*
+ * Copyright (c) Aubry Cholleton
+ */
+
+public class GriddedMapper extends MapReduceBase implements
 		Mapper<Text, Text, Text, Text> {
 
 	private static double xStep;
