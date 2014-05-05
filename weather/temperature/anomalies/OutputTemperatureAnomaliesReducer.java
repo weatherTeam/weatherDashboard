@@ -1,4 +1,4 @@
-package weather.temperature.anomalies;
+package weather.temperature.anomalies.grid;
 
 import java.io.IOException;
 import java.util.Iterator;
