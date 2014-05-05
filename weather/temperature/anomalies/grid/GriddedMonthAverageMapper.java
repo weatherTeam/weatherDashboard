@@ -14,10 +14,12 @@ public class GriddedMonthAverageMapper extends MapReduceBase implements
 
 	private static double xStep;
 	private static double yStep;
+	private static int timeGranularity;
 	
 	public void configure(JobConf job) {
 		xStep = Double.parseDouble(job.get("xStep"));
 		yStep = Double.parseDouble(job.get("yStep"));
+		timeGranularity = Integer.parseInt(job.get("timeGranularity"));
 	}
 	
 	public void map(Text key, Text value,
@@ -25,14 +27,19 @@ public class GriddedMonthAverageMapper extends MapReduceBase implements
 			throws IOException {
 		String[] values = value.toString().split(",");
 		String coords = key.toString();
-		String month = values[0];
-		String avgMonth = values[1];
-		String avgMax = values[2];
-		String avgMin = values[3];
+		String month = values[3];
+		String avgMonth = values[0];
+		String avgMax = values[1];
+		String avgMin = values[2];
+		String time = month;
+		
+		if (timeGranularity == 1)
+			time = month+","+values[4];
+			
 		
 
 		String cellCoord = Grid.getGridCoord(coords,xStep,yStep);
 		
-		output.collect(new Text(cellCoord), new Text(month+","+avgMonth+","+avgMax+","+avgMin));
+		output.collect(new Text(cellCoord), new Text(avgMonth+","+avgMax+","+avgMin+","+time));
 	}
 }

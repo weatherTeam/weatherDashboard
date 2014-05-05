@@ -30,7 +30,7 @@ public class Grid {
 		String y= String.format("%+06d", (int)lat); 
 
 		
-		return y+x;
+		return y+","+x;
 	}
 	
 }

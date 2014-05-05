@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
@@ -11,6 +12,13 @@ import org.apache.hadoop.mapred.Reporter;
 
 public class GriddedMonthAverageReducer extends MapReduceBase implements
 		Reducer<Text, Text, Text, Text> {
+
+	private static int timeGranularity;
+
+	public void configure(JobConf job) {
+		timeGranularity = Integer.parseInt(job.get("timeGranularity"));
+	}
+
 	public void reduce(Text key, Iterator<Text> values,
 			OutputCollector<Text, Text> output, Reporter reporter)
 			throws IOException {
@@ -22,33 +30,36 @@ public class GriddedMonthAverageReducer extends MapReduceBase implements
 
 		while (values.hasNext()) {
 			String[] value = values.next().toString().split(",");
-			String month = value[0];
-			int temperature = Integer.parseInt(value[1]);
-			int temperatureMax = Integer.parseInt(value[2]);
-			int temperatureMin = Integer.parseInt(value[3]);
+			String month = value[3];
+			String time = month;
+			if (timeGranularity == 1) {
+				time = month + "," + value[4];
+			}
+			int temperature = Integer.parseInt(value[0]);
+			int temperatureMax = Integer.parseInt(value[1]);
+			int temperatureMin = Integer.parseInt(value[2]);
 
-			if (!monthAverage.containsKey(month)) {
-				monthAverage.put(month, 0);
-				nbRecords.put(month, 0);
-				monthAverageMin.put(month, 0);
-				monthAverageMax.put(month, 0);
+			if (!monthAverage.containsKey(time)) {
+				monthAverage.put(time, 0);
+				nbRecords.put(time, 0);
+				monthAverageMin.put(time, 0);
+				monthAverageMax.put(time, 0);
 
 			}
-			nbRecords.put(month, nbRecords.get(month) + 1);
-			monthAverage.put(month, monthAverage.get(month) + temperature);
-			monthAverageMin.put(month, monthAverageMin.get(month)
+			nbRecords.put(time, nbRecords.get(time) + 1);
+			monthAverage.put(time, monthAverage.get(time) + temperature);
+			monthAverageMin.put(time, monthAverageMin.get(time)
 					+ temperatureMin);
-			monthAverageMax.put(month, monthAverageMax.get(month)
+			monthAverageMax.put(time, monthAverageMax.get(time)
 					+ temperatureMax);
 
 		}
-		for (String month : monthAverage.keySet()) {
-			if (nbRecords.get(month) > 0) {
-				int avg = monthAverage.get(month) / nbRecords.get(month);
-				int avgMax = monthAverageMax.get(month) / nbRecords.get(month);
-				int avgMin = monthAverageMin.get(month) / nbRecords.get(month);
-				output.collect(key, new Text(month + "," + avg + "," + avgMax
-						+ "," + avgMin));
+		for (String time : monthAverage.keySet()) {
+			if (nbRecords.get(time) > 0) {
+				int avg = monthAverage.get(time) / nbRecords.get(time);
+				int avgMax = monthAverageMax.get(time) / nbRecords.get(time);
+				int avgMin = monthAverageMin.get(time) / nbRecords.get(time);
+				output.collect(key, new Text(avg + "," + avgMax + "," + avgMin+","+time));
 			}
 		}
 	}

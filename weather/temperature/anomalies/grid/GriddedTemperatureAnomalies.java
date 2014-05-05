@@ -15,9 +15,9 @@ import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 public class GriddedTemperatureAnomalies {
 	static final boolean PROD = false;
 	public static void main(String[] args) throws IOException {
-		if (args.length != 8) {
+		if (args.length != 9) {
 			System.err
-					.println("Usage: Temperature anomalies <input path> <output path> <x step of the grid> <y step of the grid> <first year of reference period> <last year of reference period> <first year of period to analyse> <last year of period to analyse>");
+					.println("Usage: Temperature anomalies <input path> <output path> <temporal granularity> <x step of the grid> <y step of the grid> <first year of reference period> <last year of reference period> <first year of period to analyse> <last year of period to analyse>");
 			System.exit(-1);
 		}
 		
@@ -27,12 +27,13 @@ public class GriddedTemperatureAnomalies {
 		Path griddedMonthYearAveragePath = new Path("griddedMonthYearAverage");
 		Path rawOutputPath = new Path("rawOutput");
 		Path outputPath = new Path("output");
-		String firstRefYear = args[4];
-		String lastRefYear = args[5];
-		String firstYear = args[6];
-		String lastYear = args[7];
-		String xStep = args[2];
-		String yStep = args[3];
+		String firstRefYear = args[5];
+		String lastRefYear = args[6];
+		String firstYear = args[7];
+		String lastYear = args[8];
+		String xStep = args[3];
+		String yStep = args[4];
+		String timeGranularity = args[2];
 		
 		if (PROD) {
 			stationsMonthAveragePath = new Path("/team11/tempAnom/stationsMonthAverage");
@@ -58,6 +59,7 @@ public class GriddedTemperatureAnomalies {
 		stationsMonthAverage.setJobName("StationsAverageMonthTemperature");
 		stationsMonthAverage.set("firstYear",firstRefYear);
 		stationsMonthAverage.set("lastYear", lastRefYear);
+		stationsMonthAverage.set("timeGranularity", timeGranularity);
 		FileInputFormat.addInputPath(stationsMonthAverage, new Path(args[0]));
 		FileOutputFormat.setOutputPath(stationsMonthAverage, stationsMonthAveragePath);
 
@@ -78,6 +80,7 @@ public class GriddedTemperatureAnomalies {
 		stationsMonthYearAverage.setJobName("StationsAverageMonthYearTemperature");
 		stationsMonthYearAverage.set("firstYear",firstYear);
 		stationsMonthYearAverage.set("lastYear", lastYear);
+		stationsMonthYearAverage.set("timeGranularity", timeGranularity);
 		FileInputFormat.addInputPath(stationsMonthYearAverage, new Path(args[0]));
 		FileOutputFormat.setOutputPath(stationsMonthYearAverage, stationsMonthYearAveragePath);
 
@@ -98,6 +101,7 @@ public class GriddedTemperatureAnomalies {
 		griddedMonthAverage.setJobName("GriddedAverageMonthTemperature");
 		griddedMonthAverage.set("xStep",xStep);
 		griddedMonthAverage.set("yStep", yStep);
+		griddedMonthAverage.set("timeGranularity", timeGranularity);
 		FileInputFormat.addInputPath(griddedMonthAverage, stationsMonthAveragePath);
 		FileOutputFormat.setOutputPath(griddedMonthAverage, griddedMonthAveragePath);
 
@@ -120,6 +124,7 @@ public class GriddedTemperatureAnomalies {
 		griddedMonthYearAverage.setJobName("GriddedAverageMonthYearTemperature");
 		griddedMonthYearAverage.set("xStep",xStep);
 		griddedMonthYearAverage.set("yStep", yStep);
+		griddedMonthYearAverage.set("timeGranularity", timeGranularity);
 		FileInputFormat.addInputPath(griddedMonthYearAverage, stationsMonthYearAveragePath);
 		FileOutputFormat.setOutputPath(griddedMonthYearAverage, griddedMonthYearAveragePath);
 
@@ -142,6 +147,7 @@ public class GriddedTemperatureAnomalies {
 		temperatureAnomalies.setJobName("temperatureAnomalies");
 		temperatureAnomalies.set("firstYear",firstYear);
 		temperatureAnomalies.set("lastYear", lastYear);
+		temperatureAnomalies.set("timeGranularity", timeGranularity);
 		MultipleInputs.addInputPath(temperatureAnomalies, griddedMonthAveragePath,
 				KeyValueTextInputFormat.class);
 		MultipleInputs.addInputPath(temperatureAnomalies, griddedMonthYearAveragePath,
@@ -165,6 +171,7 @@ public class GriddedTemperatureAnomalies {
 		
 		JobConf outputTemperatureAnomalies = new JobConf(GriddedTemperatureAnomalies.class);
 		outputTemperatureAnomalies.setJobName("outputTemperatureAnomalies");
+		outputTemperatureAnomalies.set("timeGranularity", timeGranularity);
 
 		FileInputFormat.addInputPath(outputTemperatureAnomalies, rawOutputPath);
 		FileOutputFormat.setOutputPath(outputTemperatureAnomalies, outputPath);

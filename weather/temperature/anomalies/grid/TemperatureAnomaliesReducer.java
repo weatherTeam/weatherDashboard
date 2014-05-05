@@ -3,6 +3,7 @@ package weather.temperature.anomalies.grid;
 import java.io.IOException;
 import java.util.Iterator;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
@@ -10,6 +11,11 @@ import org.apache.hadoop.mapred.Reporter;
 
 public class TemperatureAnomaliesReducer extends MapReduceBase implements
 		Reducer<Text, Text, Text, Text> {
+	private static int timeGranularity;
+	public void configure(JobConf job) {
+
+		timeGranularity = Integer.parseInt(job.get("timeGranularity"));
+	}
 	public void reduce(Text key, Iterator<Text> values,
 			OutputCollector<Text, Text> output, Reporter reporter)
 			throws IOException {
@@ -43,14 +49,29 @@ public class TemperatureAnomaliesReducer extends MapReduceBase implements
 		int temperatureAnomaly = temperature-averageTemperature;
 		int maxAnomaly = temperatureMax-averageMax;
 		int minAnomaly = temperatureMin-averageMin;
-		String keystr = key.toString();
-		String lat = keystr.substring(0,6);
-		String lon = keystr.substring(6,13);
-		String year = keystr.substring(13, 17);
-		String month = keystr.substring(17, 19);
+		String[] keyvals = key.toString().split(",");
+		String lat = keyvals[0];
+		String lon = keyvals[1];
+		String year = keyvals[2];
+		String month = keyvals[3];
+		String time = month;
+		String eventType = "NORMAL";
+		if (timeGranularity == 1) {
+			time += "," +  keyvals[4];
+			if (temperatureMax > averageMax) {
+				eventType = "HOT";
+			} else if (temperatureMin > averageMin) {
+				eventType = "COLD";
+			}
+		} else {
+			if (temperature > ((averageMax+averageTemperature)/2)) {
+				eventType = "HOT";
+			} else if (temperature < ((averageMin+averageTemperature)/2)) {
+				eventType = "COLD";
+			}
+		}
 		
-		boolean isExtreme = ((temperature > averageMax) || (temperature< averageMin));
 		//output.collect(new Text(lat+"\t"+lon+"\t"+year+"\t"+month), new Text(temperatureAnomaly+""));
-		output.collect(new Text(year), new Text(lat+","+lon+","+month+","+temperatureAnomaly+","+maxAnomaly+","+minAnomaly+","+(isExtreme?"EXTREME":"NORMAL")));
+		output.collect(new Text(year), new Text(lat+","+lon+","+temperatureAnomaly+","+maxAnomaly+","+minAnomaly+","+eventType+","+time));
 	}
 }

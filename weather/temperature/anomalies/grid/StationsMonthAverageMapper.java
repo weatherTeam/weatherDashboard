@@ -21,11 +21,14 @@ public class StationsMonthAverageMapper extends MapReduceBase implements
 
 	private static int firstYear;
 	private static int lastYear;
+	private static int timeGranularity;
 	
 	public void configure(JobConf job) {
 		firstYear = Integer.parseInt(job.get("firstYear"));
 		lastYear = Integer.parseInt(job.get("lastYear"));
+		timeGranularity = Integer.parseInt(job.get("timeGranularity"));
 	}
+	
 	
 	public void map(LongWritable key, Text value,
 			OutputCollector<Text, Text> output, Reporter reporter)
@@ -42,6 +45,12 @@ public class StationsMonthAverageMapper extends MapReduceBase implements
 		String station = line.substring(4, 15);
 		String coord = line.substring(28, 41);
 		String month = line.substring(19, 21);
+		String day = line.substring(21, 23);
+		String time = year+","+month;
+		
+		if (timeGranularity == 1) {
+			time = year+","+month+","+day;
+		}
 		
 		int airTemperature;
 		if (line.charAt(87) == '+') {
@@ -51,7 +60,7 @@ public class StationsMonthAverageMapper extends MapReduceBase implements
 		}
 		String quality = line.substring(92, 93);
 		if (airTemperature != MISSING && quality.matches("[01459]")) {
-			output.collect(new Text(station), new Text(coord+","+year+","+month+","+airTemperature));
+			output.collect(new Text(station), new Text(coord+","+airTemperature+","+time));
 		}
 	}
 }

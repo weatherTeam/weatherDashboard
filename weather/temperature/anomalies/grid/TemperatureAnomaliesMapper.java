@@ -13,10 +13,12 @@ public class TemperatureAnomaliesMapper extends MapReduceBase implements
 	
 	private static int firstYear;
 	private static Integer lastYear;
+	private static int timeGranularity;
 	
 	public void configure(JobConf job) {
 		firstYear = Integer.parseInt(job.get("firstYear"));
 		lastYear = Integer.parseInt(job.get("lastYear"));
+		timeGranularity = Integer.parseInt(job.get("timeGranularity"));
 	}
 	public void map(Text key,  Text value,
 			OutputCollector<Text, Text> output, Reporter reporter)
@@ -24,25 +26,34 @@ public class TemperatureAnomaliesMapper extends MapReduceBase implements
 		
 		String[] values = value.toString().split(",");
 		boolean reference = (values.length==4);
+		if (timeGranularity == 1) {
+		 reference = (values.length==5);
+		}
 		String coords = key.toString();
-		String month = values[0];
+
 		
+		String val = values[0];
+		String valMax = values[1];
+		String valMin = values[2];
 		if(reference) {
-			String val = values[1];
-			String valMax = values[2];
-			String valMin = values[3];
+			String time = values[3];
+			if (timeGranularity == 1) {
+				time += "," + values[4];
+			}
+
 			for (int i = firstYear; i <= lastYear; i++) {
-				output.collect(new Text(coords+i+month), new Text("$,"+val+","+valMax+","+valMin));
+				output.collect(new Text(coords+","+i+","+time), new Text("$,"+val+","+valMax+","+valMin));
 			}
 			
 		}
 		else {
-			String year = values[1];
-			String val = values[2];
-			String valMax = values[3];
-			String valMin = values[4];
+			String time = values[3]+","+values[4];
+			if (timeGranularity == 1) {
+				time += "," + values[5];
+			}
+
 			
-			output.collect(new Text(coords+year+month), new Text("0,"+val+","+valMax+","+valMin));
+			output.collect(new Text(coords+","+time), new Text("0,"+val+","+valMax+","+valMin));
 		}
 
 	}

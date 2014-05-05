@@ -16,10 +16,12 @@ public class StationsMonthAverageReducer extends MapReduceBase implements
 	
 	private static int firstYear;
 	private static int lastYear;
+	private static int timeGranularity;
 	
 	public void configure(JobConf job) {
 		firstYear = Integer.parseInt(job.get("firstYear"));
 		lastYear = Integer.parseInt(job.get("lastYear"));
+		timeGranularity = Integer.parseInt(job.get("timeGranularity"));
 	}
 	
 	public void reduce(Text key, Iterator<Text> values,
@@ -36,14 +38,18 @@ public class StationsMonthAverageReducer extends MapReduceBase implements
 		while (values.hasNext()) {
 			String[] value = values.next().toString().split(",");
 			String coord = value[0];
-			String year = value[1];
-			String month = value[2];
-			int temperature = Integer.parseInt(value[3]);			
+			String year = value[2];
+			String month = value[3];
+			int temperature = Integer.parseInt(value[1]);
+			
+
 			if (!years.contains(year)) {
 				years.add(year);
 			}
 			
 			String k = coord+","+month;
+			if(timeGranularity == 1)
+				k = coord+","+month+","+value[4];
 							
 			if (!monthAverage.containsKey(k)) {
 				monthAverage.put(k, 0);
@@ -70,12 +76,17 @@ public class StationsMonthAverageReducer extends MapReduceBase implements
 
 		}
 		System.out.println(years.size());
-
+		
+		// Here we check that the stations has enough data over
+		// the reference period to be interesting
 		//if (years.size() > (lastYear - firstYear)/4) {
-		//if (years.size() > 2) {
+		if (years.size() >= 2) {
 			for (String k : monthAverage.keySet()) {
 				String coord = k.split(",")[0];
 				String month = k.split(",")[1];
+				String time = month;
+				if(timeGranularity == 1)
+					time = month+","+k.split(",")[2];
 				
 				int maxAvg = 0;
 				for (String l : monthYearMax.get(k).keySet()) {
@@ -89,9 +100,9 @@ public class StationsMonthAverageReducer extends MapReduceBase implements
 				}
 				minAvg/=monthYearMin.get(k).size();
 				
-				int avg = monthAverage.get(coord+","+month)/nbRecords.get(coord+","+month);
-				output.collect(new Text(coord), new Text(month+","+avg+","+maxAvg+","+minAvg));
+				int avg = monthAverage.get(k)/nbRecords.get(k);
+				output.collect(new Text(coord), new Text(avg+","+maxAvg+","+minAvg+","+time));
 			}
-		//}
+		}
 	}
 }
