@@ -34,7 +34,7 @@ public class utils {
 			period = Integer.parseInt(line.substring(12,13));
 			
 			if (!referenceYearValues.containsKey(station_id)){
-				referenceYearValues.put(station_id, new int[12]);
+				referenceYearValues.put(station_id, new int[2]);
 			}
 			
 			referenceYearStationValues = referenceYearValues.get(station_id);

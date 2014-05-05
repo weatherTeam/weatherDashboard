@@ -90,10 +90,10 @@ public class AdvancedNearestNeighbor {
           calculateDistancesSum.setNumReduceTasks(1);
           
           // Run jobs
-          //JobClient.runJob(averageMonth);
-          //JobClient.runJob(averageMonthYear);
-          //JobClient.runJob(calculateDistances);
-          //JobClient.runJob(calculateDistancesSum);
+          JobClient.runJob(averageMonth);
+          JobClient.runJob(averageMonthYear);
+          JobClient.runJob(calculateDistances);
+          JobClient.runJob(calculateDistancesSum);
           
     }
 }

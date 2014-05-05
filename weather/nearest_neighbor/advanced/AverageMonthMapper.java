@@ -35,10 +35,11 @@ public class AverageMonthMapper extends MapReduceBase implements
 	
 	// Divide into periods in stead of days
 	int day = Integer.parseInt(line.substring(21,23));
-	int period = (day-1)/5;
-	if (day==31){
-		period = 5;
-	}
+	//int period = (day-1)/5;
+	//if (day==31){
+	//	period = 5;
+	//}
+	int period = 0;
 	
 	String airTemperature;
 	String precipitation = MISSING; 
