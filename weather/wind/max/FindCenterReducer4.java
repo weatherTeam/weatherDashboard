@@ -21,7 +21,7 @@ public class FindCenterReducer4 extends MapReduceBase implements
 		int startDate = Integer.MAX_VALUE;
 		int endDate = 0;
 		int windMax = 0;
-		int rainMax = 0;
+//		int rainMax = 0;
 		int x = 0;
 		int y = 0;
 		long totX = 0, totY = 0;
@@ -78,11 +78,11 @@ public class FindCenterReducer4 extends MapReduceBase implements
 			if (windMax < wind)
 				windMax = wind;
 			
-			// find max rain
-			int rain = Integer.parseInt(inputValueString.substring(42, 46));
-			
-			if (rainMax < rain)
-				rainMax = rain;
+//			// find max rain
+//			int rain = Integer.parseInt(inputValueString.substring(42, 46));
+//			
+//			if (rainMax < rain)
+//				rainMax = rain;
 			
 			// find start date
 			int date = Integer.parseInt(inputValueString.substring(15, 23));
@@ -95,6 +95,7 @@ public class FindCenterReducer4 extends MapReduceBase implements
 				
 			++nbrPoint;
 		}
+		
 		if (nbrPoint > 1)
 		{
 			// calculate the center of the event
@@ -116,6 +117,7 @@ public class FindCenterReducer4 extends MapReduceBase implements
 					radiusMax = radius;
 			}
 			
+			radiusMax *= 1000;
 			
 			if (radiusMax > 0)
 			{
@@ -125,7 +127,7 @@ public class FindCenterReducer4 extends MapReduceBase implements
 				String centreYString = centreY + ""; // 6
 				String radiusString = (int)radiusMax + ""; // 6
 				// windMax // 3
-				String rainMaxString = rainMax + ""; // 3
+//				String rainMaxString = rainMax + ""; // 3
 				
 				if (startDate < 10000000)
 					startDateString = year + "0" + startDate;
@@ -179,32 +181,47 @@ public class FindCenterReducer4 extends MapReduceBase implements
 				else if (radiusMax < 100000)
 					radiusString = "0" + (int)radiusMax;
 				
-				if (rainMax < 10)
-					rainMaxString = "00" + rainMax;
-				else if (rainMax < 100)
-					rainMaxString = "0" + rainMax;
-				output.collect(new Text(), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMax + rainMaxString));
+//				if (rainMax < 10)
+//					rainMaxString = "00" + rainMax;
+//				else if (rainMax < 100)
+//					rainMaxString = "0" + rainMax;
+				output.collect(new Text(), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMax));
+//						+ rainMaxString));
 			}
 		}		
 	}
 	
 	public class Point
 	{
-		int x, y;
+		int LAT, LONG;
 		
 		public Point(int x, int y)
 		{
-			this.x = x;
-			this.y = y;
+			this.LAT = x;
+			this.LONG = y;
 		}
 		public String toString()
 		{
-			return "x: "+x+"    y: "+y;
+			return "x: "+LAT+"    y: "+LONG;
 		}
 	}
 	
-	public double radius(Point a, Point b)
+	public double radius(Point x, Point y)
 	{
-		return Math.sqrt(Math.pow(Math.abs(a.x) - Math.abs(b.x), 2) + Math.pow(Math.abs(a.y) - Math.abs(b.y), 2));
+		final int R = 6371; // earth radius
+		double phi1 = Math.toRadians((double)x.LAT/1000.0);
+		double phi2 = Math.toRadians((double)y.LAT/1000.0);
+		double deltaPhi = Math.toRadians((double)y.LAT/1000.0 - (double)x.LAT/1000.0);
+		double deltaLambda = Math.toRadians((double)y.LONG/1000.0 - (double)x.LONG/1000.0);
+		
+		double a = Math.sin(deltaPhi/2.0) * Math.sin(deltaPhi/2.0) +
+		        Math.cos(phi1) * Math.cos(phi2) *
+		        Math.sin(deltaLambda/2.0) * Math.sin(deltaLambda/2.0);
+		
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		
+		double d = R * c;
+		
+		return d;
 	}
 }

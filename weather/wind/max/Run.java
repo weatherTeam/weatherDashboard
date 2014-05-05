@@ -113,7 +113,7 @@ public class Run
 //		FileOutputFormat.setOutputPath(conf3, new Path("output/3tmpCluster"));
 //		
 //		FileInputFormat.setInputPaths(conf4, new Path("output/3tmpCluster"));
-//
+
 		FileOutputFormat.setOutputPath(conf4, new Path(args[1]));
 
 		JobClient.runJob(conf1);
