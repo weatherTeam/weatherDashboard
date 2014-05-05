@@ -38,11 +38,13 @@ public class DailySnowFallEstimation {
 	public static class MapperDailySnowComputation extends MapReduceBase implements Mapper<LongWritable, Text, Text,
 			Text> {
 
-		int lastDepth = -1;
+		int lastDepth = SnowData.NO_SNOW_INFO;
 
 		//store the last time they was information about snow depth.
 		Calendar lastDepthTime = Calendar.getInstance();
 		final long MILIS_IN_2_DAYS = 2 * 24 * 3600 * 1000;
+
+		String lastStationID = "";
 
 		//After an amount of time, if there is no value, we consider there is no more snow.
 		// (generally, if there is no measure after some time, it means there is no more snow at all)
@@ -76,6 +78,13 @@ public class DailySnowFallEstimation {
 
 
 				String stationID = input.substring(4, 10);
+
+				//process a new station, reset the settings
+				if(stationID.equals(lastStationID) == false){
+					lastStationID = stationID;
+					lastDepth = SnowData.NO_SNOW_INFO;
+				}
+				lastStationID = stationID;
 
 				//location of the station
 				String latitude = input.substring(28, 34);
@@ -127,32 +136,35 @@ public class DailySnowFallEstimation {
 					int startPosition = input.indexOf("AJ1") + 3; //start of depth value AJ1xxxx, xxxx is the depth
 					int endPosition = startPosition + 4;
 
+					//in case something go wrong in the input
+					if(endPosition < input.length()) {
 
-					try {
-						//System.out.println("SNOW DEPTH : " + input.substring(startPosition, endPosition));
-						int newDepth = Integer.parseInt(input.substring(startPosition, endPosition));
+						try {
+							//System.out.println("SNOW DEPTH : " + input.substring(startPosition, endPosition));
+							int newDepth = Integer.parseInt(input.substring(startPosition, endPosition));
 
-						//9999 = missing data (ish-format-document)
-						if (newDepth != 9999) {
-							snowDepth = newDepth;
+							//9999 = missing data (ish-format-document)
+							if (newDepth != 9999) {
+								snowDepth = newDepth;
 
-							if (lastDepth != SnowData.NO_SNOW_INFO) {
-								cumulationFromSnowDepth = newDepth - lastDepth;
-								//if < 0, is mean the snow has melt. (cumulation does not change)
-								// We just update the lastSnowDepth value
-								//if start from 1st january, then we do not consider the first day,
-								// which will serve as an initial value
-								if (cumulationFromSnowDepth >= 0) {
-									containsDataFromSnowDepth = true;
+								if (lastDepth != SnowData.NO_SNOW_INFO) {
+									cumulationFromSnowDepth = newDepth - lastDepth;
+									//if < 0, is mean the snow has melt. (cumulation does not change)
+									// We just update the lastSnowDepth value
+									//if start from 1st january, then we do not consider the first day,
+									// which will serve as an initial value
+									if (cumulationFromSnowDepth >= 0) {
+										containsDataFromSnowDepth = true;
+									}
 								}
+								lastDepth = newDepth;
+								lastDepthTime.setTime(c.getTime()); // new snow information for today
 							}
-							lastDepth = newDepth;
-							lastDepthTime.setTime(c.getTime()); // new snow information for today
-						}
 
-					} catch (NumberFormatException e) {
-						cumulationFromSnowDepth = SnowData.NO_SNOW_INFO;
-						lastDepth = SnowData.NO_SNOW_INFO;
+						} catch (NumberFormatException e) {
+							cumulationFromSnowDepth = SnowData.NO_SNOW_INFO;
+							lastDepth = SnowData.NO_SNOW_INFO;
+						}
 					}
 
 				}
