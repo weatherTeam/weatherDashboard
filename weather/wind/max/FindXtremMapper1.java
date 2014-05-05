@@ -14,7 +14,7 @@ public class FindXtremMapper1 extends MapReduceBase implements
 		Mapper<LongWritable, Text, IntWritable, Text>
 {
 	private static final int MISSING = 9999;
-	private static final int MISSING99 = 99;
+//	private static final int MISSING99 = 99;
 
 	@Override
 	public void map(LongWritable inputKey, Text inputValue,
@@ -29,31 +29,31 @@ public class FindXtremMapper1 extends MapReduceBase implements
 		String geoloc = inputValue.toString().substring(28, 41);
 		String wind = inputValue.toString().substring(65, 69);
 
-		String periodQuantityInHoursPrecipitation = null;
-		String millimetersPrecipitation = null;
+//		String periodQuantityInHoursPrecipitation = null;
+//		String millimetersPrecipitation = null;
 
-		if (inputValue.toString().contains("AA1"))
-		{
-			int startIndex = inputValue.toString().indexOf("AA1");
-			int endIndex = startIndex + 10;
-			String precipitation = inputValue.toString().substring(startIndex, endIndex);
-			periodQuantityInHoursPrecipitation = precipitation.substring(3, 5);
-			millimetersPrecipitation = precipitation.substring(5, 9);
-		}
+//		if (inputValue.toString().contains("AA1"))
+//		{
+//			int startIndex = inputValue.toString().indexOf("AA1");
+//			int endIndex = startIndex + 10;
+//			String precipitation = inputValue.toString().substring(startIndex, endIndex);
+//			periodQuantityInHoursPrecipitation = precipitation.substring(3, 5);
+//			millimetersPrecipitation = precipitation.substring(5, 9);
+//		}
 
 
 		if (
 				Integer.parseInt(wind) > 0
-				&& periodQuantityInHoursPrecipitation != null & millimetersPrecipitation != null
+//				&& periodQuantityInHoursPrecipitation != null & millimetersPrecipitation != null
 				&& Integer.parseInt(wind) != MISSING
-				&& Integer.parseInt(millimetersPrecipitation) != MISSING
-				&& Integer.parseInt(periodQuantityInHoursPrecipitation) != MISSING99
+//				&& Integer.parseInt(millimetersPrecipitation) != MISSING
+//				&& Integer.parseInt(periodQuantityInHoursPrecipitation) != MISSING99
 				&& windQuality.matches("[01459]"))
 		{
 			IntWritable outputKey = new IntWritable(Integer.parseInt(month));
-			Text outputValue = new Text(id + date + geoloc + wind
-					+ periodQuantityInHoursPrecipitation
-					+ millimetersPrecipitation);			
+			Text outputValue = new Text(id + date + geoloc + wind);
+//					+ periodQuantityInHoursPrecipitation
+//					+ millimetersPrecipitation);			
 			output.collect(outputKey, outputValue);
 		}
 

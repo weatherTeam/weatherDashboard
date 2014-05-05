@@ -26,12 +26,14 @@ public class FindCenterReducer4 extends MapReduceBase implements
 		int y = 0;
 		long totX = 0, totY = 0;
 		int nbrPoint = 0;
+		int year = 0;
 		
 		ArrayList<Point> points = new ArrayList<Point>();
-		
+			
 		while (inputValue.hasNext())
 		{
 			String inputValueString = inputValue.next().toString();
+			
 			if (inputValueString.charAt(23) == '+')
 				x = Integer.parseInt(inputValueString.substring(24, 29));
 			else if (inputValueString.charAt(23) == '-')
@@ -67,6 +69,9 @@ public class FindCenterReducer4 extends MapReduceBase implements
 			totX += x;
 			totY += y;
 			
+			System.out.println("totX: "+totX);
+			System.out.println("totY: "+totY);
+			
 			// find max wind
 			int wind = Integer.parseInt(inputValueString.substring(36, 40));
 			
@@ -86,70 +91,100 @@ public class FindCenterReducer4 extends MapReduceBase implements
 				startDate = date;
 			if (date > endDate);
 				endDate = date;
+			year = Integer.parseInt(inputValueString.substring(11, 15));
 				
 			++nbrPoint;
-			
-			System.out.println("totX: "+totX);
-			System.out.println("totY: "+totY);
 		}
+		if (nbrPoint > 1)
+		{
+			// calculate the center of the event
+			int centreX = 0, centreY = 0;
+			if (nbrPoint > 0)
+			{
+				centreX = (int) totX/nbrPoint;
+				centreY = (int) totY/nbrPoint;
+			}
+			
+			// find the radius of the event
+			Point center = new Point(centreX, centreY);
+			double radiusMax = 0.0;
+			for (Point p : points)
+			{
+				double radius = radius(center, p);
 				
-		// calculate the center of the event
-		int centreX = 0, centreY = 0;
-		if (nbrPoint > 0)
-		{
-			centreX = (int) totX/nbrPoint;
-			centreY = (int) totY/nbrPoint;
-		}
-
-		// find the radius of the event
-		Point center = new Point(centreX, centreY);
-		double radiusMax = 0.0;
-		for (Point p : points)
-		{
-			double radius = radius(center, p);
-			
-			if (radiusMax < radius)
+				if (radiusMax < radius)
 					radiusMax = radius;
-		}
-		
-		String year = inputKey.toString().substring(0, 4);
-		String startDateString = year + startDate; // 12
-		String endDateString = year + endDate; // 12
-		String centreXString = centreX + ""; // 6
-		String centreYString = centreY + ""; // 6
-		String radiusString = (int)radiusMax + ""; // 6
-		// windMax // 3
-		String rainMaxString = rainMax + ""; // 3
-		
-		if (startDate < 10000000)
-			startDateString = year + "0" + startDate;
-		if (endDate < 10000000)
-			endDateString = year + "0" + endDate;
-		
-		if (centreX < 10000)
-			centreXString = "00" + centreX;
-		else if (centreX < 100000)
-			centreXString = "0" + centreX;
-		
-		if (centreY < 10000)
-			centreYString = "00" + centreY;
-		else if (centreY < 100000)
-			centreYString = "0" + centreY;	
-		
-		if (radiusMax < 1)
-			radiusString = "000000";
-		else if (radiusMax < 1000)
-			radiusString = "000" + (int)radiusMax;
-		else if (radiusMax < 10000)
-			radiusString = "00" + (int)radiusMax;
-		else if (radiusMax < 100000)
-			radiusString = "0" + (int)radiusMax;
-		
-		if (rainMax < 100)
-			rainMaxString = "0" + rainMax;
-		
-		output.collect(inputKey, new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMax + rainMaxString));
-
+			}
+			
+			
+			if (radiusMax > 0)
+			{
+				String startDateString = startDate + ""; // 12
+				String endDateString = endDate + ""; // 12
+				String centreXString = centreX + ""; // 6
+				String centreYString = centreY + ""; // 6
+				String radiusString = (int)radiusMax + ""; // 6
+				// windMax // 3
+				String rainMaxString = rainMax + ""; // 3
+				
+				if (startDate < 10000000)
+					startDateString = year + "0" + startDate;
+				else
+					startDateString = year +""+ startDate;
+				if (endDate < 10000000)
+					endDateString = year + "0" + endDate;
+				else
+					endDateString = year +""+ endDate;
+				
+				if (centreX < 0)
+				{
+					if (centreX > -10000)
+						centreXString = "-00" + Math.abs(centreX);
+					else if (centreX > -100000)
+						centreXString = "-0" + Math.abs(centreX);	
+				}
+				else
+				{
+					if (centreX < 10000)
+						centreXString = "+00" + centreX;
+					else if (centreX < 100000)
+						centreXString = "+0" + centreX;
+				}
+				
+				if (centreY < 0)
+				{
+					if (centreY > -10000)
+						centreYString = "-00" + Math.abs(centreY);
+					else if (centreY > -100000)
+						centreYString = "-0" + Math.abs(centreY);	
+				}
+				else
+				{
+					if (centreY < 10000)
+						centreYString = "+00" + centreY;
+					else if (centreY < 100000)
+						centreYString = "+0" + centreY;
+				}	
+				
+				if (radiusMax < 1)
+					radiusString = "000000";
+				else if (radiusMax < 10)
+					radiusString = "00000" + (int)radiusMax;
+				else if (radiusMax < 100)
+					radiusString = "0000" + (int)radiusMax;
+				else if (radiusMax < 1000)
+					radiusString = "000" + (int)radiusMax;
+				else if (radiusMax < 10000)
+					radiusString = "00" + (int)radiusMax;
+				else if (radiusMax < 100000)
+					radiusString = "0" + (int)radiusMax;
+				if (rainMax < 10)
+					rainMaxString = "00" + rainMax;
+				else if (rainMax < 100)
+					rainMaxString = "0" + rainMax;
+				output.collect(new Text(), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMax + rainMaxString));
+			}
+		}		
 	}
 	
 	public class Point
@@ -161,10 +196,14 @@ public class FindCenterReducer4 extends MapReduceBase implements
 			this.x = x;
 			this.y = y;
 		}
+		public String toString()
+		{
+			return "x: "+x+"    y: "+y;
+		}
 	}
 	
 	public double radius(Point a, Point b)
 	{
-		return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+		return Math.sqrt(Math.pow(Math.abs(a.x) - Math.abs(b.x), 2) + Math.pow(Math.abs(a.y) - Math.abs(b.y), 2));
 	}
 }

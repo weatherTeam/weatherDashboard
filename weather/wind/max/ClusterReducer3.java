@@ -16,7 +16,7 @@ import org.apache.hadoop.mapred.Reporter;
 public class ClusterReducer3 extends MapReduceBase implements
 		Reducer<IntWritable, Text, Text, Text>
 {
-	static final int closeLocationTreshold = 500;
+	static final int closeLocationTreshold = 1000;
 	static final ArrayList<Location> closeLocation = new ArrayList<Location>();
 	static ArrayList<String> infoToOutput = new ArrayList<String>();
 	
@@ -63,6 +63,10 @@ public class ClusterReducer3 extends MapReduceBase implements
 				
 		int index = 0;
 
+		String inputKeyString = inputKey.toString();
+		if (Integer.parseInt(inputKeyString) < 1000)
+			inputKeyString = "0" + inputKeyString;
+		
 		while(!closeLocation.isEmpty())
 		{
 			Location firstElem = closeLocation.remove(0);
@@ -71,11 +75,11 @@ public class ClusterReducer3 extends MapReduceBase implements
 			for (String s : infoToOutput)
 			{
 				if (index < 10)
-					output.collect(new Text(inputKey.toString() +"00"+index), new Text(s));
+					output.collect(new Text(inputKeyString +"00"+index), new Text(s));
 				else if (index < 100)
-					output.collect(new Text(inputKey.toString() +"0"+index), new Text(s));
+					output.collect(new Text(inputKeyString +"0"+index), new Text(s));
 				else
-					output.collect(new Text(inputKey.toString() +index), new Text(s));
+					output.collect(new Text(inputKeyString +index), new Text(s));
 			}
 			infoToOutput = new ArrayList<String>();
 			index++;
