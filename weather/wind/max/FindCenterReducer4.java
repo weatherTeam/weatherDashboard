@@ -63,14 +63,8 @@ public class FindCenterReducer4 extends MapReduceBase implements
 			
 			points.add(new Point(x, y));
 			
-			System.out.println("x: "+x);
-			System.out.println("y: "+y);
-			
 			totX += x;
 			totY += y;
-			
-			System.out.println("totX: "+totX);
-			System.out.println("totY: "+totY);
 			
 			// find max wind
 			int wind = Integer.parseInt(inputValueString.substring(36, 40));

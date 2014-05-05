@@ -78,8 +78,6 @@ public class FindXtremMapper1 extends MapReduceBase implements
 			else
 				windString = "0"+wind;
 			
-			System.out.println(id + date + geoloc + windString);
-			
 //			if (mmPrec < 10)
 //				mmPrecString = "00" + mmPrec;
 //			else if (mmPrec < 100)
