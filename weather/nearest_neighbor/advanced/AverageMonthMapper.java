@@ -12,9 +12,9 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
 public class AverageMonthMapper extends MapReduceBase implements
-	Mapper<LongWritable, Text, Text, IntWritable> {
+	Mapper<LongWritable, Text, Text, Text> {
 	
-	private static final int MISSING = 9999;
+	private static final String MISSING = "9999";
 	private static String referenceMonth;
 	
 	public void configure(JobConf job) {
@@ -22,7 +22,7 @@ public class AverageMonthMapper extends MapReduceBase implements
 	}
 	
 	public void map(LongWritable key, Text value,
-		OutputCollector<Text, IntWritable> output, Reporter reporter)
+		OutputCollector<Text, Text> output, Reporter reporter)
 		throws IOException {
 	
 	String line = value.toString();
@@ -40,15 +40,24 @@ public class AverageMonthMapper extends MapReduceBase implements
 		period = 5;
 	}
 	
-	int airTemperature;
+	String airTemperature;
+	String precipitation = MISSING; 
+
 	if (line.charAt(87) == '+') {
-		airTemperature = Integer.parseInt(line.substring(88, 92));
+		airTemperature = line.substring(88, 92);
 	} else {
-		airTemperature = Integer.parseInt(line.substring(87, 92));
+		airTemperature = line.substring(87, 92);
 	}
+	
+	int index = line.indexOf("ADDAA1");
+	if (index != -1){
+		precipitation = line.substring(index+8,index+12);
+	}
+	
 	String quality = line.substring(92, 93);
-	if (airTemperature != MISSING && quality.matches("[01459]") && referenceMonth.equals(month)) {
-		output.collect(new Text(station+intYear+month+period), new IntWritable(airTemperature));
+	if (!airTemperature.equals(MISSING) && quality.matches("[01459]") && referenceMonth.equals(month)) {
+		output.collect(new Text(station+intYear+month+period), 
+				new Text(airTemperature+";"+precipitation));
 	}
 	}
 }
