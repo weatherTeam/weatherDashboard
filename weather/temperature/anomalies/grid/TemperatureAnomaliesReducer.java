@@ -58,9 +58,9 @@ public class TemperatureAnomaliesReducer extends MapReduceBase implements
 		String eventType = "NORMAL";
 		if (timeGranularity == 1) {
 			time += "," +  keyvals[4];
-			if (temperatureMax > averageMax) {
+			if (temperatureMax > averageMax && temperatureMin > averageMin && temperature > averageTemperature) {
 				eventType = "HOT";
-			} else if (temperatureMin > averageMin) {
+			} else if (temperatureMax < averageMax && temperatureMin < averageMin && temperature < averageTemperature) {
 				eventType = "COLD";
 			}
 		} else {

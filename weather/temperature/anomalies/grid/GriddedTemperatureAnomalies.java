@@ -13,7 +13,7 @@ import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 
 
 public class GriddedTemperatureAnomalies {
-	static final boolean PROD = false;
+	static final boolean PROD = true;
 	public static void main(String[] args) throws IOException {
 		if (args.length != 9) {
 			System.err

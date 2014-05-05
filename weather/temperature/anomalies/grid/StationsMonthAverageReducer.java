@@ -10,6 +10,7 @@ import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.commons.math3.stat.descriptive.AbstractUnivariateStatistic;
 
 public class StationsMonthAverageReducer extends MapReduceBase implements
 		Reducer<Text, Text, Text, Text> {
@@ -99,6 +100,8 @@ public class StationsMonthAverageReducer extends MapReduceBase implements
 					minAvg+=monthYearMin.get(k).get(l);
 				}
 				minAvg/=monthYearMin.get(k).size();
+				
+				monthAverage.values();
 				
 				int avg = monthAverage.get(k)/nbRecords.get(k);
 				output.collect(new Text(coord), new Text(avg+","+maxAvg+","+minAvg+","+time));
