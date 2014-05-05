@@ -17,7 +17,7 @@ public class AdvancedNearestNeighbor {
           averageMonth.setJobName("Average Month Values");
 
           averageMonth.setOutputKeyClass(Text.class);
-          averageMonth.setOutputValueClass(IntWritable.class);
+          averageMonth.setOutputValueClass(Text.class);
           
           averageMonth.set("referenceMonth",args[3]);
           
@@ -35,7 +35,7 @@ public class AdvancedNearestNeighbor {
           averageMonthYear.setJobName("Filter for specific year");
 
           averageMonthYear.setOutputKeyClass(Text.class);
-          averageMonthYear.setOutputValueClass(IntWritable.class);
+          averageMonthYear.setOutputValueClass(Text.class);
           
           averageMonthYear.set("referenceYear",args[2]);
           
@@ -93,7 +93,7 @@ public class AdvancedNearestNeighbor {
           //JobClient.runJob(averageMonth);
           //JobClient.runJob(averageMonthYear);
           //JobClient.runJob(calculateDistances);
-          JobClient.runJob(calculateDistancesSum);
+          //JobClient.runJob(calculateDistancesSum);
           
     }
 }
