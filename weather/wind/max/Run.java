@@ -79,7 +79,7 @@ public class Run
 		JobConf conf4 = new JobConf(Run.class);
 		conf4.setJobName("Find Center");
 		conf4.setNumMapTasks(40);
-		conf4.setNumReduceTasks(40);
+		conf4.setNumReduceTasks(1);
 		
 		conf4.setMapOutputKeyClass(Text.class);
 		conf4.setMapOutputValueClass(Text.class);
@@ -95,25 +95,25 @@ public class Run
 
 		FileInputFormat.setInputPaths(conf1, new Path(args[0]));
 		
-//		FileOutputFormat.setOutputPath(conf1, new Path("/team11/tmp/CedricAlexis/1tmpXtrem"));
+		FileOutputFormat.setOutputPath(conf1, new Path("/team11/tmp/CedricAlexis/1tmpXtrem"));
+
+		FileInputFormat.setInputPaths(conf2, new Path("/team11/tmp/CedricAlexis/1tmpXtrem"));
+		FileOutputFormat.setOutputPath(conf2, new Path("/team11/tmp/CedricAlexis/2tmpDateCluster"));
+
+		FileInputFormat.setInputPaths(conf3, new Path("/team11/tmp/CedricAlexis/2tmpDateCluster"));
+		FileOutputFormat.setOutputPath(conf3, new Path("/team11/tmp/CedricAlexis/3tmpCluster"));
+		
+		FileInputFormat.setInputPaths(conf4, new Path("/team11/tmp/CedricAlexis/3tmpCluster"));
+		
+//		FileOutputFormat.setOutputPath(conf1, new Path("output/1tmpXtrem"));
 //
-//		FileInputFormat.setInputPaths(conf2, new Path("/team11/tmp/CedricAlexis/1tmpXtrem"));
-//		FileOutputFormat.setOutputPath(conf2, new Path("/team11/tmp/CedricAlexis/2tmpDateCluster"));
+//		FileInputFormat.setInputPaths(conf2, new Path("output/1tmpXtrem"));
+//		FileOutputFormat.setOutputPath(conf2, new Path("output/2tmpDateCluster"));
 //
-//		FileInputFormat.setInputPaths(conf3, new Path("/team11/tmp/CedricAlexis/2tmpDateCluster"));
-//		FileOutputFormat.setOutputPath(conf3, new Path("/team11/tmp/CedricAlexis/3tmpCluster"));
+//		FileInputFormat.setInputPaths(conf3, new Path("output/2tmpDateCluster"));
+//		FileOutputFormat.setOutputPath(conf3, new Path("output/3tmpCluster"));
 //		
-//		FileInputFormat.setInputPaths(conf4, new Path("/team11/tmp/CedricAlexis/3tmpCluster"));
-		
-		FileOutputFormat.setOutputPath(conf1, new Path("output/1tmpXtrem"));
-
-		FileInputFormat.setInputPaths(conf2, new Path("output/1tmpXtrem"));
-		FileOutputFormat.setOutputPath(conf2, new Path("output/2tmpDateCluster"));
-
-		FileInputFormat.setInputPaths(conf3, new Path("output/2tmpDateCluster"));
-		FileOutputFormat.setOutputPath(conf3, new Path("output/3tmpCluster"));
-		
-		FileInputFormat.setInputPaths(conf4, new Path("output/3tmpCluster"));
+//		FileInputFormat.setInputPaths(conf4, new Path("output/3tmpCluster"));
 
 		FileOutputFormat.setOutputPath(conf4, new Path(args[1]));
 

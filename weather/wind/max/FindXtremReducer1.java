@@ -16,7 +16,7 @@ public class FindXtremReducer1 extends MapReduceBase implements
 		Reducer<IntWritable, Text, IntWritable, Text>
 {
 
-	private static final int WIND_TRESHOLD = 200;
+	private static final int WIND_TRESHOLD = 250;
 
 	@Override
 	public void reduce(IntWritable inputKey, Iterator<Text> inputValue,
