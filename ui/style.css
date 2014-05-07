@@ -14,21 +14,19 @@ nav {
 	font-family: Helvetica, Arial, sans-serif;
 }
 
-nav a {
+nav a, nav menuitem {
 	color: #f5efea;
 	display: inline-block;
 	padding: 5px 10px 5px 10px;
 }
 
-nav a:hover {
+nav a:hover, nav menuitem:hover {
 	color: #e6e4bd;
+	cursor: pointer;
 }
 nav a.currentPage {
 	background-color: #e6e4bd;
 	color: #76b6e3;
-}
-
-nav menuitem {
 }
 
 main {
