@@ -50,8 +50,8 @@ public class DailyToWeeklySnowFallEstimation {
 			String split[] = input.split("\\s+");
 
 			String stationID = split[0];
-			String latitude = "" + Float.parseFloat(split[1]) / 1000f;
-			String longitude = "" + Float.parseFloat(split[2]) / 1000f;;
+			String latitude = split[1];
+			String longitude = split[2];
 			String dateString = split[3];
 			String cumulationString = split[4];
 
@@ -79,6 +79,12 @@ public class DailyToWeeklySnowFallEstimation {
 
 	}
 
+
+	/*
+	*
+	* OUTPUT KEY: STATION ID + tab + LATITUDE + tab + LONGITUDE + tab + TIME
+	* OUTPUT VALUE: snow cumulation of each week
+	 */
 	public static class Reduce extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
 
 
@@ -86,7 +92,7 @@ public class DailyToWeeklySnowFallEstimation {
 		                   Reporter reporter) throws IOException {
 
             /*
-             * Each key-value pair is of kind: "year-month" - {43, 50, 60, 30, 20, 0}. Values are all measured depth
+             * Each key-value pair is of kind: "year-week" - {43, 50, 60, 30, 20, 0}. Values are all measured depth
              * in the time period given by the key
              */
 

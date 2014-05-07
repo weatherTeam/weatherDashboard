@@ -74,7 +74,26 @@ public class DailySnowFallEstimation {
 			//First check if there enough data. (Need snowdepth OR precipitation amount)
 			//We need at least the snowDepth (AJ1) or precipitation (AA1). Otherwise,
 			// it is not possible to compute anything
-			if ((input.indexOf("AJ1") != -1) || (input.indexOf("AA1") != -1)) {
+
+			//location of the station
+			boolean stationCanBeUsed = true;
+			float latitudeFloat = 0;
+			float longitudeFloat = 0;
+
+			try {
+				latitudeFloat = Float.parseFloat(input.substring(28, 34)) / 1000f;
+				longitudeFloat = Float.parseFloat(input.substring(34, 41)) / 1000f;
+				if(latitudeFloat < -90f || latitudeFloat > 90f || longitudeFloat < -180f || longitudeFloat > 180f){
+					System.out.println("YOUYOU " + longitudeFloat + " " + latitudeFloat);
+					stationCanBeUsed = false;
+				}
+			} catch (NumberFormatException e){
+				stationCanBeUsed = false;
+			}
+
+
+
+			if (((input.indexOf("AJ1") != -1) || (input.indexOf("AA1") != -1)) && stationCanBeUsed == true) {
 
 
 				String stationID = input.substring(4, 10);
@@ -86,9 +105,10 @@ public class DailySnowFallEstimation {
 				}
 				lastStationID = stationID;
 
-				//location of the station
-				String latitude = input.substring(28, 34);
-				String longitude = input.substring(34, 41);
+
+
+				String latitude = "" + latitudeFloat;
+				String longitude = "" + longitudeFloat;
 
 
 				//read and format DATE
