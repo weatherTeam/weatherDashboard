@@ -1,0 +1,127 @@
+<div id='map'></div>
+
+<div id='form'>
+		<form id='formcontent'>
+			<input type="week" name="holidays" id="period" value="2013-W52" class="box" onclick="salut()"><br \>
+			<!-- <input type="submit" name="submit" value="Display" class="btn">-->
+		</form>
+	</div>
+<script src="data/snowcumulation.js" type="text/javascript"></script>
+
+<script>
+
+// This example will run with just Leaflet, without the Mapbox.js
+// dependency. Use Leaflet v0.6.3 or newer.
+
+// In the URL below, replace 'examples.map-zr0njcqy' with your map id.
+var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/aubry.i3j7cknp/{z}/{x}/{y}.png', {
+    attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+});
+var map = L.map('map')
+    .addLayer(mapboxTiles)
+    .setView([39.82, -98.57], 4);
+
+
+$.getJSON("data/snow/snowcumulation-2013-52.json", function(snow) {
+	//When GeoJSON is loaded
+	geojson = L.geoJson(snow, {
+		style: function (feature) {
+			return {
+				color: getColor(feature.properties.value),
+				fillOpacity: getOpacity(feature.properties.value)
+			}
+		},
+
+		pointToLayer: function (feature, latlng) {
+			return L.circleMarker(latlng);
+		},
+
+		onEachFeature: onEachFeature
+
+        //onEachFeature: onEachFeature,
+        });//.addTo(map);
+
+	map.addLayer(geojson);	//Add layer to map
+});
+
+
+//show a popup with the value when clicking
+function onEachFeature(feature, layer) {
+	var popupContent = "<p>Snow cumulation of the week: " +
+	feature.properties.value + "</p>";
+
+	if (feature.properties && feature.properties.popupContent) {
+		popupContent += feature.properties.popupContent;
+	}
+
+	layer.bindPopup(popupContent);
+}
+
+function salut(){
+	var date = $("#period").val().split('-W');
+	var year = date[0]
+	var week = date[1]
+	var fileName = "snowcumulation-" + date[0]+ "-" +date[1]+".json";
+
+
+ 	map.removeLayer(geojson);
+
+ 	$.getJSON("data/snow/" + fileName, function(snow) {
+	//When GeoJSON is loaded
+	geojson = L.geoJson(snow, {
+		style: function (feature) {
+			return {
+				color: getColor(feature.properties.value),
+				fillOpacity: getOpacity(feature.properties.value)
+				//console.log("alut")
+			}
+		},
+
+		pointToLayer: function (feature, latlng) {
+			return L.circleMarker(latlng);
+		},
+
+		onEachFeature: onEachFeature
+
+        //onEachFeature: onEachFeature,
+        });//.addTo(map);
+	map.addLayer(geojson);	//Add layer to map
+});
+ }
+
+function getColor(snowCumulation){
+	var gradient = ["#B33409", "#B83E07", "#BE4806", "#C35204", "#C95C03", "#CE6601", "#D47100", "#D7870C", "#DA9D19", "#DDB326", "#E0C932", "#E3DF3F", "#E7F54C", "#D4EE46", "#C1E840", "#AFE23A", "#9CDB34", "#89D52E", "#77CF29", "#70D141", "#69D459", "#62D771", "#5BDA89", "#54DDA1", "#4EE0B9", "#3FB9C3", "#3092CD", "#216BD8", "#1144E2", "#031EED"];
+	return snowCumulation > 500 ? gradient[1] :
+			snowCumulation > 300 ? gradient[3] :
+			snowCumulation > 250 ? gradient[5] :
+			snowCumulation > 200 ? gradient[7] :
+			snowCumulation > 175 ? gradient[9] :
+			snowCumulation > 150 ? gradient[11] :
+			snowCumulation > 125 ? gradient[13] :
+			snowCumulation > 100 ? gradient[15] :
+			snowCumulation > 75 ? gradient[17] :
+			snowCumulation > 50 ? gradient[19] :
+			snowCumulation > 30 ? gradient[21] :
+			snowCumulation > 20 ? gradient[23] :
+			snowCumulation > 10 ? gradient[25] :
+			snowCumulation > 5 ? gradient[27] :
+			snowCumulation > 0 ? gradient[29] :
+			'#267cc4';
+		}
+
+
+		function getOpacity(snowCumulation){
+			var opacity = [0.6, 0.8, 0.9, 1];
+			return snowCumulation > 500 ? opacity[3] :
+
+			snowCumulation > 100 ? opacity[3] :
+
+			snowCumulation > 50 ? opacity[2] :
+
+			snowCumulation > 15 ? opacity[1] :
+
+			snowCumulation > 0 ? opacity[0] :
+			0.4;
+		}
+
+</script>

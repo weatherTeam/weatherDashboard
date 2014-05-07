@@ -1,0 +1,118 @@
+body {
+	font-family: 'Amaranth';
+	padding: 0px;
+	margin: 0px;
+	background-image: url('agsquare.png');
+}
+
+header {
+}
+
+nav {
+	width: 100%;
+	background-color: #76b6e3;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+nav a {
+	color: #f5efea;
+	display: inline-block;
+	padding: 5px 10px 5px 10px;
+}
+
+nav a:hover {
+	color: #e6e4bd;
+}
+nav a.currentPage {
+	background-color: #e6e4bd;
+	color: #76b6e3;
+}
+
+nav menuitem {
+}
+
+main {
+ height: 80%;
+}
+
+footer {
+	padding: 50px 10px 0px 10px;
+	text-align: center;
+	font-size: 0.8em;
+	color: #999;
+}
+
+h1, h2 {
+	padding: 10px;
+	margin: 0px;
+}
+
+a {
+	font-weight: bold;
+	text-decoration: none;
+	color: #999;
+}
+
+#map {
+	height: 600px;
+}
+
+.dataTables_wrapper {
+	margin: auto;
+	width: 80%;
+}
+
+.dataTables_length, .dataTables_filter, .dataTables_paginate {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.dataTables_paginate a {
+	display: inline-block;
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+.dataTables_paginate a:hover, table.dataTable a:hover {
+	cursor: pointer;
+	color: #333;
+}
+
+table.dataTable {
+	border-collapse: collapse;
+	border: 1px solid #999;
+}
+
+table.dataTable td, table.dataTable th {
+	border: 1px solid #999;
+	padding: 5px;
+}
+
+table.dataTable tr:nth-child(odd) {
+	background-color: #EEE;
+}
+
+#form {
+	text-align: center;
+}
+.box {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 29px;
+	text-align: center;
+	margin:1%;
+
+}
+.btn {
+  font-family: Georgia;
+  color: #ffffff;
+  font-size: 39px;
+  background: #3498db;
+  padding: 18px 25px 18px 25px;
+  border: solid #1f628d 0px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #146191;
+  text-decoration: none;
+}
