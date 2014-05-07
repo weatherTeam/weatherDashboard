@@ -6,7 +6,8 @@ import ogr, osr, os.path, string
 #from matplotlib.mlab import griddata
 from json import dumps, loads
 
-filename = "snow.txt"
+
+filename = "snow_weekly.txt"
 anomalies = np.genfromtxt(filename, dtype = str, usecols=(1, 2, 3, 4), delimiter = '\t')
 #stations = np.genfromtxt("stations.txt", dtype = str)
 
