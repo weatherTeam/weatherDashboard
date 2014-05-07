@@ -2,9 +2,9 @@
 $navigation = array();
 
 if (isset($_GET['page'])) {
-	$pageURLName = $_GET['page'];
+    $pageURLName = $_GET['page'];
 } else {
-	$pageURLName = "home";
+    $pageURLName = "home";
 }
 
 $pages = array(
@@ -18,12 +18,12 @@ $pages = array(
     array("Storms", "storms")
     );
 
-	foreach ($pages as $page) {
-		if ($page[1] == $pageURLName) {
-			$pageName = $page[0];
-			$pageContent = $page[1].'.html';
-		}
-	}
+    foreach ($pages as $page) {
+        if ($page[1] == $pageURLName) {
+            $pageName = $page[0];
+            $pageContent = $page[1].'.html';
+        }
+    }
 
 ?>
 <!DOCTYPE html>
@@ -31,12 +31,12 @@ $pages = array(
 <head>
     <meta charset=utf-8 />
     <title>Weather Dashboard - <?php echo $pageName; ?></title>
-	<link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />
-	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
     <!--<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">-->
     <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
-	<script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js'></script>
-<!-- 	<script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script> -->
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js'></script>
+    <!-- <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script> -->
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <script type="text/javascript" language="javascript" src="http://cdn.datatables.net/1.10-dev/js/jquery.dataTables.min.js"></script>
@@ -45,21 +45,21 @@ $pages = array(
 </head>
 <body>
 <header>
-	<h1>Weather Dashboard</h1>
-	<nav>
-		<?php
-			foreach ($pages as $menuitem) {
-				if ($menuitem[1] == $pageURLName) {
-					$menuItemClass = 'class="currentPage"';
-				} else {
-					$menuItemClass = '';
-				}
-				?>
-				<menuitem><a href="<?php echo $menuitem[1]; ?>" <?php echo $menuItemClass; ?>><?php echo $menuitem[0]; ?></a></menuitem>
-				<?php
-			}
-		?>
-	</nav>
+    <h1>Weather Dashboard</h1>
+    <nav>
+        <?php
+            foreach ($pages as $menuitem) {
+                if ($menuitem[1] == $pageURLName) {
+                    $menuItemClass = 'class="currentPage"';
+                } else {
+                    $menuItemClass = '';
+                }
+                ?>
+                <menuitem><a href="<?php echo $menuitem[1]; ?>" <?php echo $menuItemClass; ?>><?php echo $menuitem[0]; ?></a></menuitem>
+                <?php
+            }
+        ?>
+    </nav>
 </header>
 <main>
 <!--<h2><?php echo $pageName; ?></h2>-->
