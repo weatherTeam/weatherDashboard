@@ -23,15 +23,15 @@
         <div id='map'></div>
         <div id='form'>
             <form id='formcontent'>
-                <input type="checkbox" name="layer" id="all-stations" value="All stations"> All stations
-                <input type="checkbox" name="layer" id="storms" value="Storms"> Storms
-                <input type="checkbox" name="layer" id="temperature-anomalies" value="Temperature anomalies"> Temperature anomalies
-                <input type="checkbox" name="layer" id="snow-cumulation" value="Snow cumulation"> Snow cumulation
-                <input type="checkbox" name="layer" id="rainfall" value="Rainfall"> Rainfall<br />
+                <input type="checkbox" name="layer" id="all-stations" value="All stations"> <label for="all-stations">All stations</label>
+                <input type="checkbox" name="layer" id="storms" value="Storms"> <label for="storms">Storms (by <span id="storm-period"></span>)</label>
+                <input type="checkbox" name="layer" id="temperature-anomalies" value="Temperature anomalies"> <label for="temperature-anomalies">Temperature anomalies (by <span id="tempAnom-period"></span>)</label>
+                <input type="checkbox" name="layer" id="snow-cumulation" value="Snow cumulation"> <label for="snow-cumulation">Snow cumulation (by <span id="snowCumulation-period"></span>)</label>
+                <input type="checkbox" name="layer" id="rainfall" value="Rainfall"> <label for="rainfall">Rainfall</label><br />
                 <input type="date" name="period" id="period" value="2007-03-15" class="box"><br />
-                <input type="radio" name="time" id="day" value="Day"> Day
-                <input type="radio" name="time" id="month" value="Month" checked> Month
-                <input type="radio" name="time" id="year" value="Year"> Year
+                <input type="radio" name="time" id="day" value="Day"> <label for="day">Day</label>
+                <input type="radio" name="time" id="month" value="Month" checked> <label for="month">Month</label>
+                <input type="radio" name="time" id="year" value="Year"> <label for="year">Year</label>
                 <div>
                     <h3>Temperature anomalies settings</h3>
                     <!-- Ajouter ici -->
@@ -50,10 +50,17 @@
         var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/sandoz.i550lpml/{z}/{x}/{y}.png', {
             attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
         });
-        // The map is initially empty.
         var map = L.map('map')
             .addLayer(mapboxTiles)
             .setView([39.82, -98.57], 4);
+
+
+        var allStations = L.geoJson();
+        var storms = L.geoJson();
+        var tempAnomalies = L.geoJson();
+        var rainfall = L.geoJson();
+        var snowCumulation = L.geoJson();
+        // The map is initially empty.
 
         function onEachStationFeature(feature, layer) {
             if (feature.properties && (feature.properties.name || feature.properties.alt)) {
@@ -98,12 +105,6 @@
 
             layer.bindPopup(popupContent);
         }
-
-        var allStations = L.geoJson();
-        var storms = L.geoJson();
-        var tempAnomalies = L.geoJson();
-        var rainfall = L.geoJson();
-        var snowCumulation = L.geoJson();
 
 
         var updateMap = function() {
@@ -170,7 +171,7 @@
                     pointToLayer: function (feature, latlng) {
                         var radius = feature.properties.radius;
                         return L.circle(latlng, radius, {
-                            fillColor: "#ff7800",
+                            fillColor: getStormColor(feature.properties.windspeed),
                             color: "#000",
                             weight: 1,
                             opacity: 1,
@@ -205,6 +206,22 @@
             } else if(!$("#all-stations").is(':checked')) {
                 map.removeLayer(allStations);
             }
+
+            if ($("#day").is(':checked')) {
+                $("#storm-period").html("month");
+                $("#tempAnom-period").html("day");
+                $("#snowCumulation-period").html("week");
+            }
+            if ($("#month").is(':checked')) {
+                $("#storm-period").html("month");
+                $("#tempAnom-period").html("month");
+                $("#snowCumulation-period").html("week");
+            }
+            if ($("#year").is(':checked')) {
+                $("#storm-period").html("year");
+                $("#tempAnom-period").html("month");
+                $("#snowCumulation-period").html("week");
+            }
          };
 
          $("#period").change(function(event) {
@@ -216,7 +233,19 @@
             updateMap();
          });
 
-
+         function getStormColor(windspeed) { //According to beaufort scale
+            var gradient = [];
+            return windspeed > 200 ? '#FFFF00' :
+                   windspeed > 175 ? '#FF3300' :
+                   windspeed > 150 ? '#FF6600' :
+                   windspeed > 140 ? '#FF9900' :
+                   windspeed > 130 ? '#FFCC00' :
+                   windspeed > 120 ? '#FFFF00' :
+                   windspeed > 110 ? '#CCFF00' :
+                   windspeed > 100 ? '#99FF00' :
+                   windspeed > 75 ? '#66FF00' :
+                   '#ffffff';
+         }
 
         function getSnowColor(snowCumulation){
             var gradient = ["#B33409", "#B83E07", "#BE4806", "#C35204", "#C95C03", "#CE6601", "#D47100", "#D7870C", "#DA9D19", "#DDB326", "#E0C932", "#E3DF3F", "#E7F54C", "#D4EE46", "#C1E840", "#AFE23A", "#9CDB34", "#89D52E", "#77CF29", "#70D141", "#69D459", "#62D771", "#5BDA89", "#54DDA1", "#4EE0B9", "#3FB9C3", "#3092CD", "#216BD8", "#1144E2", "#031EED"];
@@ -247,6 +276,9 @@
                     snowCumulation > 0 ? opacity[0] :
                     0.4;
         }
+
+        //Update map at the page loading to fill the parenthesis of the layers label
+        updateMap();
         </script>
     </main>
     <footer>
