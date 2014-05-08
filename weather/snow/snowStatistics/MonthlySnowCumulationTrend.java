@@ -12,7 +12,7 @@ import java.util.Iterator;
 /**
  * Created by Jonathan Duss on 07.05.14.
  *
- * INPUT: Daily snow cumulation
+ * INPUT: Monthly snow cumulation
  * OUTPUT: monthly snow cumulation
  */
 public class MonthlySnowCumulationTrend {
@@ -61,7 +61,6 @@ public class MonthlySnowCumulationTrend {
 
 	}
 
-
 	/*
 	* Compute the snow cumulation over a month for each station
 	 */
@@ -86,11 +85,8 @@ public class MonthlySnowCumulationTrend {
 
 				while (values.hasNext()) {
 					int cumulation = Integer.parseInt(values.next().toString());
-					if(cumulation > 0){
 						cumulationInMonth += cumulation;
 						numberStationHavingSnow ++;
-					}
-
 				}
 
 

@@ -23,8 +23,8 @@ public class DailyToMonthlySnowFallEstimation {
 	 * Preprocess the data: if snow depth is given, it may be measured each XX hours.
 	 * <p/>
 	 * output:
-	 * key: stationID_year/month/day
-	 * value: temperature  snowDepth snow_cum_from_depth rain snowDepth snow_cum_from_rain
+	 * key: stationID TAB latitude TAB longitude TAB date(day)
+	 * value: snow cumulation of the month
 	 */
 	public static class GroupeByStationByMonth extends MapReduceBase implements Mapper<LongWritable, Text, Text,
 			Text> {
