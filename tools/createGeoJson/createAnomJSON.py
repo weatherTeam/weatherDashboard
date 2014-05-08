@@ -1,9 +1,3 @@
-import numpy as np
-import ogr, osr
-import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap
-from scipy.interpolate import griddata
-#from matplotlib.mlab import griddata
 from json import dumps, loads
 import os
 
@@ -31,9 +25,9 @@ for root, directories, files in os.walk(inputFolder):
 				stats['features'].append({
 					"type": "Feature",
 					"geometry": {
-						"type": "Polygon",
+						"type": "Polygon",#Point
 						"coordinates": [[[lon, lat],[lon, lat+step],[lon+step, lat+step],[lon+step, lat]]]
-						#"coordinates": [[[lon, lat],[lon+step, lat],[lon+step, lat+step],[lon, lat+step]]]
+						#"coordinates": [lon, lat]
 					},
 					"properties": {
 						"avg" : avg,
