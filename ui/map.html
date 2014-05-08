@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8 />
+    <title>Weather Dashboard</title>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js'></script>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js"></script>
+    <script src="http://cdn.datatables.net/1.10-dev/js/jquery.dataTables.min.js"></script>
+    <script src="js/jquery.csvToTable.js"></script>
+    <script src="js/moment-range.js"></script>
+    <script src="js/wiki.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Weather Dashboard</h1>
+    </header>
+    <main>
+        <div id='map'></div>
+        <div id='form'>
+            <form id='formcontent'>
+                <input type="checkbox" name="layer" id="all-stations" value="All stations"> All stations
+                <input type="checkbox" name="layer" id="storms" value="Storms"> Storms
+                <input type="checkbox" name="layer" id="temperature-anomalies" value="Temperature anomalies"> Temperature anomalies
+                <input type="checkbox" name="layer" id="snow-cumulation" value="Snow cumulation"> Snow cumulation
+                <input type="checkbox" name="layer" id="rainfall" value="Rainfall"> Rainfall<br />
+                <input type="date" name="period" id="period" value="2007-03-15" class="box"><br />
+                <input type="radio" name="time" id="day" value="Day"> Day
+                <input type="radio" name="time" id="month" value="Month" checked> Month
+                <input type="radio" name="time" id="year" value="Year"> Year
+                <div>
+                    <h3>Temperature anomalies settings</h3>
+                    <!-- Ajouter ici -->
+                </div>
+            </form>
+            <h2>Wikipedia articles</h2>
+            <div id="wikiTable"></div>
+        </div>
+
+        <script>
+
+        var dataRepo = "data";
+        var stormDataRepo = "storms";
+        var snowDataRepo = "snow";
+
+        var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/sandoz.i550lpml/{z}/{x}/{y}.png', {
+            attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+        });
+        // The map is initially empty.
+        var map = L.map('map')
+            .addLayer(mapboxTiles)
+            .setView([39.82, -98.57], 4);
+
+        function onEachStationFeature(feature, layer) {
+            if (feature.properties && (feature.properties.name || feature.properties.alt)) {
+                layer.bindPopup('Name: ' + feature.properties.name + '<br />' +
+                                'Altitude: ' + feature.properties.alt);
+            }
+        }
+
+        function onEachStormFeature(feature, layer) {
+            if (feature.properties && feature.properties.windspeed) {
+            var startdate = feature.properties.startdate;
+            var startYear = startdate.substr(0, 4);
+            var startMonth = startdate.substr(4, 2);
+            var startDay = startdate.substr(6, 2);
+            var startHour = startdate.substr(8, 2);
+            var startMinute = startdate.substr(10, 2);
+
+
+            var enddate = feature.properties.enddate;
+            var endYear = enddate.substr(0, 4);
+            var endMonth = enddate.substr(4, 2);
+            var endDay = enddate.substr(6, 2);
+            var endHour = enddate.substr(8, 2);
+            var endMinute = enddate.substr(10, 2);
+
+
+                layer.bindPopup('Start date: ' + startDay + '.' + startMonth + '.' + startYear + ' at ' + startHour + '.' + startMinute + '<br />' +
+                                'End date: ' + endDay + '.' + endMonth + '.' + endYear + ' at ' + endHour + '.' + endMinute + '<br />' +
+                                'Max. Windspeed: ' + (feature.properties.windspeed).toFixed(2) + 'km/h' + '<br />' +
+                                'Max. Rainfall: ' + feature.properties.rainfall + '<br />' +
+                                'Radius: ' + feature.properties.radius);
+            }
+        }
+
+        function onEachSnowCumulationFeature(feature, layer) {
+            var popupContent = "<p>Snow cumulation of the week: " +
+            feature.properties.value + "</p>";
+
+            if (feature.properties && feature.properties.popupContent) {
+                popupContent += feature.properties.popupContent;
+            }
+
+            layer.bindPopup(popupContent);
+        }
+
+        var allStations = L.geoJson();
+        var storms = L.geoJson();
+        var tempAnomalies = L.geoJson();
+        var rainfall = L.geoJson();
+        var snowCumulation = L.geoJson();
+
+
+        var updateMap = function() {
+
+            map.removeLayer(tempAnomalies);
+            map.removeLayer(rainfall);
+            map.removeLayer(snowCumulation);
+            map.removeLayer(storms);
+
+            var date = $('#period').val().split('-');
+
+            var dateMoment = moment($('#period').val());
+
+            //Temperature anomalies layer
+            if ($("#temperature-anomalies").is(':checked')) {
+
+            }
+
+            //Rainfall layer
+            if ($("#rainfall").is(':checked')) {
+
+            }
+
+            //Snow cumulation layer
+            if ($("#snow-cumulation").is(':checked')) {
+                var snowCumulation_filename = dataRepo+"/"+snowDataRepo+"/snowcumulation-"+dateMoment.format('YYYY-WW')+".json";
+
+                $.getJSON(snowCumulation_filename, function(snow) {
+                    //When GeoJSON is loaded
+                    snowCumulation = L.geoJson(snow, {
+                        style: function (feature) {
+                            return {
+                                color: getSnowColor(feature.properties.value),
+                                fillOpacity: getSnowOpacity(feature.properties.value)
+                            }
+                        },
+
+                        pointToLayer: function (feature, latlng) {
+                            return L.circleMarker(latlng);
+                        },
+
+                        onEachFeature: onEachSnowCumulationFeature
+
+                        //onEachFeature: onEachFeature,
+                        });//.addTo(map);
+                    map.addLayer(snowCumulation);  //Add layer to map
+                });
+            }
+
+            //Storms layer
+            if ($("#storms").is(':checked')) {
+                var storms_filename = "";
+                if ($("#month").is(':checked') || $("#day").is(':checked')) {
+                        storms_filename = dataRepo+"/"+stormDataRepo+"/"+date[0]+date[1]+".json";
+                }
+                if ($("#year").is(':checked')) {
+                        storms_filename = dataRepo+"/"+stormDataRepo+"/"+date[0]+".json";
+                }
+
+                $.getJSON(storms_filename, function(data) {
+                //When GeoJSON is loaded
+                storms = L.geoJson(data, {
+                    onEachFeature: onEachStormFeature,
+                    pointToLayer: function (feature, latlng) {
+                        var radius = feature.properties.radius;
+                        return L.circle(latlng, radius, {
+                            fillColor: "#ff7800",
+                            color: "#000",
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.3
+                        });
+                    }
+                    });
+                map.addLayer(storms);
+                });
+            }
+
+            //All stations layer
+            if ($("#all-stations").is(':checked') && !map.hasLayer(allStations)) {
+                $.getJSON("data/stationslist.json", function(stations) {
+                    //When GeoJSON is loaded
+                    allStations = L.geoJson(stations, {
+                        onEachFeature: onEachStationFeature,
+
+                        pointToLayer: function (feature, latlng) {
+                            return L.circleMarker(latlng, {
+                                    //fillColor: "#ff7800",
+                                    color: "#000",
+                                    weight: 1,
+                                    opacity: 1,
+                                    radius: 2,
+                                    fillOpacity: 0.3
+                                });
+                        }
+                    });
+                    map.addLayer(allStations);
+                });
+            } else if(!$("#all-stations").is(':checked')) {
+                map.removeLayer(allStations);
+            }
+         };
+
+         $("#period").change(function(event) {
+            filterWiki("", usa, $('#period').val());
+         });
+
+         $("input").change(function(event) {
+            event.preventDefault();
+            updateMap();
+         });
+
+
+
+        function getSnowColor(snowCumulation){
+            var gradient = ["#B33409", "#B83E07", "#BE4806", "#C35204", "#C95C03", "#CE6601", "#D47100", "#D7870C", "#DA9D19", "#DDB326", "#E0C932", "#E3DF3F", "#E7F54C", "#D4EE46", "#C1E840", "#AFE23A", "#9CDB34", "#89D52E", "#77CF29", "#70D141", "#69D459", "#62D771", "#5BDA89", "#54DDA1", "#4EE0B9", "#3FB9C3", "#3092CD", "#216BD8", "#1144E2", "#031EED"];
+            return snowCumulation > 500 ? gradient[1] :
+                    snowCumulation > 300 ? gradient[3] :
+                    snowCumulation > 250 ? gradient[5] :
+                    snowCumulation > 200 ? gradient[7] :
+                    snowCumulation > 175 ? gradient[9] :
+                    snowCumulation > 150 ? gradient[11] :
+                    snowCumulation > 125 ? gradient[13] :
+                    snowCumulation > 100 ? gradient[15] :
+                    snowCumulation > 75 ? gradient[17] :
+                    snowCumulation > 50 ? gradient[19] :
+                    snowCumulation > 30 ? gradient[21] :
+                    snowCumulation > 20 ? gradient[23] :
+                    snowCumulation > 10 ? gradient[25] :
+                    snowCumulation > 5 ? gradient[27] :
+                    snowCumulation > 0 ? gradient[29] :
+                    '#267cc4';
+        }
+
+        function getSnowOpacity(snowCumulation){
+            var opacity = [0.6, 0.8, 0.9, 1];
+            return snowCumulation > 500 ? opacity[3] :
+                    snowCumulation > 100 ? opacity[3] :
+                    snowCumulation > 50 ? opacity[2] :
+                    snowCumulation > 15 ? opacity[1] :
+                    snowCumulation > 0 ? opacity[0] :
+                    0.4;
+        }
+        </script>
+    </main>
+    <footer>
+        As part of the course <em>Big Data</em> of the <a href="http://www.epfl.ch">EPFL</a> given by Christoph Koch<br />
+        By Aubry Cholleton, Jonathan Duss, Anders Hennum, Alexis Kessel, Quentin Mazars-Simon, Cédric Rolland, Orianne Rollier, David Sandoz & Amato Van Geyt<br />
+        Under the supervision of Amir Shaikhha
+    </footer>
+</body>
+</html>

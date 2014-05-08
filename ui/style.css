@@ -34,7 +34,7 @@ main {
 }
 
 footer {
-	padding: 50px 10px 0px 10px;
+	padding: 50px 10px 30px 10px;
 	text-align: center;
 	font-size: 0.8em;
 	color: #999;
@@ -96,6 +96,11 @@ table td, table th {
 
 #form {
 	text-align: center;
+	margin: 10px;
+}
+#form fieldset {
+	width: 50%;
+	margin: auto;
 }
 .box {
 	font-family: Helvetica, Arial, sans-serif;
