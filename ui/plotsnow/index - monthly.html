@@ -65,7 +65,7 @@ var map = L.map('map')
 
 
 //initial data (week 52 of year 2013)
-$.getJSON("data_weekly/snowcumulation-2013-52.json", function(snow) {
+$.getJSON("data_monthly/snowcumulation-2013-12.json", function(snow) {
 	//When GeoJSON is loaded
 	geojson = L.geoJson(snow, {
 		style: function (feature) {
@@ -115,8 +115,9 @@ function updateMap(){
 
 
 	var date = $("#period").val(); // YYYY-MM-DD
-	var week = moment(date).week()
+	var week = moment(date).month() + 1
 	var year = moment(date).year()
+	console.log(week)
 
 	var weekFormatted = week < 10 ? '0' + week : week
 
@@ -124,7 +125,7 @@ function updateMap(){
 
 
 
- 	$.getJSON("data_weekly/" + fileName, function(snow) {
+ 	$.getJSON("data_monthly/" + fileName, function(snow) {
 	//When GeoJSON is loaded
 	geojson = L.geoJson(snow, {
 		style: function (feature) {
