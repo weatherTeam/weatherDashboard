@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $('#wikiTable').CSVToTable('events.csv',
+  $('#wikiTable').CSVToTable('data/events.csv',
     {
       tableClass: "table table-striped table-bordered",
       separator: "\t",
