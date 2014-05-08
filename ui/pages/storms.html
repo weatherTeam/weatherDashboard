@@ -6,7 +6,7 @@
         <input type="radio" name="time" id="year" value="Year" checked> Year<br \>
     </form>
 
-    <div class="container" id="test"></div>
+    <div id="wikiTable"></div>
 </div>
 <script>
 
@@ -116,127 +116,5 @@ var updateMap = function() {
     event.preventDefault();
     updateMap();
  });
-
-</script>
-<script>
-
-$(document).ready(function() {
-  /*$.getJSON("wiki.json",function( data ) {window.wikiData = data});*/
-
-
-$.extend( $.fn.dataTableExt.oSort, {
-    "date-uk-pre": function ( a ) {
-        var ukDatea = a.split('/');
-        return (ukDatea[2]*10000 + ukDatea[1]*100 + ukDatea[0]*1);
-    },
-
-    "date-uk-asc": function ( a, b ) {
-        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    },
-
-    "date-uk-desc": function ( a, b ) {
-        return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    }
-
-} );
-
-
-  $('#test').CSVToTable('data/events.csv',
-    {
-      tableClass: "table table-striped table-bordered",
-      separator: "\t",
-      headers: ['Title', 'Category', 'Start date', 'End date', 'Location', 'ref']
-    }).bind("loadComplete",function() {
-    $('#test table').dataTable({
-            "aoColumns": [
-                null,
-                null,
-                {"sType": "date-uk"},
-                {"sType": "date-uk"},
-                null,
-                null
-            ],
-            "iDisplayLength": 25,
-            "paging": true,
-            "searching": true,
-            "info": true,
-            "columnDefs": [
-            {
-                "targets": [ 5 ],
-                "visible": false,
-                "searchable": false
-            }],
-            "order": [[ 5, "desc" ]]
-        } );
-});
-
-});
-
-
-var usa = "united states|america|alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|district of columbia|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|virginia|washington|west virginia|wisconsin|wyoming"
-var ch = "switzerland|europe"
-
-window.day = -1;
-
-function filterItemsMonth(category, areas, month, year){
-  //reset
-  $('#test table').DataTable().draw();
-  window.day = -1;
-
-  //Filter by area
-  //$('#test table').DataTable().column(4).search(areas,true, true).draw();
-
-  //Filter by category
-  $('#test table').DataTable().column(1).search(category,true, true).draw();
-
-  //Filter by date
-  $('#test table').DataTable().search(month+'/'+year, true, true).draw();
-}
-
-function filterItemsDay(category, areas, day){
-
-  //reset
-  //$('#test table').DataTable().draw();
-
-
-
-  //Filter by area
-  //$('#test table').DataTable().column(4).search(areas,true, true).draw();
-
-  //Filter by category
-  $('#test table').DataTable().column(1).search(category,true, true).draw();
-
-  $('#test table').DataTable().draw();
-
-}
-
-  //Filter by date
-$.fn.DataTable.ext.search.push(
-    function( settings, data, dataIndex ) {
-          var date = $('#period').val().split('-');
-        day = date[2]+"/"+date[1]+"/"+date[0];
-        if(day === -1){
-          return true;
-        }
-
-        startDate = data[2];
-        endDate = data[3];
-
-        date = startDate.split('/');
-        startDate_timestamp = (date[2]*10000 + date[1]*100 + date[0]*1);
-
-        date = endDate.split('/');
-        endDate_timestamp = (date[2]*10000 + date[1]*100 + date[0]*1);
-
-        date = day.split('/');
-        day_timestamp = (date[2]*10000 + date[1]*100 + date[0]*1);
-
-        if (day_timestamp <= endDate_timestamp && day_timestamp >= startDate_timestamp){
-          return true;
-        }
-
-        return false;
-    }
-);
 
 </script>
