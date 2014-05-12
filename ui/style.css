@@ -123,3 +123,39 @@ table td, table th {
   background: #146191;
   text-decoration: none;
 }
+
+.link {  
+stroke: #666;
+opacity: 0.6;
+stroke-width: 1.5px; 
+} 
+.node circle { 
+stroke: #fff; 
+opacity: 0.6;
+stroke-width: 1.5px; 
+} 
+text { 
+font: 14px serif; 
+opacity: 0.6;
+pointer-events: none; 
+}
+
+#graph_wrapper {
+	float: left;
+	width: 100%;
+}
+#graph {
+	width:900px;
+	height: 600px;
+	margin: 0 auto;
+}
+#select-wrapper {
+	height: 20px;
+	width: 100%;
+	float: left;
+}
+#select-month {
+	width: 200px;
+	height: 40px;
+	margin:0 auto;
+}
