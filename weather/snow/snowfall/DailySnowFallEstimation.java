@@ -84,7 +84,6 @@ public class DailySnowFallEstimation {
 				latitudeFloat = Float.parseFloat(input.substring(28, 34)) / 1000f;
 				longitudeFloat = Float.parseFloat(input.substring(34, 41)) / 1000f;
 				if(latitudeFloat < -90f || latitudeFloat > 90f || longitudeFloat < -180f || longitudeFloat > 180f){
-					System.out.println("YOUYOU " + longitudeFloat + " " + latitudeFloat);
 					stationCanBeUsed = false;
 				}
 			} catch (NumberFormatException e){
@@ -155,16 +154,27 @@ public class DailySnowFallEstimation {
 					//System.out.println("AJ1");
 					int startPosition = input.indexOf("AJ1") + 3; //start of depth value AJ1xxxx, xxxx is the depth
 					int endPosition = startPosition + 4;
+					int startPositionQuality = input.indexOf("AJ1") + 3 + 4+1; //start of depth value AJ1xxxx, xxxx is the depth
+					int endPositionQuality = startPosition + 4 + 1+1;
+
+
 
 					//in case something go wrong in the input
-					if(endPosition < input.length()) {
+					if(endPositionQuality < input.length()) {
+						//look at data quality code
+						String snowQuality = input.substring(startPositionQuality, endPositionQuality);
+						boolean snowQualityEnough = true;
+
+						if(snowQuality.equals("2") || snowQuality.equals("3") || snowQuality.equals("6") || snowQuality.equals("7")){
+							snowQualityEnough = false;
+						}
 
 						try {
 							//System.out.println("SNOW DEPTH : " + input.substring(startPosition, endPosition));
 							int newDepth = Integer.parseInt(input.substring(startPosition, endPosition));
 
 							//9999 = missing data (ish-format-document)
-							if (newDepth != 9999) {
+							if (newDepth != 9999 && snowQualityEnough == true) {
 								snowDepth = newDepth;
 
 								if (lastDepth != SnowData.NO_SNOW_INFO) {
@@ -219,6 +229,14 @@ public class DailySnowFallEstimation {
 						try {
 							int indexOfAA1 = input.indexOf("AA1");
 							String precipitationString = input.substring(indexOfAA1 + 3 + 2, indexOfAA1 + 3 + 2 + 4);
+							String qualityRain = input.substring(indexOfAA1 + 3 + 2 + 4+1, indexOfAA1 + 3 + 2 + 4 + 1+1);
+							boolean qualityRainEnough = false;
+
+							//1 = erroenous / inaccurate and 9 = missing
+							if(qualityRain.equals("2") || qualityRain.equals("3") || qualityRain.equals("6") || qualityRain.equals("7")){
+								qualityRainEnough = false;
+							}
+
 							//fix temperature according to the conversion table which only convert if temperature is
 							// under 1.1. So if it the weather observation says it is snowing and the temperature is 2
 							// (or more general, is over 1.1), we set it to 1.1
@@ -230,7 +248,7 @@ public class DailySnowFallEstimation {
 							}
 
 							//9999 => means missing data
-							if (precipitationString.equals("9999") == false) {
+							if (precipitationString.equals("9999") == false && qualityRainEnough == true) {
 								//divide by 10 (scaling factor) and by 10 again for mm -> cm
 								precipitationAmount = Float.parseFloat(precipitationString) / 100.0f; //scaling factor
 
