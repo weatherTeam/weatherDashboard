@@ -21,7 +21,7 @@ public class FindCenterReducer4 extends MapReduceBase implements
 		int startDate = Integer.MAX_VALUE;
 		int endDate = 0;
 		int windMax = 0;
-//		int rainMax = 0;
+		int rainMax = 0;
 		int x = 0;
 		int y = 0;
 		long totX = 0, totY = 0;
@@ -72,11 +72,11 @@ public class FindCenterReducer4 extends MapReduceBase implements
 			if (windMax < wind)
 				windMax = wind;
 			
-//			// find max rain
-//			int rain = Integer.parseInt(inputValueString.substring(42, 46));
-//			
-//			if (rainMax < rain)
-//				rainMax = rain;
+			// find max rain
+			int rain = Integer.parseInt(inputValueString.substring(40, 44));
+			
+			if (rain < 9999 && rainMax < rain)
+				rainMax = rain;
 			
 			// find start date
 			int date = Integer.parseInt(inputValueString.substring(15, 23));
@@ -121,7 +121,7 @@ public class FindCenterReducer4 extends MapReduceBase implements
 				String centreYString = centreY + ""; // 6
 				String radiusString = (int)radiusMax + ""; // 6
 				String windMaxString = windMax + ""; // 3
-//				String rainMaxString = rainMax + ""; // 3
+				String rainMaxString = rainMax + ""; // 3
 				
 				if (startDate < 10000000)
 					startDateString = year + "0" + startDate;
@@ -178,18 +178,19 @@ public class FindCenterReducer4 extends MapReduceBase implements
 				if (windMax < 100)
 					windMaxString = "0" + windMax;
 				
-//				if (rainMax < 10)
-//					rainMaxString = "00" + rainMax;
-//				else if (rainMax < 100)
-//					rainMaxString = "0" + rainMax;
+				if (rainMax < 10)
+					rainMaxString = "000" + rainMax;
+				else if (rainMax < 100)
+					rainMaxString = "00" + rainMax;
+				else if (rainMax < 1000)
+					rainMaxString = "0" + rainMax;
 				if (Integer.parseInt(startDateString.subSequence(0, 6).toString()) == Integer.parseInt(endDateString.subSequence(0, 8).toString()))
-					output.collect(new Text(startDateString.subSequence(0, 6).toString()), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMaxString));
+					output.collect(new Text(startDateString.subSequence(0, 6).toString()), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMaxString + rainMaxString));
 				else
 				{
-					output.collect(new Text(startDateString.subSequence(0, 6).toString()), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMaxString));
-					output.collect(new Text(endDateString.subSequence(0, 6).toString()), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMaxString));
+					output.collect(new Text(startDateString.subSequence(0, 6).toString()), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMaxString+ rainMaxString));
+					output.collect(new Text(endDateString.subSequence(0, 6).toString()), new Text(startDateString + endDateString + centreXString + centreYString + radiusString + windMaxString + rainMaxString));
 				}
-//						+ rainMaxString));
 			}
 		}		
 	}
