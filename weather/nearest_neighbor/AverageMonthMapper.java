@@ -11,6 +11,9 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
+// This mapper emits values for each station
+// Corresponding reducer calculates the averages for each station
+
 public class AverageMonthMapper extends MapReduceBase implements
 	Mapper<LongWritable, Text, Text, Text> {
 	

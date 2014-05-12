@@ -10,6 +10,8 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
+// This reducer calclutes the averages for each station
+
 public class AverageMonthReducer extends MapReduceBase implements 
 	Reducer<Text, Text, Text, Text> {
 	
