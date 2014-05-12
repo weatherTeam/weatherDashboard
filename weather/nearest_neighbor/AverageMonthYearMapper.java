@@ -14,7 +14,10 @@ import org.apache.hadoop.mapred.JobConf;
 public class AverageMonthYearMapper extends MapReduceBase implements
 	Mapper<LongWritable, Text, Text, Text> {
 	
-	private static Integer referenceYear;
+    // Filter out results for reference year to its own file
+    // A pure filter job
+	
+    private static Integer referenceYear;
 	private static String tempPrec;
 	private static String stationYearMonthPeriod;
 	
