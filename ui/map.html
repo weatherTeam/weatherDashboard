@@ -56,6 +56,10 @@
         var stormDataRepo = "storms";
         var snowDataRepoMonthly = "snow_monthly";
         var snowDataRepoWeekly = "snow_weekly";
+        var temperatureDataRepoMonthly = "monthTemperature";
+        var temperatureDataRepoDaily = "dayTemperature";
+        var rainfallDataRepoMonthly = "monthRain";
+        var rainfallDataRepoDaily = "dayRain";
 
         var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/sandoz.i550lpml/{z}/{x}/{y}.png', {
             attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
@@ -202,10 +206,10 @@
             if ($("#rainfall").is(':checked')) {
                 var filename = "";
                 if ($("#month").is(':checked')) {
-                    fileName = "data/monthRain/"+date[0]+"."+date[1]+".json";
+                    fileName = dataRepo+"/"+rainfallDataRepoMonthly+"/"+date[0]+"."+date[1]+".json";
                 }
                 if ($("#day").is(':checked')) {
-                    fileName = "data/dayRain/"+date[0]+"."+date[1]+"."+date[2]+".json";
+                    fileName = dataRepo+"/"+rainfallDataRepoDaily+"/"+date[0]+"."+date[1]+"."+date[2]+".json";
                 }
 
                 $.getJSON(fileName, function(data) {
@@ -232,10 +236,10 @@
             if ($("#temperature-anomalies").is(':checked')) {
                 var filename = "";
                 if ($("#month").is(':checked')) {
-                    fileName = "data/monthTemperature/"+date[0]+date[1]+".json";
+                    fileName =dataRepo+"/"+temperatureDataRepoMonthly+"/"+date[0]+date[1]+".json";
                 }
                 if ($("#day").is(':checked')) {
-                    fileName = "data/dayTemperature/"+date[0]+date[1]+date[2]+".json";
+                    fileName = dataRepo+"/"+temperatureDataRepoMonthly+"/"+date[0]+date[1]+date[2]+".json";
                 }
 
                 $.getJSON(fileName, function(data) {
