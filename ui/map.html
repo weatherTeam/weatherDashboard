@@ -14,6 +14,7 @@
     <script src="js/jquery.csvToTable.js"></script>
     <script src="js/moment-range.js"></script>
     <script src="js/wiki.js"></script>
+    <script src="js/leaflet-dvf.min.js"></script>
 </head>
 <body>
     <header>
@@ -32,12 +33,17 @@
                 <input type="radio" name="time" id="day" value="Day"> <label for="day">Day</label>
                 <input type="radio" name="time" id="month" value="Month" checked> <label for="month">Month</label>
                 <input type="radio" name="time" id="year" value="Year"> <label for="year">Year</label>
-                <div>
+                <div id="temperatureSettings"  style="display: none">
                     <h3>Temperature anomalies settings</h3>
                     <input type="radio" name="tempType" id="avg" value="avgAnomaly" checked> Average temperature anomalies
                     <input type="radio" name="tempType" id="max" value="maxAnomaly"> Maximum temperature anomalies
                     <input type="radio" name="tempType" id="min" value="minAnomaly"> Minimum temperature anomalies<br \>
                     <input type="checkbox" name="extreme" id="extreme" value="extreme"> Display only extreme values
+                </div>
+                <div id="rainfallSettings" style="display: none">
+                    <h3>Rainfall settings</h3>
+                    <input type="radio" name="rainType" id="value" checked> Value
+                    <input type="radio" name="rainType" id="dev"> Deviation
                 </div>
             </form>
             <h2>Wikipedia articles</h2>
@@ -140,7 +146,7 @@
                     snowCumulation = L.geoJson(snow, {
                         style: function (feature) {
                             return {
-                                color: getSnowColor(feature.properties.value),
+                                color: snowColor.evaluate(feature.properties.value),
                                 fillOpacity: getSnowOpacity(feature.properties.value)
                             }
                         },
@@ -186,6 +192,36 @@
                 });
             }
 
+            if ($("#rainfall").is(':checked')) {
+                var filename = "";
+                if ($("#month").is(':checked')) {
+                    fileName = "data/monthRain/"+date[0]+"."+date[1]+".json";
+                }
+                if ($("#day").is(':checked')) {
+                    fileName = "data/dayRain/"+date[0]+"."+date[1]+"."+date[2]+".json";
+                }
+
+                $.getJSON(fileName, function(data) {
+                    rainfall = L.geoJson(data, {
+                        style: function(feature) {
+                            var color = rainFallColor.evaluate(feature.properties.value);;
+                            if ($("#dev").is(':checked'))
+                                color = rainFallDevColor.evaluate(feature.properties.deviation);
+                            return {
+                                fillColor:color,
+                                fillOpacity:0.8,
+                                opacity:0
+                            };
+
+                        },
+                        pointToLayer: function (feature, latlng) {
+                            return L.circleMarker(latlng);
+                        },
+                    });
+                    map.addLayer(rainfall);
+                });
+            }
+
             if ($("#temperature-anomalies").is(':checked')) {
                 var filename = "";
                 if ($("#month").is(':checked')) {
@@ -199,38 +235,38 @@
                     tempAnomalies = L.geoJson(data, {
                         style: function(feature) {
                             var feat = feature.properties.avg;
-                            var color;
+                            var color = temperatureColor.evaluate(feat);
                             if ($("#max").is(':checked'))
                                 feat = feature.properties.max;
                             if ($("#min").is(':checked'))
                                 feat = feature.properties.min;
                             if (feature.properties.type == "NORMAL" && $("#extreme").is(':checked')) {
                                 return {
-                                    fillColor:getTemperatureColor(feat),
-                                    fillOpacity:0.05,
+                                    fillOpacity:0.0,
                                     opacity:0
                                 };
                             }
                             if (feature.properties.type == "VERYHOT") {
-                                return {
-                                    fillColor:getTemperatureColor(feat),
-                                    fillOpacity:0.9,
+                                return {                                   
                                     stroke:true,
-                                    color : "#FF00BF",
+                                    color : '#000',
+                                    fillColor:color,
+                                    fillOpacity:0.9,
                                 };
                             }
                             else if (feature.properties.type == "VERYCOLD") {
                                 return {
-                                    fillColor:getTemperatureColor(feat),
-                                    fillOpacity:0.9,
+
                                     stroke:true,
-                                    color : "#00FF00",
+                                    color : '#000',
+                                    fillColor:color,
+                                    fillOpacity:0.9,
                                 };
                             } else {
                                 return {
                                     
-                                    fillColor:getTemperatureColor(feat),
-                                    fillOpacity:0.7,
+                                    fillColor:temperatureColor.evaluate(feat),
+                                    fillOpacity:0.5,
                                     stroke:((feature.properties.type != "NORMAL") ),
                                     color : color,
                                 };
@@ -294,6 +330,15 @@
             updateMap();
          });
 
+         $("#temperature-anomalies").change(function(event) {
+            $("#temperatureSettings").toggle();
+         });
+
+        $("#rainfall").change(function(event) {
+            $("#rainfallSettings").toggle();
+         });
+
+
          function getStormColor(windspeed) { //According to beaufort scale
             var gradient = [];
             return windspeed > 200 ? '#FFFF00' :
@@ -308,26 +353,6 @@
                    '#ffffff';
          }
 
-        function getSnowColor(snowCumulation){
-            var gradient = ["#B33409", "#B83E07", "#BE4806", "#C35204", "#C95C03", "#CE6601", "#D47100", "#D7870C", "#DA9D19", "#DDB326", "#E0C932", "#E3DF3F", "#E7F54C", "#D4EE46", "#C1E840", "#AFE23A", "#9CDB34", "#89D52E", "#77CF29", "#70D141", "#69D459", "#62D771", "#5BDA89", "#54DDA1", "#4EE0B9", "#3FB9C3", "#3092CD", "#216BD8", "#1144E2", "#031EED"];
-            return snowCumulation > 500 ? gradient[1] :
-                    snowCumulation > 300 ? gradient[3] :
-                    snowCumulation > 250 ? gradient[5] :
-                    snowCumulation > 200 ? gradient[7] :
-                    snowCumulation > 175 ? gradient[9] :
-                    snowCumulation > 150 ? gradient[11] :
-                    snowCumulation > 125 ? gradient[13] :
-                    snowCumulation > 100 ? gradient[15] :
-                    snowCumulation > 75 ? gradient[17] :
-                    snowCumulation > 50 ? gradient[19] :
-                    snowCumulation > 30 ? gradient[21] :
-                    snowCumulation > 20 ? gradient[23] :
-                    snowCumulation > 10 ? gradient[25] :
-                    snowCumulation > 5 ? gradient[27] :
-                    snowCumulation > 0 ? gradient[29] :
-                    '#267cc4';
-        }
-
         function getSnowOpacity(snowCumulation){
             var opacity = [0.6, 0.8, 0.9, 1];
             return snowCumulation > 500 ? opacity[3] :
@@ -338,37 +363,11 @@
                     0.4;
         }
 
-        function getTemperatureColor(anomaly){
+        var temperatureColor = new L.HSLHueFunction(new L.Point(-80, 240), new L.Point(80, 0));
+        var snowColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(500, 0));
+        var rainFallColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(5000, 0));
+        var rainFallDevColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(7, 0));
 
-            var gradient = ["#FA0000", "#F0000A", "#E60014", "#DC011E", "#D20128", "#C80133", "#BE023D", "#B40247", "#A90251", "#A0035B", "#960366", "#8C0370", "#82047A", "#780484", "#6D058E", "#640599", "#5A05A3", "#4F06AD", "#4606B7", "#3C06C1", "#3107CC", "#2807D6", "#1E07E0", "#1308EA", "#0A08F4", "#0009FF"];
-
-            return anomaly > 50 ? gradient[0] :
-                anomaly > 45 ? gradient[1] :
-                anomaly > 40 ? gradient[2] :
-                anomaly > 35 ? gradient[3] :
-                anomaly > 30 ? gradient[4] :
-                anomaly > 25 ? gradient[5] :
-                anomaly > 20 ? gradient[6] :
-                anomaly > 15 ? gradient[7] :
-                anomaly > 10 ? gradient[8] :
-                anomaly > 7.5 ? gradient[9] :
-                anomaly > 5 ? gradient[10] :
-                anomaly > 2.5 ? gradient[11] :
-                anomaly > 0 ? gradient[12] :
-                anomaly > -2.5 ? gradient[13] :
-                anomaly > -5 ? gradient[14] :
-                anomaly > -7.5 ? gradient[15] :
-                anomaly > -10 ? gradient[16] :
-                anomaly > -15 ? gradient[17] :
-                anomaly > -20 ? gradient[18] :
-                anomaly > -25 ? gradient[19] :
-                anomaly > -30 ? gradient[20] :
-                anomaly > -35 ? gradient[21] :
-                anomaly > -40 ? gradient[22] :
-                anomaly > -45 ? gradient[23] :
-                anomaly > -50 ? gradient[24] :
-            gradient[25];
-        }
 
         //Update map at the page loading to fill the parenthesis of the layers label
         updateMap();
