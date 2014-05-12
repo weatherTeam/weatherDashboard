@@ -27,10 +27,13 @@ public class AverageMonthReducer extends MapReduceBase implements
 		String[] value;
 		while (values.hasNext()) {
 			value = values.next().toString().split(";");
-			
+		
+            // Sum up all temperatures    
 			temperature += Integer.parseInt(value[0]);
+            // Count records
 			tempNumRecords++;
-			
+		
+            // Sum precipitation (if it is not missing)
 			if (!value[1].equals("9999")){
 				precipitation += Integer.parseInt(value[1]);
 				hasValues = true;
@@ -38,12 +41,16 @@ public class AverageMonthReducer extends MapReduceBase implements
 			}
 			
 		}
+        // Calculate average
 		temperature /= tempNumRecords;
+        
+        // Only calculate average if it has some records
 		if (hasValues){
 			precipitation /= precNumRecords;
 		} else {
 			precipitation = 9999;
 			}
+        // Emit (station+date, temp average + precipitation average)
 		output.collect(key, new Text(temperature+";"+precipitation));
 	}
 }
