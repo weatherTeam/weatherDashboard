@@ -364,7 +364,10 @@
         }
 
         var temperatureColor = new L.HSLHueFunction(new L.Point(-80, 240), new L.Point(80, 0));
-        var snowColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(500, 0));
+        var fewSnow = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(50, 120));
+        var moreSnow = new L.HSLHueFunction(new L.Point(50, 120), new L.Point(200, 50));
+        var lotSnow = new L.HSLHueFunction(new L.Point(200, 50), new L.Point(500, 0));
+        var snowColor = new L.PiecewiseFunction([fewSnow, moreSnow,lotSnow]);
         var rainFallColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(5000, 0));
         var rainFallDevColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(7, 0));
 
