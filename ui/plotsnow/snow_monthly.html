@@ -92,7 +92,7 @@ $.getJSON("data_monthly/snowcumulation-2013-12.json", function(snow) {
 
 //show a popup with the value when clicking
 function onEachFeature(feature, layer) {
-	var popupContent = "<p>Snow cumulation of the week: " +
+	var popupContent = "<p>Snow cumulation of the month: " +
 	feature.properties.value + "</p>";
 
 	if (feature.properties && feature.properties.popupContent) {
