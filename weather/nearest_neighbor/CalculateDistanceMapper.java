@@ -2,13 +2,14 @@ package weather.nearest_neighbor;
 
 import java.io.IOException;
 
-//import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
+
+// This mapper emits (station+year+month, period + temp + precipitation) 
 
 public class CalculateDistanceMapper extends MapReduceBase implements 
 	Mapper<LongWritable, Text, Text, Text> {

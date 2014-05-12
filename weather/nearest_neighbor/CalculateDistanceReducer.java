@@ -6,13 +6,17 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.hadoop.io.DoubleWritable;
-//import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
+
+/* This reducer reads in the values for the reference year
+ * and calculate the euclidean distance to the other years
+ * values which it recieves from the mapper
+ */
 
 public class CalculateDistanceReducer extends MapReduceBase implements 
 	Reducer<Text, Text, Text, DoubleWritable> {   
@@ -53,7 +57,9 @@ public class CalculateDistanceReducer extends MapReduceBase implements
             		period = Integer.parseInt(textArray[0]);
             		temp = Double.parseDouble(textArray[1].split(";")[0]);
             		prec = Double.parseDouble(textArray[1].split(";")[1]);
-            		
+            	
+                    // Only calculate distance for precipitation if it has values for
+                    // both years    
             		if (prec >= 9999 || referenceYearStationValues[period*2+1]>= 9999){
             			distance += Math.abs(referenceYearStationValues[period*2]-temp);
             		} else {
@@ -61,7 +67,6 @@ public class CalculateDistanceReducer extends MapReduceBase implements
             				Math.pow(referenceYearStationValues[period*2+1]-prec,2));
             		}
             	}
-            	//distance = Math.sqrt(distance);
             	output.collect(new Text(year+month), new DoubleWritable(distance));
             }
         }
