@@ -1,4 +1,4 @@
-package weather.nearest_neighbor.advanced;
+package weather.nearest_neighbor;
 
 import java.io.*;
 import java.util.HashMap;
