@@ -10,6 +10,11 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
+/* This reducers sums up the distances for each year and
+ * outputs the average of the distance (divides the total 
+ * sum on the number of records registered
+ */
+
 public class CalculateDistanceSumReducer extends MapReduceBase 
 	implements Reducer<IntWritable, DoubleWritable, IntWritable, DoubleWritable> {
 		

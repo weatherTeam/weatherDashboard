@@ -7,6 +7,15 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 
+/* This file contains helper functions
+ * 
+ * There is one important function that reads in the reference year values
+ * It reads from the hdfs file system, so this path must be changed according
+ * to which enviroment you are running the job on
+ *
+ * If the number of periods is changed, this must also be changed here
+ */
+
 public class utils {
     // Read in reference year average values
 	static public Map<String,int[]> readInReferenceYear(String path_to_file) throws IOException{
@@ -20,8 +29,6 @@ public class utils {
 	    
 		String line;
 		Map<String,int[]> referenceYearValues = new HashMap<String, int[]>();
-	    
-		//int[] referenceYearValues = new int[12];
 
 		String station_id;
 		int period;

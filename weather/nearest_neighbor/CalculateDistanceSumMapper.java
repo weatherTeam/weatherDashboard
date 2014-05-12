@@ -11,9 +11,10 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
+// This mapper emits distances for each year
+
 public class CalculateDistanceSumMapper extends MapReduceBase implements 
 	Mapper<LongWritable, Text, IntWritable, DoubleWritable> {
-	
 	
 	public void map(LongWritable key, Text value,
 			OutputCollector<IntWritable, DoubleWritable> output, Reporter reporter)
@@ -21,8 +22,8 @@ public class CalculateDistanceSumMapper extends MapReduceBase implements
 		
 		String[] lineArray = value.toString().split("\\s+");
 		int yearMonth = Integer.parseInt(lineArray[0]);
-		double temp = Double.parseDouble(lineArray[1]);
-		output.collect(new IntWritable(yearMonth), new DoubleWritable(temp));
+		double distance = Double.parseDouble(lineArray[1]);
+		output.collect(new IntWritable(yearMonth), new DoubleWritable(distance));
 	}
 
 }
