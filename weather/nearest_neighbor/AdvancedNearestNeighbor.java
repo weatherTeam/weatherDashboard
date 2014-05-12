@@ -4,10 +4,31 @@ import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapred.*;
 
+/*
+ * This file contains the job configuration for Nearest Neighbor
+ *
+ * It consits of four jobs:
+ *  - Calculate averages
+ *  - Filter for reference year
+ *  - Calculate distances
+ *  - Sum up total distances
+ *
+ * Input paramters is:
+ * 
+ *      input output year month
+ * 
+ * where "year" is the reference year and "month" is the
+ * period to be compared
+ *
+ * Input data is of the standard NOAA form (ish-format)
+ * 
+ * Output is:
+ *     
+ *     year distance
+ * 
+ */
 
 public class AdvancedNearestNeighbor {
-    // Input paramters is:
-    // input output year month
     
     public static void main(String[] args) throws Exception {
     	
