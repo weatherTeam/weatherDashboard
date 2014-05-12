@@ -54,7 +54,8 @@
 
         var dataRepo = "data";
         var stormDataRepo = "storms";
-        var snowDataRepo = "snow";
+        var snowDataRepoMonthly = "snow_monthly";
+        var snowDataRepoWeekly = "snow_weekly";
 
         var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/sandoz.i550lpml/{z}/{x}/{y}.png', {
             attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
@@ -139,7 +140,13 @@
 
             //Snow cumulation layer
             if ($("#snow-cumulation").is(':checked')) {
-                var snowCumulation_filename = dataRepo+"/"+snowDataRepo+"/snowcumulation-"+dateMoment.format('YYYY-WW')+".json";
+                var snowCumulation_filename = "";
+                if ($("#day").is(':checked')) {
+                    snowCumulation_filename = dataRepo+"/"+snowDataRepoWeekly+"/snowcumulation-"+dateMoment.format('YYYY-WW')+".json";
+                }
+                if ($("#month").is(':checked')) {
+                    snowCumulation_filename = dataRepo+"/"+snowDataRepoMonthly+"/snowcumulation-"+dateMoment.format('YYYY-MM')+".json";
+                }
 
                 $.getJSON(snowCumulation_filename, function(snow) {
                     //When GeoJSON is loaded
