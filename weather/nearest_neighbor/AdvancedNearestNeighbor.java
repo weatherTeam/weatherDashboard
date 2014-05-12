@@ -1,18 +1,17 @@
 package weather.nearest_neighbor;
 
-//import java.io.*;
-//import java.util.*;
-
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapred.*;
 
 
 public class AdvancedNearestNeighbor {
+    // Input paramters is:
+    // input output year month
     
     public static void main(String[] args) throws Exception {
     	
-    	  // All months averages
+    	  // Calculate averages for the specified month for all years
           JobConf averageMonth = new JobConf(AdvancedNearestNeighbor.class);
           averageMonth.setJobName("Average Month Values");
 
@@ -26,11 +25,12 @@ public class AdvancedNearestNeighbor {
 
           FileInputFormat.setInputPaths(averageMonth, new Path(args[0]));
           FileOutputFormat.setOutputPath(averageMonth, new Path("/tmp/averageMonth"));
+         
+          // To be set on server (depending on load and parameters) 
+          averageMonth.setNumMapTasks(100);
+          averageMonth.setNumReduceTasks(100);
           
-          averageMonth.setNumMapTasks(1);
-          averageMonth.setNumReduceTasks(1);
-          
-          // Get averages for reference year (filter on one year)
+          // Job to filter out data for the reference year
           JobConf averageMonthYear = new JobConf(AdvancedNearestNeighbor.class);
           averageMonthYear.setJobName("Filter for specific year");
 
@@ -44,10 +44,11 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(averageMonthYear, new Path("/tmp/averageMonth"));
           FileOutputFormat.setOutputPath(averageMonthYear, new Path("/tmp/averageMonthYear"));
           
-          averageMonthYear.setNumMapTasks(1);
+          // To be set on server (depending on load and parameters) 
+          averageMonthYear.setNumMapTasks(100);
           
 
-          // Calculate distances job configuration
+          // Job to calculate distances
           JobConf calculateDistances = new JobConf(AdvancedNearestNeighbor.class);
           calculateDistances.setJobName("Calculate Distances");
           
@@ -66,8 +67,9 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(calculateDistances, new Path("/tmp/averageMonth"));
           FileOutputFormat.setOutputPath(calculateDistances, new Path("/tmp/calculateDistances"));
           
-          calculateDistances.setNumMapTasks(1);
-          calculateDistances.setNumReduceTasks(1);
+          // To be set on server (depending on load and parameters) 
+          calculateDistances.setNumMapTasks(100);
+          calculateDistances.setNumReduceTasks(100);
           
           
           // Sum up results for each year and station
@@ -86,7 +88,8 @@ public class AdvancedNearestNeighbor {
           FileInputFormat.setInputPaths(calculateDistancesSum, new Path("/tmp/calculateDistances"));
           FileOutputFormat.setOutputPath(calculateDistancesSum, new Path(args[1]));
           
-          calculateDistancesSum.setNumMapTasks(1);
+          // To be set on server (depending on load and parameters) 
+          calculateDistancesSum.setNumMapTasks(100);
           calculateDistancesSum.setNumReduceTasks(1);
           
           // Run jobs
@@ -94,6 +97,5 @@ public class AdvancedNearestNeighbor {
           JobClient.runJob(averageMonthYear);
           JobClient.runJob(calculateDistances);
           JobClient.runJob(calculateDistancesSum);
-          
     }
 }
