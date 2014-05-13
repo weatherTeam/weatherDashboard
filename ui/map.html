@@ -26,10 +26,10 @@
         <div id='form'>
             <form id='formcontent'>
                 <input type="checkbox" name="layer" id="all-stations" value="All stations"> <label for="all-stations">All stations</label>
-                <input type="checkbox" name="layer" id="storms" value="Storms"> <label for="storms">Storms (by <span id="storm-period"></span>)</label>
                 <input type="checkbox" name="layer" id="temperature-anomalies" value="Temperature anomalies"> <label for="temperature-anomalies">Temperature anomalies (by <span id="tempAnom-period"></span>)</label>
                 <input type="checkbox" name="layer" id="snow-cumulation" value="Snow cumulation"> <label for="snow-cumulation">Snow cumulation (by <span id="snowCumulation-period"></span>)</label>
-                <input type="checkbox" name="layer" id="rainfall" value="Rainfall"> <label for="rainfall">Rainfall</label><br />
+                <input type="checkbox" name="layer" id="rainfall" value="Rainfall"> <label for="rainfall">Rainfall</label>
+                <input type="checkbox" name="layer" id="storms" value="Storms"> <label for="storms">Storms (by <span id="storm-period"></span>)</label><br />
                 <input type="date" name="period" id="period" value="2007-03-15" class="box"><br />
                 <input type="radio" name="time" id="day" value="Day"> <label for="day">Day</label>
                 <input type="radio" name="time" id="month" value="Month" checked> <label for="month">Month</label>
@@ -127,17 +127,42 @@
 
         var updateMap = function() {
 
-            map.removeLayer(tempAnomalies);
-            map.removeLayer(rainfall);
-            map.removeLayer(snowCumulation);
-            map.removeLayer(storms);
+            // map.removeLayer(tempAnomalies);
+            // map.removeLayer(rainfall);
+            // map.removeLayer(snowCumulation);
+            // map.removeLayer(storms);
 
             var date = $('#period').val().split('-');
 
             var dateMoment = moment($('#period').val());
 
+            //All stations layer
+            if ($("#all-stations").is(':checked') && !map.hasLayer(allStations)) {
+                $.getJSON("data/stationslist.json", function(stations) {
+                    //When GeoJSON is loaded
+                    allStations = L.geoJson(stations, {
+                        onEachFeature: onEachStationFeature,
+
+                        pointToLayer: function (feature, latlng) {
+                            return L.circleMarker(latlng, {
+                                    //fillColor: "#ff7800",
+                                    color: "#000",
+                                    weight: 1,
+                                    opacity: 1,
+                                    radius: 2,
+                                    fillOpacity: 0.3
+                                });
+                        }
+                    });
+                    map.addLayer(allStations);
+                });
+            } else if(!$("#all-stations").is(':checked')) {
+                map.removeLayer(allStations);
+            }
+
             //Temperature anomalies layer
             if ($("#temperature-anomalies").is(':checked')) {
+                map.removeLayer(tempAnomalies);
                 var filename = "";
                 if ($("#month").is(':checked')) {
                     fileName =dataRepo+"/"+temperatureDataRepoMonthly+"/"+date[0]+date[1]+".json";
@@ -193,41 +218,13 @@
                     });
                     map.addLayer(tempAnomalies);
                 });
-            }
-
-            //Rainfall layer
-            if ($("#rainfall").is(':checked')) {
-                var filename = "";
-                if ($("#month").is(':checked')) {
-                    fileName = dataRepo+"/"+rainfallDataRepoMonthly+"/"+date[0]+"."+date[1]+".json";
-                }
-                if ($("#day").is(':checked')) {
-                    fileName = dataRepo+"/"+rainfallDataRepoDaily+"/"+date[0]+"."+date[1]+"."+date[2]+".json";
-                }
-
-                $.getJSON(fileName, function(data) {
-                    rainfall = L.geoJson(data, {
-                        style: function(feature) {
-                            var color = rainFallColor.evaluate(feature.properties.value);;
-                            if ($("#dev").is(':checked'))
-                                color = rainFallDevColor.evaluate(feature.properties.deviation);
-                            return {
-                                fillColor:color,
-                                fillOpacity:0.8,
-                                opacity:0
-                            };
-
-                        },
-                        pointToLayer: function (feature, latlng) {
-                            return L.circleMarker(latlng);
-                        },
-                    });
-                    map.addLayer(rainfall);
-                });
+            } else {
+                map.removeLayer(tempAnomalies);
             }
 
             //Snow cumulation layer
             if ($("#snow-cumulation").is(':checked')) {
+                map.removeLayer(snowCumulation);
                 var snowCumulation_filename = "";
                 if ($("#day").is(':checked')) {
                     snowCumulation_filename = dataRepo+"/"+snowDataRepoWeekly+"/snowcumulation-"+dateMoment.format('YYYY-WW')+".json";
@@ -257,10 +254,47 @@
                         });//.addTo(map);
                     map.addLayer(snowCumulation);  //Add layer to map
                 });
+            } else {
+                map.removeLayer(snowCumulation);
+            }
+
+            //Rainfall layer
+            if ($("#rainfall").is(':checked')) {
+                map.removeLayer(rainfall);
+                var filename = "";
+                if ($("#month").is(':checked')) {
+                    fileName = dataRepo+"/"+rainfallDataRepoMonthly+"/"+date[0]+"."+date[1]+".json";
+                }
+                if ($("#day").is(':checked')) {
+                    fileName = dataRepo+"/"+rainfallDataRepoDaily+"/"+date[0]+"."+date[1]+"."+date[2]+".json";
+                }
+
+                $.getJSON(fileName, function(data) {
+                    rainfall = L.geoJson(data, {
+                        style: function(feature) {
+                            var color = rainFallColor.evaluate(feature.properties.value);;
+                            if ($("#dev").is(':checked'))
+                                color = rainFallDevColor.evaluate(feature.properties.deviation);
+                            return {
+                                fillColor:color,
+                                fillOpacity:0.8,
+                                opacity:0
+                            };
+
+                        },
+                        pointToLayer: function (feature, latlng) {
+                            return L.circleMarker(latlng);
+                        },
+                    });
+                    map.addLayer(rainfall);
+                });
+            } else {
+                map.removeLayer(rainfall);
             }
 
             //Storms layer
             if ($("#storms").is(':checked')) {
+                map.removeLayer(storms);
                 var storms_filename = "";
                 if ($("#month").is(':checked') || $("#day").is(':checked')) {
                         storms_filename = dataRepo+"/"+stormDataRepo+"/"+date[0]+date[1]+".json";
@@ -286,30 +320,8 @@
                     });
                 map.addLayer(storms);
                 });
-            }
-
-            //All stations layer
-            if ($("#all-stations").is(':checked') && !map.hasLayer(allStations)) {
-                $.getJSON("data/stationslist.json", function(stations) {
-                    //When GeoJSON is loaded
-                    allStations = L.geoJson(stations, {
-                        onEachFeature: onEachStationFeature,
-
-                        pointToLayer: function (feature, latlng) {
-                            return L.circleMarker(latlng, {
-                                    //fillColor: "#ff7800",
-                                    color: "#000",
-                                    weight: 1,
-                                    opacity: 1,
-                                    radius: 2,
-                                    fillOpacity: 0.3
-                                });
-                        }
-                    });
-                    map.addLayer(allStations);
-                });
-            } else if(!$("#all-stations").is(':checked')) {
-                map.removeLayer(allStations);
+            } else {
+                map.removeLayer(storms);
             }
 
             if ($("#day").is(':checked')) {
