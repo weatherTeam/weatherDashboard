@@ -149,7 +149,7 @@
                 if ($("#day").is(':checked')) {
                     snowCumulation_filename = dataRepo+"/"+snowDataRepoWeekly+"/snowcumulation-"+dateMoment.format('YYYY-WW')+".json";
                 }
-                if ($("#month").is(':checked')) {
+                if ($("#month").is(':checked') || $("#year").is(':checked')) {
                     snowCumulation_filename = dataRepo+"/"+snowDataRepoMonthly+"/snowcumulation-"+dateMoment.format('YYYY-MM')+".json";
                 }
 
@@ -324,12 +324,12 @@
             if ($("#month").is(':checked')) {
                 $("#storm-period").html("month");
                 $("#tempAnom-period").html("month");
-                $("#snowCumulation-period").html("week");
+                $("#snowCumulation-period").html("month");
             }
             if ($("#year").is(':checked')) {
                 $("#storm-period").html("year");
                 $("#tempAnom-period").html("month");
-                $("#snowCumulation-period").html("week");
+                $("#snowCumulation-period").html("month");
             }
          };
 
