@@ -240,7 +240,7 @@
                     fileName =dataRepo+"/"+temperatureDataRepoMonthly+"/"+date[0]+date[1]+".json";
                 }
                 if ($("#day").is(':checked')) {
-                    fileName = dataRepo+"/"+temperatureDataRepoMonthly+"/"+date[0]+date[1]+date[2]+".json";
+                    fileName = dataRepo+"/"+temperatureDataRepoDaily+"/"+date[0]+date[1]+date[2]+".json";
                 }
 
                 $.getJSON(fileName, function(data) {
@@ -375,7 +375,7 @@
                     0.4;
         }
 
-        var temperatureColor = new L.HSLHueFunction(new L.Point(-80, 240), new L.Point(80, 0));
+        var temperatureColor = new L.HSLHueFunction(new L.Point(-140, 240), new L.Point(140, 0));
         var fewSnow = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(50, 120));
         var moreSnow = new L.HSLHueFunction(new L.Point(50, 120), new L.Point(200, 50));
         var lotSnow = new L.HSLHueFunction(new L.Point(200, 50), new L.Point(500, 0));
