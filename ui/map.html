@@ -69,6 +69,9 @@
             .addLayer(mapboxTiles)
             .setView([39.82, -98.57], 4);
 
+        L.control.scale({
+            imperial: false
+        }).addTo(map);
 
         var allStations = L.geoJson();
         var storms = L.geoJson();
@@ -106,7 +109,7 @@
                                 'End date: ' + endDay + '.' + endMonth + '.' + endYear + ' at ' + endHour + '.' + endMinute + '<br />' +
                                 'Max. Windspeed: ' + (feature.properties.windspeed).toFixed(2) + 'km/h' + '<br />' +
                                 'Max. Rainfall: ' + feature.properties.rainfall + '<br />' +
-                                'Radius: ' + feature.properties.radius);
+                                'Radius: ' + ((feature.properties.radius)/1000).toFixed(2) + 'km');
             }
         }
 
@@ -134,106 +137,6 @@
             var dateMoment = moment($('#period').val());
 
             //Temperature anomalies layer
-            if ($("#temperature-anomalies").is(':checked')) {
-
-            }
-
-            //Rainfall layer
-            if ($("#rainfall").is(':checked')) {
-
-            }
-
-            //Snow cumulation layer
-            if ($("#snow-cumulation").is(':checked')) {
-                var snowCumulation_filename = "";
-                if ($("#day").is(':checked')) {
-                    snowCumulation_filename = dataRepo+"/"+snowDataRepoWeekly+"/snowcumulation-"+dateMoment.format('YYYY-WW')+".json";
-                }
-                if ($("#month").is(':checked') || $("#year").is(':checked')) {
-                    snowCumulation_filename = dataRepo+"/"+snowDataRepoMonthly+"/snowcumulation-"+dateMoment.format('YYYY-MM')+".json";
-                }
-
-                $.getJSON(snowCumulation_filename, function(snow) {
-                    //When GeoJSON is loaded
-                    snowCumulation = L.geoJson(snow, {
-                        style: function (feature) {
-                            return {
-                                color: snowColor.evaluate(feature.properties.value),
-                                fillOpacity: getSnowOpacity(feature.properties.value)
-                            }
-                        },
-
-                        pointToLayer: function (feature, latlng) {
-                            return L.circleMarker(latlng);
-                        },
-
-                        onEachFeature: onEachSnowCumulationFeature
-
-                        //onEachFeature: onEachFeature,
-                        });//.addTo(map);
-                    map.addLayer(snowCumulation);  //Add layer to map
-                });
-            }
-
-            //Storms layer
-            if ($("#storms").is(':checked')) {
-                var storms_filename = "";
-                if ($("#month").is(':checked') || $("#day").is(':checked')) {
-                        storms_filename = dataRepo+"/"+stormDataRepo+"/"+date[0]+date[1]+".json";
-                }
-                if ($("#year").is(':checked')) {
-                        storms_filename = dataRepo+"/"+stormDataRepo+"/"+date[0]+".json";
-                }
-
-                $.getJSON(storms_filename, function(data) {
-                //When GeoJSON is loaded
-                storms = L.geoJson(data, {
-                    onEachFeature: onEachStormFeature,
-                    pointToLayer: function (feature, latlng) {
-                        var radius = feature.properties.radius;
-                        return L.circle(latlng, radius, {
-                            fillColor: getStormColor(feature.properties.windspeed),
-                            color: "#000",
-                            weight: 1,
-                            opacity: 1,
-                            fillOpacity: 0.3
-                        });
-                    }
-                    });
-                map.addLayer(storms);
-                });
-            }
-
-            if ($("#rainfall").is(':checked')) {
-                var filename = "";
-                if ($("#month").is(':checked')) {
-                    fileName = dataRepo+"/"+rainfallDataRepoMonthly+"/"+date[0]+"."+date[1]+".json";
-                }
-                if ($("#day").is(':checked')) {
-                    fileName = dataRepo+"/"+rainfallDataRepoDaily+"/"+date[0]+"."+date[1]+"."+date[2]+".json";
-                }
-
-                $.getJSON(fileName, function(data) {
-                    rainfall = L.geoJson(data, {
-                        style: function(feature) {
-                            var color = rainFallColor.evaluate(feature.properties.value);;
-                            if ($("#dev").is(':checked'))
-                                color = rainFallDevColor.evaluate(feature.properties.deviation);
-                            return {
-                                fillColor:color,
-                                fillOpacity:0.8,
-                                opacity:0
-                            };
-
-                        },
-                        pointToLayer: function (feature, latlng) {
-                            return L.circleMarker(latlng);
-                        },
-                    });
-                    map.addLayer(rainfall);
-                });
-            }
-
             if ($("#temperature-anomalies").is(':checked')) {
                 var filename = "";
                 if ($("#month").is(':checked')) {
@@ -289,6 +192,99 @@
                         },
                     });
                     map.addLayer(tempAnomalies);
+                });
+            }
+
+            //Rainfall layer
+            if ($("#rainfall").is(':checked')) {
+                var filename = "";
+                if ($("#month").is(':checked')) {
+                    fileName = dataRepo+"/"+rainfallDataRepoMonthly+"/"+date[0]+"."+date[1]+".json";
+                }
+                if ($("#day").is(':checked')) {
+                    fileName = dataRepo+"/"+rainfallDataRepoDaily+"/"+date[0]+"."+date[1]+"."+date[2]+".json";
+                }
+
+                $.getJSON(fileName, function(data) {
+                    rainfall = L.geoJson(data, {
+                        style: function(feature) {
+                            var color = rainFallColor.evaluate(feature.properties.value);;
+                            if ($("#dev").is(':checked'))
+                                color = rainFallDevColor.evaluate(feature.properties.deviation);
+                            return {
+                                fillColor:color,
+                                fillOpacity:0.8,
+                                opacity:0
+                            };
+
+                        },
+                        pointToLayer: function (feature, latlng) {
+                            return L.circleMarker(latlng);
+                        },
+                    });
+                    map.addLayer(rainfall);
+                });
+            }
+
+            //Snow cumulation layer
+            if ($("#snow-cumulation").is(':checked')) {
+                var snowCumulation_filename = "";
+                if ($("#day").is(':checked')) {
+                    snowCumulation_filename = dataRepo+"/"+snowDataRepoWeekly+"/snowcumulation-"+dateMoment.format('YYYY-WW')+".json";
+                }
+                if ($("#month").is(':checked') || $("#year").is(':checked')) {
+                    snowCumulation_filename = dataRepo+"/"+snowDataRepoMonthly+"/snowcumulation-"+dateMoment.format('YYYY-MM')+".json";
+                }
+
+                $.getJSON(snowCumulation_filename, function(snow) {
+                    //When GeoJSON is loaded
+                    snowCumulation = L.geoJson(snow, {
+                        style: function (feature) {
+                            return {
+                                color: "#fff",
+                                fillColor: snowColor.evaluate(feature.properties.value),
+                                fillOpacity: getSnowOpacity(feature.properties.value)
+                            }
+                        },
+
+                        pointToLayer: function (feature, latlng) {
+                            return L.circleMarker(latlng);
+                        },
+
+                        onEachFeature: onEachSnowCumulationFeature
+
+                        //onEachFeature: onEachFeature,
+                        });//.addTo(map);
+                    map.addLayer(snowCumulation);  //Add layer to map
+                });
+            }
+
+            //Storms layer
+            if ($("#storms").is(':checked')) {
+                var storms_filename = "";
+                if ($("#month").is(':checked') || $("#day").is(':checked')) {
+                        storms_filename = dataRepo+"/"+stormDataRepo+"/"+date[0]+date[1]+".json";
+                }
+                if ($("#year").is(':checked')) {
+                        storms_filename = dataRepo+"/"+stormDataRepo+"/"+date[0]+".json";
+                }
+
+                $.getJSON(storms_filename, function(data) {
+                //When GeoJSON is loaded
+                storms = L.geoJson(data, {
+                    onEachFeature: onEachStormFeature,
+                    pointToLayer: function (feature, latlng) {
+                        var radius = feature.properties.radius;
+                        return L.circle(latlng, radius, {
+                            fillColor: windSpeedColor.evaluate(feature.properties.windspeed),
+                            color: "#000",
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.3
+                        });
+                    }
+                    });
+                map.addLayer(storms);
                 });
             }
 
@@ -350,21 +346,6 @@
             $("#rainfallSettings").toggle();
          });
 
-
-         function getStormColor(windspeed) { //According to beaufort scale
-            var gradient = [];
-            return windspeed > 200 ? '#FFFF00' :
-                   windspeed > 175 ? '#FF3300' :
-                   windspeed > 150 ? '#FF6600' :
-                   windspeed > 140 ? '#FF9900' :
-                   windspeed > 130 ? '#FFCC00' :
-                   windspeed > 120 ? '#FFFF00' :
-                   windspeed > 110 ? '#CCFF00' :
-                   windspeed > 100 ? '#99FF00' :
-                   windspeed > 75 ? '#66FF00' :
-                   '#ffffff';
-         }
-
         function getSnowOpacity(snowCumulation){
             var opacity = [0.6, 0.8, 0.9, 1];
             return snowCumulation > 500 ? opacity[3] :
@@ -382,6 +363,7 @@
         var snowColor = new L.PiecewiseFunction([fewSnow, moreSnow,lotSnow]);
         var rainFallColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(5000, 0));
         var rainFallDevColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(7, 0));
+        var windSpeedColor = new L.HSLHueFunction(new L.Point(75, 100), new L.Point(300, 0))
 
 
         //Update map at the page loading to fill the parenthesis of the layers label
