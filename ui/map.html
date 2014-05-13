@@ -19,6 +19,7 @@
 <body>
     <header>
         <h1>Weather Dashboard</h1>
+        <a href="graph.html">&rarr; Graphs</a>
     </header>
     <main>
         <div id='map'></div>
@@ -258,7 +259,7 @@
                                 };
                             }
                             if (feature.properties.type == "VERYHOT") {
-                                return {                                   
+                                return {
                                     stroke:true,
                                     color : '#000',
                                     fillColor:color,
@@ -275,7 +276,7 @@
                                 };
                             } else {
                                 return {
-                                    
+
                                     fillColor:temperatureColor.evaluate(feat),
                                     fillOpacity:0.5,
                                     stroke:((feature.properties.type != "NORMAL") ),
