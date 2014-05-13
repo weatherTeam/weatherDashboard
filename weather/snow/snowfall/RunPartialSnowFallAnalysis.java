@@ -8,6 +8,9 @@ import weather.snow.snowStatistics.MonthlySnowCumulationTrend;
  * This assume the RunCompleteSnowFallAnalysis (the part DailySnowFall Estimation) was launched.
  * It uses its output.
  *
+ * PARAM:
+ * input: outputOf DailySnowFallEstimation
+ * output: snow avarage (for trend), weekly snow cumulation and monthly  snow cumulation
  *
  */
 public class RunPartialSnowFallAnalysis {

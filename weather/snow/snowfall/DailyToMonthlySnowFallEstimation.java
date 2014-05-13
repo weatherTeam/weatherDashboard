@@ -17,13 +17,14 @@ import java.util.Iterator;
  *
  * INPUT: Daily snow cumulation
  * OUTPUT: monthly snow cumulation
+ * OUTPUT format: YYYY-MM tab LATITUDE tab LONGITUDE tab snow cumulation
  */
 public class DailyToMonthlySnowFallEstimation {
 	/**
 	 * Preprocess the data: if snow depth is given, it may be measured each XX hours.
 	 * <p/>
 	 * output:
-	 * key: stationID TAB latitude TAB longitude TAB date(day)
+	 * key: stationID TAB latitude TAB longitude TAB year-month
 	 * value: snow cumulation of the month
 	 */
 	public static class GroupeByStationByMonth extends MapReduceBase implements Mapper<LongWritable, Text, Text,
@@ -77,6 +78,8 @@ public class DailyToMonthlySnowFallEstimation {
 
 	/*
 	* Compute the snow cumulation over a month for each station
+	* output key: stationID TAB latitude TAB longitude TAB year-month
+	* output value: snow cumulation of the month
 	 */
 	public static class MonthlySnowCumulation extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
 

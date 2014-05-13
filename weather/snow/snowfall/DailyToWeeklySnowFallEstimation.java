@@ -20,6 +20,8 @@ import java.util.Iterator;
 /**
  * Created by Jonathan Duss on 01.04.14.
  * INPUT REQUIRED: output of dailySnowFallEstimation
+ *
+ *
  */
 public class DailyToWeeklySnowFallEstimation {
 

@@ -268,13 +268,7 @@ public class DailySnowFallEstimation {
 
 				} //end if (input.contains("AA101") || input.contains("AA102") || input.contains("AA101"))
 
-				SnowData sd2 = new SnowData();
-				sd2.setSnowDepth(snowDepth);
-				sd2.setSnowFallFromRain(cumulationFromRain);
-				sd2.setSnowFallFromSnowDepth(cumulationFromSnowDepth);
-				sd2.setPrecipitation(precipitationAmount);
-				sd2.setTemperature(temperature);
-				//System.out.println("HELLO " + dateFormatterForSyso.format(c.getTime()) + " - " + sd2.toString());
+
 
 				if (containsDataFromSnowDepth || containsDataFromRain) {
 					SnowData sd = new SnowData();

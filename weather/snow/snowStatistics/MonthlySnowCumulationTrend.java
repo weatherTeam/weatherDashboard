@@ -13,14 +13,16 @@ import java.util.Iterator;
  * Created by Jonathan Duss on 07.05.14.
  *
  * INPUT: Monthly snow cumulation
- * OUTPUT: monthly snow cumulation
+ * OUTPUT: Year-Month TAB Lattitude TAB longitude TAB monthly snow cumulation
+ *
+ * Try to find trend about the snow cumulation over 30 years.
  */
 public class MonthlySnowCumulationTrend {
 	/**
-	 * Preprocess the data: if snow depth is given, it may be measured each XX hours.
+	 *
 	 * <p/>
 	 * output:
-	 * key: stationID_year/month/day
+	 * key: stationID _year/month/day
 	 * value: temperature  snowDepth snow_cum_from_depth rain snowDepth snow_cum_from_rain
 	 */
 	public static class GroupeByStationByMonth extends MapReduceBase implements Mapper<LongWritable, Text, Text,
