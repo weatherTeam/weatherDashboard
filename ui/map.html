@@ -272,19 +272,19 @@
                 $.getJSON(fileName, function(data) {
                     rainfall = L.geoJson(data, {
                         style: function(feature) {
-                            var color = rainFallColor.evaluate(feature.properties.value);;
+                            var rcolor = rainFallColor.evaluate(feature.properties.value);
                             if ($("#dev").is(':checked'))
-                                color = rainFallDevColor.evaluate(feature.properties.deviation);
+                                rcolor = rainFallDevColor.evaluate(feature.properties.deviation);
                             return {
-                                fillColor:color,
-                                fillOpacity:0.8,
-                                opacity:0
-                            };
+                                color: "#ff69b4",
+                                fillColor: rcolor,
+                                fillOpacity: 0.8
+                            }
 
                         },
                         pointToLayer: function (feature, latlng) {
                             return L.circleMarker(latlng);
-                        },
+                        }
                     });
                     map.addLayer(rainfall);
                 });
