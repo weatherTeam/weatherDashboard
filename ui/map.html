@@ -6,6 +6,7 @@
     <link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="dvf.css" />
     <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js'></script>
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
@@ -73,6 +74,12 @@
             imperial: false
         }).addTo(map);
 
+        var layerControl = new L.Control.Layers();
+        var legendControl = new L.Control.Legend();
+
+        layerControl.addTo(map);
+        legendControl.addTo(map);
+
         var allStations = L.geoJson();
         var storms = L.geoJson();
         var tempAnomalies = L.geoJson();
@@ -124,6 +131,10 @@
             layer.bindPopup(popupContent);
         }
 
+        var temperatureData;
+        var snowData;
+        var rainData;
+        var stormsData;
 
         var updateMap = function() {
 
@@ -172,6 +183,7 @@
                 }
 
                 $.getJSON(fileName, function(data) {
+                    temperatureData = data;
                     tempAnomalies = L.geoJson(data, {
                         style: function(feature) {
                             var feat = feature.properties.avg;
@@ -234,6 +246,7 @@
                 }
 
                 $.getJSON(snowCumulation_filename, function(snow) {
+                    snowData = snow;
                     //When GeoJSON is loaded
                     snowCumulation = L.geoJson(snow, {
                         style: function (feature) {
@@ -270,6 +283,7 @@
                 }
 
                 $.getJSON(fileName, function(data) {
+                    rainData = data;
                     rainfall = L.geoJson(data, {
                         style: function(feature) {
                             var rcolor = rainFallColor.evaluate(feature.properties.value);
@@ -304,21 +318,22 @@
                 }
 
                 $.getJSON(storms_filename, function(data) {
-                //When GeoJSON is loaded
-                storms = L.geoJson(data, {
-                    onEachFeature: onEachStormFeature,
-                    pointToLayer: function (feature, latlng) {
-                        var radius = feature.properties.radius;
-                        return L.circle(latlng, radius, {
-                            fillColor: windSpeedColor.evaluate(feature.properties.windspeed),
-                            color: "#000",
-                            weight: 1,
-                            opacity: 1,
-                            fillOpacity: 0.3
-                        });
-                    }
+                    stormsData = data;
+                    //When GeoJSON is loaded
+                    storms = L.geoJson(data, {
+                        onEachFeature: onEachStormFeature,
+                        pointToLayer: function (feature, latlng) {
+                            var radius = feature.properties.radius;
+                            return L.circle(latlng, radius, {
+                                fillColor: windSpeedColor.evaluate(feature.properties.windspeed),
+                                color: "#000",
+                                weight: 1,
+                                opacity: 1,
+                                fillOpacity: 0.3
+                            });
+                        }
                     });
-                map.addLayer(storms);
+                    map.addLayer(storms);
                 });
             } else {
                 map.removeLayer(storms);
@@ -375,7 +390,67 @@
         var snowColor = new L.PiecewiseFunction([fewSnow, moreSnow,lotSnow]);
         var rainFallColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(5000, 0));
         var rainFallDevColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(7, 0));
-        var windSpeedColor = new L.HSLHueFunction(new L.Point(75, 100), new L.Point(300, 0))
+        var windSpeedColor = new L.HSLHueFunction(new L.Point(75, 100), new L.Point(300, 0));
+
+        //Showing color scale
+        var options = {
+            recordsField: 'locals',
+            locationMode: L.LocationModes.STATE,
+            codeField: 'abbr',
+            displayOptions: {
+                electoral: {
+                    displayName: 'foo'
+                }
+            },
+            layerOptions: {
+                fillOpacity: 0.8,
+                opacity: 1,
+                weight: 1
+            },
+            tooltipOptions: {
+                iconSize: new L.Point(80,55),
+                iconAnchor: new L.Point(-5,55)
+            }
+        };
+
+
+            options = $.extend(true, {}, options);
+
+            options.displayOptions.electoral.fillColor = temperatureColor;
+            options.displayOptions.electoral.color = temperatureColor;
+            options.displayOptions.electoral.displayName = 'Temperature anomalies (/10 °C)';
+            var temperatureLegend = new L.ChoroplethDataLayer(temperatureData,options);
+            layerControl.addOverlay(temperatureLegend, 'Temperature anomalies legend');
+            map.addLayer(temperatureLegend);
+
+            options.displayOptions.electoral.fillColor = snowColor;
+            options.displayOptions.electoral.color = snowColor;
+            options.displayOptions.electoral.displayName = 'Snow cumulation (cm)';
+            var snowLegend = new L.ChoroplethDataLayer(snowData,options);
+            layerControl.addOverlay(snowLegend, 'Snow cumulation legend');
+            map.addLayer(snowLegend);
+
+            options.displayOptions.electoral.fillColor = rainFallColor;
+            options.displayOptions.electoral.color = rainFallColor;
+            options.displayOptions.electoral.displayName = 'Rainfall';
+            var rainLegend = new L.ChoroplethDataLayer(rainData,options);
+            layerControl.addOverlay(rainLegend, 'Rainfall legend');
+            map.addLayer(rainLegend);
+
+            options.displayOptions.electoral.fillColor = rainFallDevColor;
+            options.displayOptions.electoral.color = rainFallDevColor;
+            options.displayOptions.electoral.displayName = 'Rainfall deviation';
+            var rainDevLegend = new L.ChoroplethDataLayer(rainData,options);
+            layerControl.addOverlay(rainDevLegend, 'Rainfall deviation legend');
+            map.addLayer(rainDevLegend);
+
+            options.displayOptions.electoral.fillColor = windSpeedColor;
+            options.displayOptions.electoral.color = windSpeedColor;
+            options.displayOptions.electoral.displayName = 'Windspeed (km/h)';
+            var stormsLegend = new L.ChoroplethDataLayer(stormsData,options);
+            layerControl.addOverlay(stormsLegend, 'Windspeed legend');
+            map.addLayer(stormsLegend);
+
 
 
         //Update map at the page loading to fill the parenthesis of the layers label
