@@ -1,55 +1,43 @@
 $(document).ready(function() {
-  $('#wikiTable').CSVToTable('data/events.csv',
-    {
-      tableClass: "table table-striped table-bordered",
-      separator: "\t",
-      headers: ['Title', 'Category', 'Start date', 'End date', 'Location', 'ref']
+
+
+$('#wikiTable').CSVToTable('events.csv',
+{
+  tableClass: "table table-striped table-bordered",
+  separator: "\t",
+  headers: ['Title', 'Category', 'Start date', 'End date', 'Location', 'ref']
     });
-  /*.bind("loadComplete",function() {
-    $('#test table').dataTable({
-            "aoColumns": [
-                null,
-                null,
-                {"sType": "date-uk"},
-                {"sType": "date-uk"},
-                null,
-                null
-            ],
-            "iDisplayLength": 25,
-            "paging": true,
-            "searching": true,
-            "info": true,
-            "columnDefs": [
-            {
-                "targets": [ 5 ],
-                "visible": false,
-                "searchable": false
-            }],
-            "order": [[ 5, "desc" ]]
-        } );
+
+
+/*$("#period").change(function(event){
+  setTimeout(function() {
+    filterWiki('', '', $('#period').val(), $('input[name=periodType]:checked').val());
+  }, 100);
+});
+
+$("#periodType").change(function(event){
+  setTimeout(function() {
+    filterWiki('', '', $('#period').val(), $('input[name=periodType]:checked').val());
+  }, 100);
+
 });*/
 
-
-$("#period").change(function(event){
-  filterWiki('', usa, $('#period').val())
 });
 
-$("#period2").change(function(event){
-  filterWiki('', usa, $('#period2').val())
-});
-
-});
-
-
+/*
 var usa = new RegExp("united states|america|alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|district of columbia|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|virginia|washington|west virginia|wisconsin|wyoming");
 var ch = new RegExp("switzerland|europe");
+*/
 
 
 
 
 //Filter wikipedia table rows based on parameters
 //Based on http://jsfiddle.net/ukW2C/3/
-function filterWiki(category, place, period){
+function filterWiki(category, place, period, periodType){
+
+
+    then = new Date();
 
     //Create a jquery object of the rows
     var rows = $("#wikiTable").find("tr");
@@ -82,31 +70,42 @@ function filterWiki(category, place, period){
         if(!placeOk){
           return false;
         }
-
+        
         //Filter with date
-        var rowStartDate = moment($t.children()[2].innerText, "DD/MM/YYYY");
-        var rowEndDate = moment($t.children()[3].innerText, "DD/MM/YYYY").add('ms', 42); //We add a few seconds so that it will be a range even if periodStartDate and periodEndDate are the same.
-        var rowRange = moment().range(rowStartDate, rowEndDate);
+        var splittedStartDate = $t.children()[2].innerText.split('/');
+        var rowStartDate = splittedStartDate[2]+'-'+splittedStartDate[1]+'-'+splittedStartDate[0];
 
+        var splittedEndDate = $t.children()[3].innerText.split('/');
+        var rowEndDate = splittedEndDate[2]+'-'+splittedEndDate[1]+'-'+splittedEndDate[0];
 
-        if(period.split('-').length === 2){//Month
+        if(periodType === 'Month'){//Month
 
-          periodStartDate = moment(period, "YYYY-MM");
-          numDaysMonth = periodStartDate.daysInMonth();
-          periodEndDate = moment(period, "YYYY-MM").add('d', numDaysMonth).subtract('ms', 1);
-          var periodRange = moment().range(periodStartDate, periodEndDate);
+          splittedDate = period.split('-');
+          year = splittedDate[0];
+          month = splittedDate[1];
+          periodStartDate = year+'-'+month+'-01';
+          periodEndDate = year+'-'+month+'-31';
 
-        } else { //Day
+        } else if(periodType === 'Day'){ //Day
 
-          periodStartDate = moment(period, "YYYY-MM-DD");
-          periodEndDate = moment(period, "YYYY-MM-DD").add('h', 23);
-          var periodRange = moment().range(periodStartDate, periodEndDate);
+          periodStartDate = period;
+          periodEndDate = period;
 
+        } if(periodType === 'Year'){
+
+          year = period.split('-')[0];
+          periodStartDate = year+'-01-01';
+          periodEndDate = year+'-12-31';
         }
 
-        dateOk = rowRange.overlaps(periodRange);
+        //if the event starts after the end of the period, or ends before the end of the period it should be filtered  
 
-        return dateOk;
+        return !( rowStartDate > periodEndDate || rowEndDate < periodStartDate );
 
     }).show(); // Show only necessary rows
-  }
+
+  now = new Date();
+
+  console.log(now-then);
+
+}

@@ -13,7 +13,6 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js"></script>
     <script src="http://cdn.datatables.net/1.10-dev/js/jquery.dataTables.min.js"></script>
     <script src="js/jquery.csvToTable.js"></script>
-    <script src="js/moment-range.js"></script>
     <script src="js/wiki.js"></script>
     <script src="js/leaflet-dvf.min.js"></script>
 </head>
@@ -357,7 +356,11 @@
          };
 
          $("#period").change(function(event) {
-            filterWiki("", usa, $('#period').val());
+            filterWiki("", '', $('#period').val(), $('input[name=time]:checked').val() );
+         });
+
+         $("input[name=time]").change(function(event) {
+            filterWiki("", '', $('#period').val(), $('input[name=time]:checked').val() );
          });
 
          $("input").change(function(event) {
