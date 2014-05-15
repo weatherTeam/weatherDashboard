@@ -7,6 +7,14 @@ import java.io.IOException;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
+/**
+ * 
+ * Simple tuple class to store Weather Events detected in Wikipedia
+ * {@link #title} is the title of the Wikipedia entry 
+ * {@link #category} is the category (one from list {@link WikiFilter#keywords}) of the entry
+ * {@link #startDate} and {@link #endDate} denote the start and the end of the event 
+ * {@link #location} is the the extracted location of the event
+ */
 class WeatherEvent implements Writable {
 
 	Text title;
@@ -24,6 +32,9 @@ class WeatherEvent implements Writable {
 		this.location = new Text(location);
 	}
 
+	/**
+	 * Used by Hadoop for reflexion
+	 */
 	public WeatherEvent() {
 		this.title = new Text("");
 		this.category = new Text("");

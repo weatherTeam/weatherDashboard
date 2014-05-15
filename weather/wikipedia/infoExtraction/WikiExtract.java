@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Iterator;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +21,6 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextOutputFormat;
 
@@ -29,6 +28,9 @@ import weather.wikipedia.inputFormat.XMLInputFormat;
 
 /*For a more detailed explanation see wiki: https://github.com/weatherTeam/weatherDashboard/wiki/Wikipedia*/
 public class WikiExtract {
+
+	public static final int PERIOD_START = 1900;
+	public static final int PERIOD_END = Calendar.getInstance().get(Calendar.YEAR);
 
 	// A list of useful keywords that will define if an article is relevant or
 	// not (if the category contains one of those words).
@@ -48,20 +50,9 @@ public class WikiExtract {
 	// Regex to extract title from article
 	public static Pattern titleRegex = Pattern.compile("<title>(.*)</title>");
 
-	// Regex to extract infobox from article
-	//public static Pattern infoboxRegex = Pattern.compile(
-		//	"\\{\\{Infobox.*?\\}\\}", Pattern.DOTALL); // Works most of the
-														// time. Issues when
-														// there are {{}} nested
-														// inside. We have to
-														// use DOTALL because
-														// (.|\n)* leads to
-														// stack overflows (cf.
-														// http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6337993)
-
 	static String americanDate = "(january|february|march|april|may|june|july|august|september|october|november|december) (\\d?\\d), (\\d\\d\\d\\d)";
 	static String standardDate = "(\\d?\\d) (january|february|march|april|may|june|july|august|september|october|november|december) (\\d\\d\\d\\d)";
-	static String numericalDate = "(\\d\\d\\d\\d).(\\d\\d).(\\d\\d)";
+	static String numericalDate = "(\\d\\d\\d\\d)\\W([01]\\d)\\W([0123]\\d)";
 	static String filename = new String();
 
 	// Create a regex of the form "(keyword1|keyword2|...|keywordn)"
@@ -77,7 +68,8 @@ public class WikiExtract {
 		return Pattern.compile(regex);
 	}
 
-	// Create a regex to extract country, from a predefined list
+	// Create a regex to extract countries and corresponding demonyms, from a
+	// predefined list (from Stanford NLP)
 	static Pattern createRegexForCountries() {
 		String regex = "((north|west|east|south)(ern)? ?)*(";
 
@@ -86,10 +78,12 @@ public class WikiExtract {
 		String line = "";
 
 		try {
+			// Usual Java stuff to read file from jar
 			InputStream test = WikiExtract.class
 					.getResourceAsStream(countryFile);
 			InputStreamReader in = new InputStreamReader(test);
 			br = new BufferedReader(in);
+
 			while ((line = br.readLine()) != null) {
 				line = line.toLowerCase();
 				String countryAndDemonym[] = line.split("\t");
@@ -103,6 +97,7 @@ public class WikiExtract {
 			e.printStackTrace();
 			System.out.println(line);
 		} finally {
+			// Close file
 			if (br != null) {
 				try {
 					br.close();
@@ -118,7 +113,9 @@ public class WikiExtract {
 		return Pattern.compile(regex);
 	}
 
-	// Takes an article as an XML fragment as input, output it only if relevant.
+	/**
+	 * Extract information from each given Wikipedia article
+	 */
 	public static class WEMap extends MapReduceBase implements
 			Mapper<LongWritable, Text, NullWritable, WeatherEvent> {
 
@@ -137,19 +134,15 @@ public class WikiExtract {
 			String location = "";
 
 			// Instead of extracting again the category, we get it from the
-			// filename
+			// filename. (Not sure which way is better)
 			String[] tmp = filename.split("/");
 			category = tmp[tmp.length - 1];
 			category = category.replaceAll("\\.xml|\\d", "");
 
-			// We don't care about floods actually, and I'm too lazy to refilter
+			// Actually, we don't care about floods, but I'm too lazy to
+			// refilter
 			// the whole dataset.
 			if (category.equals("flood")) {
-				return;
-			}
-
-			// Will be irrelevant once we have document categorisation working
-			if (isSport(XMLString)) {
 				return;
 			}
 
@@ -167,24 +160,29 @@ public class WikiExtract {
 			}
 
 			XMLString = XMLString.toLowerCase();
-			
+
+			// Will be irrelevant once we have document categorisation working
+			if (isFalsePositive(XMLString)) {
+				return;
+			}
+
 			String month = "";
 
-			Matcher matcherMonth = monthRegex.matcher(title);
+			Matcher matcherMonth = monthRegex.matcher(title.toLowerCase());
 			if (matcherMonth.find()) {
 				month = matcherMonth.group(0);
 			}
 
 			String year = "";
 
-			Matcher matcherYear = yearRegex.matcher(title);
+			Matcher matcherYear = yearRegex.matcher(title.toLowerCase());
 			if (matcherYear.find()) {
 				year = matcherYear.group(0);
 			}
 
 			String country = "";
 
-			Matcher matcherCountry = countryRegex.matcher(title);
+			Matcher matcherCountry = countryRegex.matcher(title.toLowerCase());
 			if (matcherCountry.find()) {
 				country = matcherCountry.group(0);
 			}
@@ -193,23 +191,14 @@ public class WikiExtract {
 				location = country;
 			}
 
-			// System.out.println(title + ": " + country + " " + month + " "+
-			// year);
-
-			// Extracting stuff from infobox (maybe there is no need to extract
-			// infobox, and extract info directly)
-			// TODO
+			// Extracting stuff from infobox
 
 			String infobox = "";
 
-			/*
-			 * Matcher matcherInfobox = infoboxRegex.matcher(XMLString); if
-			 * (matcherInfobox.find()) { infobox = matcherInfobox.group(0); }
-			 */
-			
-			//We're using regex here, as it is not appropriate to find balanced brackets
-
+			// Starting point of the infobox
 			int index = XMLString.indexOf("{{infobox");
+
+			// Brackets counter to stop when balanced
 			int numBrackets = 0;
 			String infoboxBuffer = "";
 
@@ -232,14 +221,15 @@ public class WikiExtract {
 			}
 
 			if (!infobox.equals("")) {
-				// System.out.println(title+": \n"+infobox);
 
+				// Replace some symbols
 				infobox = infobox.replaceAll("&amp;nbsp;", " ");
 
+				// Regex of the formed "(date|formed).*=.*(event date).*"
 				Pattern startDatePattern = Pattern
 						.compile("(?:date|formed).*=.*?((" + americanDate
 								+ ")|(" + standardDate + ")|(" + numericalDate
-								+ ")).*");
+								+ ")).*\n");
 				String start = "";
 
 				Matcher matcherStart = startDatePattern.matcher(infobox);
@@ -251,9 +241,10 @@ public class WikiExtract {
 					startDate = start;
 				}
 
+				// Regex of the formed "dissipated.*=.*(event date).*"
 				Pattern endDatePattern = Pattern.compile("dissipated.*=.*?(("
 						+ americanDate + ")|(" + standardDate + ")|("
-						+ numericalDate + ")).*");
+						+ numericalDate + ")).*\n");
 				String end = "";
 
 				Matcher matcherEnd = endDatePattern.matcher(infobox);
@@ -280,6 +271,7 @@ public class WikiExtract {
 					areas = areas.replaceAll(
 							"&gt;(br)?|&lt;(br)?|([^A-Za-z\\s])|flag(icon)?",
 							"");
+					areas = areas.trim();
 					location = location + " " + areas;
 				}
 
@@ -288,7 +280,7 @@ public class WikiExtract {
 			// Extracting stuff from article's body
 
 			// Last resort: If we do not have any location information from
-			// title and infobox, we extract it from text
+			// title and infobox, we try to extract it from text
 			if (location.equals("")) {
 				location = "";
 				Matcher matcherLocation = countryRegex.matcher(XMLString);
@@ -298,7 +290,7 @@ public class WikiExtract {
 						location += " " + place;
 					}
 				}
-				
+
 			}
 
 			if (startDate.equals("")) {
@@ -321,23 +313,29 @@ public class WikiExtract {
 						startDate = "1/09/" + year;
 						endDate = "31/12/" + year;
 					} else {
+						// If we have month and year
 						startDate = "1/" + monthToNum(month) + "/" + year;
 						endDate = getLastDayOfMonth(month, year) + "/"
 								+ monthToNum(month) + "/" + year;
 					}
 				} else if (!year.equals("")) {
+					// If we only have the year
 					startDate = "1/01/" + year;
 					endDate = "31/12/" + year;
 				}
 			}
 
+			// If we have no end date, we suppose it is the same as the start
+			// date
 			if (endDate.equals("") && !startDate.equals("")) {
 				endDate = startDate;
 			}
 
+			// Conver to DD/MM/YYYY date format
 			startDate = formatDate(startDate);
 			endDate = formatDate(endDate);
 
+			// Event is beween 1900 and now
 			if (!isInTimeRange(startDate, endDate)) {
 				return;
 			}
@@ -354,11 +352,8 @@ public class WikiExtract {
 			if (location.equals("")) {
 				location = "-";
 			}
-			
-			if(title.equals("Big Flats, Wisconsin")|title.equals("Spencer, South Dakota")){
-				System.out.println(title+": "+location);
-			}
 
+			// We output only if we managed to extract some information
 			if (!startDate.equals("-") || !location.equals("-")) {
 				output.collect(NullWritable.get(), new WeatherEvent(title,
 						category, startDate, endDate, location));
@@ -380,6 +375,7 @@ public class WikiExtract {
 
 			if (month.equals("february")) {
 				int yearInt = Integer.parseInt(year);
+				// between 1900 and now, only 2000 is weird
 				if (yearInt != 2000 && yearInt % 4 == 0) {
 					return 29;
 				}
@@ -390,6 +386,12 @@ public class WikiExtract {
 
 		}
 
+		/**
+		 * 
+		 * @param date
+		 *            : a string representing a date
+		 * @return a date in DD/MM/YYYY format
+		 */
 		private String formatDate(String date) {
 
 			date = date.trim();
@@ -403,41 +405,66 @@ public class WikiExtract {
 			date = date.replaceAll("nbsp;", " ");
 			date = date.replaceAll("&gt;(br)?|&lt;(br)?|&amp;", "");
 
-			Pattern americanFormat = Pattern.compile(americanDate);
-
+			// Already formated
 			if (date.matches(dateFormat)) {
-				return date;
+				//We make sure that days are in the format 0\d and not \d
+				try{
+				return ('0'+date).substring(date.length() - 9);
+				} catch(Exception e){
+					System.out.println(date);
+				}
 			}
+
+			// For dates in American format eg. April 30, 1991
+			Pattern americanFormat = Pattern.compile(americanDate);
 
 			Matcher americanDate = americanFormat.matcher(date);
 			if (americanDate.find()) {
-				return americanDate.group(2) + "/"
+				
+				String day = "0"+americanDate.group(2);
+				day = day.substring(day.length()-2);
+				
+				return day + "/"
 						+ monthToNum(americanDate.group(1)) + "/"
 						+ americanDate.group(3);
 			}
 
+			// For date in "normal" format eg. 30 April 1991
 			Pattern standardFormat = Pattern.compile(standardDate);
 
 			Matcher standardDate = standardFormat.matcher(date);
 			if (standardDate.find()) {
-				return standardDate.group(1) + "/"
+				
+				String day = "0"+standardDate.group(1);
+				day = day.substring(day.length()-2);
+				
+				return day + "/"
 						+ monthToNum(standardDate.group(2)) + "/"
 						+ standardDate.group(3);
 			}
 
+			// For dates in YYYY/MM/DD format
 			Pattern numericalFormat = Pattern.compile(numericalDate);
 
 			Matcher numericalDate = numericalFormat.matcher(date);
 			if (numericalDate.find()) {
-				return numericalDate.group(3) + "/" + numericalDate.group(2)
+				
+				String day = "0"+numericalDate.group(3);
+				day = day.substring(day.length()-2);
+				
+				return day + "/" + numericalDate.group(2)
 						+ "/" + numericalDate.group(1);
 			}
 
 			System.out.println(date);
+
+			// For debugging purpose
 			return "XXXX: " + date;
 
 		}
 
+		// Did not find any function in the API for that, maybe I should search
+		// more
 		private String monthToNum(String month) {
 			if (month.equals("january")) {
 				return "01";
@@ -480,11 +507,16 @@ public class WikiExtract {
 
 		}
 
-		// TODO: Move to Filter file, eventually
-		private boolean isSport(String article) {
+		// TODO: Move to Filter class, eventually
+		/**
+		 * Remove false positives i.e. articles whose categories contain one of
+		 * the keywords but who are not relevant to weather (eg. sports team
+		 * named Hurricanes, Blizzard Entertainment, etc.)
+		 */
+		private boolean isFalsePositive(String article) {
 
 			Pattern categoryRegex = Pattern
-					.compile("\\[\\[Category:((\\w|\\s|\\d|')*)(\\|.*)?\\]\\]");
+					.compile("\\[\\[category:((\\w|\\s|\\d|')*)(\\|.*)?\\]\\]");
 			Matcher matcherCategory = categoryRegex.matcher(article);
 
 			// If an article is relevant, we output it.
@@ -523,19 +555,26 @@ public class WikiExtract {
 			return Pattern.compile(regex);
 		}
 
+		/**
+		 * @return true if event takes place between {@link #PERIOD_START} and
+		 *         {@link #PERIOD_END}, false otherwise
+		 */
 		boolean isInTimeRange(String startDate, String endDate) {
+			
+			//If we have no time info we (don't) dismiss the event
 			if (startDate.equals("")) {
-				return false;
+				//return false;
+				return true;
 			}
 
 			int startYear = Integer.parseInt(startDate.split("/")[2]);
 			int endYear = Integer.parseInt(endDate.split("/")[2]);
 
-			if (endYear < 1900) {
+			if (endYear < PERIOD_START) {
 				return false;
 			}
 
-			if (startYear > 2014) {
+			if (startYear > PERIOD_END) {
 				return false;
 			}
 
@@ -543,40 +582,12 @@ public class WikiExtract {
 
 		}
 
+		//Allows us to access the name of the input file
 		public void configure(JobConf job) {
 			filename = job.get("map.input.file");
 		}
 
 	}
-
-	public static class WEReduce extends MapReduceBase implements
-			Reducer<NullWritable, WeatherEvent, NullWritable, WeatherEvent> {
-
-		@Override
-		public void reduce(NullWritable key, Iterator<WeatherEvent> values,
-				OutputCollector<NullWritable, WeatherEvent> output,
-				Reporter reporter) throws IOException {
-
-			while (values.hasNext()) {
-				output.collect(NullWritable.get(), values.next());
-			}
-
-		}
-
-	}
-
-	// Allows us to generate a file for each category. Nicer output. (from
-	// https://sites.google.com/site/hadoopandhive/home/how-to-write-output-to-multiple-named-files-in-hadoop-using-multipletextoutputformat)
-	/*
-	 * static class MultiFileOutputWE extends
-	 * MultipleTextOutputFormat<NullWritable, WeatherEvent> {
-	 * 
-	 * @Override protected String generateFileNameForKeyValue(NullWritable key,
-	 * WeatherEvent value, String name) { return value.category.toString() +
-	 * ".tsv"; }
-	 * 
-	 * }
-	 */
 
 	public static void main(String[] args) throws Exception {
 
@@ -588,15 +599,17 @@ public class WikiExtract {
 
 		JobConf conf = new JobConf(WikiExtract.class);
 		conf.setJobName("Wikipedia Extraction");
-		// conf.setNumMapTasks(88);
+		conf.setNumMapTasks(88);
+		
+		//We don't need a reducer (map does all the work)
 		conf.setNumReduceTasks(0);
 
 		conf.setMapOutputKeyClass(NullWritable.class);
 		conf.setMapOutputValueClass(WeatherEvent.class);
 
 		conf.setMapperClass(WEMap.class);
-		// conf.setReducerClass(WEReduce.class);
-
+		
+		//XML config
 		conf.setInputFormat(XMLInputFormat.class);
 		conf.set("xmlinput.start", "<page>");
 		conf.set("xmlinput.end", "</page>");
