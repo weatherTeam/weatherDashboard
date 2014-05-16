@@ -25,7 +25,8 @@
         <div id='map'></div>
         <div id='form'>
             <form id='formcontent'>
-                <input type="checkbox" name="layer" id="all-stations" value="All stations"> <label for="all-stations">All stations</label>
+                <!-- <input type="checkbox" name="layer" id="all-stations" value="All stations"> <label for="all-stations">All stations</label> -->
+                <input type="checkbox" name="layer" id="us-stations" value="US stations"> <label for="u-stations">US stations</label>
                 <input type="checkbox" name="layer" id="temperature-anomalies" value="Temperature anomalies"> <label for="temperature-anomalies">Temperature anomalies (by <span id="tempAnom-period"></span>)</label>
                 <input type="checkbox" name="layer" id="snow-cumulation" value="Snow cumulation"> <label for="snow-cumulation">Snow cumulation (by <span id="snowCumulation-period"></span>)</label>
                 <input type="checkbox" name="layer" id="rainfall" value="Rainfall"> <label for="rainfall">Rainfall</label>
@@ -79,7 +80,8 @@
         layerControl.addTo(map);
         legendControl.addTo(map);
 
-        var allStations = L.geoJson();
+        // var allStations = L.geoJson();
+        var USStations = L.geoJson();
         var storms = L.geoJson();
         var tempAnomalies = L.geoJson();
         var rainfall = L.geoJson();
@@ -89,7 +91,7 @@
         function onEachStationFeature(feature, layer) {
             if (feature.properties && (feature.properties.name || feature.properties.alt)) {
                 layer.bindPopup('Name: ' + feature.properties.name + '<br />' +
-                                'Altitude: ' + feature.properties.alt);
+                                'Altitude: ' + feature.properties.alt + 'm');
             }
         }
 
@@ -147,10 +149,34 @@
             var dateMoment = moment($('#period').val());
 
             //All stations layer
-            if ($("#all-stations").is(':checked') && !map.hasLayer(allStations)) {
-                $.getJSON("data/stationslist.json", function(stations) {
+            // if ($("#all-stations").is(':checked') && !map.hasLayer(allStations)) {
+            //     $.getJSON(dataRepo+"/stationslist.json", function(stations) {
+            //         //When GeoJSON is loaded
+            //         allStations = L.geoJson(stations, {
+            //             onEachFeature: onEachStationFeature,
+
+            //             pointToLayer: function (feature, latlng) {
+            //                 return L.circleMarker(latlng, {
+            //                         //fillColor: "#ff7800",
+            //                         color: "#000",
+            //                         weight: 1,
+            //                         opacity: 1,
+            //                         radius: 2,
+            //                         fillOpacity: 0.3
+            //                     });
+            //             }
+            //         });
+            //         map.addLayer(allStations);
+            //     });
+            // } else if(!$("#all-stations").is(':checked')) {
+            //     map.removeLayer(allStations);
+            // }
+
+            //US stations layer
+            if ($("#us-stations").is(':checked') && !map.hasLayer(USStations)) {
+                $.getJSON(dataRepo+"/USStations.json", function(stations) {
                     //When GeoJSON is loaded
-                    allStations = L.geoJson(stations, {
+                    USStations = L.geoJson(stations, {
                         onEachFeature: onEachStationFeature,
 
                         pointToLayer: function (feature, latlng) {
@@ -164,10 +190,10 @@
                                 });
                         }
                     });
-                    map.addLayer(allStations);
+                    map.addLayer(USStations);
                 });
-            } else if(!$("#all-stations").is(':checked')) {
-                map.removeLayer(allStations);
+            } else if(!$("#us-stations").is(':checked')) {
+                map.removeLayer(USStations);
             }
 
             //Temperature anomalies layer

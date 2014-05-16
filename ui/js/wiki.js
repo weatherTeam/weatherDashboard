@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
 
-$('#wikiTable').CSVToTable('events.csv',
+$('#wikiTable').CSVToTable('data/events.csv',
 {
   tableClass: "table table-striped table-bordered",
   separator: "\t",
@@ -70,7 +70,7 @@ function filterWiki(category, place, period, periodType){
         if(!placeOk){
           return false;
         }
-        
+
         //Filter with date
         var splittedStartDate = $t.children()[2].innerText.split('/');
         var rowStartDate = splittedStartDate[2]+'-'+splittedStartDate[1]+'-'+splittedStartDate[0];
@@ -98,7 +98,7 @@ function filterWiki(category, place, period, periodType){
           periodEndDate = year+'-12-31';
         }
 
-        //if the event starts after the end of the period, or ends before the end of the period it should be filtered  
+        //if the event starts after the end of the period, or ends before the end of the period it should be filtered
 
         return !( rowStartDate > periodEndDate || rowEndDate < periodStartDate );
 
