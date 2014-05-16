@@ -27,10 +27,10 @@
             <form id='formcontent'>
                 <!-- <input type="checkbox" name="layer" id="all-stations" value="All stations"> <label for="all-stations">All stations</label> -->
                 <input type="checkbox" name="layer" id="us-stations" value="US stations"> <label for="u-stations">US stations</label>
-                <input type="checkbox" name="layer" id="temperature-anomalies" value="Temperature anomalies"> <label for="temperature-anomalies">Temperature anomalies (by <span id="tempAnom-period"></span>)</label>
-                <input type="checkbox" name="layer" id="snow-cumulation" value="Snow cumulation"> <label for="snow-cumulation">Snow cumulation (by <span id="snowCumulation-period"></span>)</label>
-                <input type="checkbox" name="layer" id="rainfall" value="Rainfall"> <label for="rainfall">Rainfall</label>
-                <input type="checkbox" name="layer" id="storms" value="Storms"> <label for="storms">Storms (by <span id="storm-period"></span>)</label><br />
+                <input type="checkbox" name="layer" id="temperature-anomalies" value="Temperature anomalies"> <label for="temperature-anomalies">Temperature anomalies (by <span id="tempAnom-period">month</span>)</label>
+                <input type="checkbox" name="layer" id="snow-cumulation" value="Snow cumulation"> <label for="snow-cumulation">Snow cumulation (by <span id="snowCumulation-period">month</span>)</label>
+                <input type="checkbox" name="layer" id="rainfall" value="Rainfall"> <label for="rainfall">Rainfall (by <span id="rainfall-period">month</span>)</label>
+                <input type="checkbox" name="layer" id="storms" value="Storms"> <label for="storms">Storms (by <span id="storm-period">month</span>)</label><br />
                 <input type="date" name="period" id="period" value="2007-03-15" class="box"><br />
                 <input type="radio" name="time" id="day" value="Day"> <label for="day">Day</label>
                 <input type="radio" name="time" id="month" value="Month" checked> <label for="month">Month</label>
@@ -137,12 +137,41 @@
         var rainData;
         var stormsData;
 
+        var oldDate = "";
+
+        var periodSelect = "";
+        var oldPeriodSelect = "";
+
         var updateMap = function() {
 
-            // map.removeLayer(tempAnomalies);
-            // map.removeLayer(rainfall);
-            // map.removeLayer(snowCumulation);
-            // map.removeLayer(storms);
+            if ($("#day").is(':checked')) {
+                $("#storm-period").html("month");
+                $("#tempAnom-period").html("day");
+                $("#snowCumulation-period").html("week");
+                $("#rainfall-period").html("day");
+                periodSelect = "day";
+            }
+            if ($("#month").is(':checked')) {
+                $("#storm-period").html("month");
+                $("#tempAnom-period").html("month");
+                $("#snowCumulation-period").html("month");
+                $("#rainfall-period").html("month");
+                periodSelect = "month";
+            }
+            if ($("#year").is(':checked')) {
+                $("#storm-period").html("year");
+                $("#tempAnom-period").html("month");
+                $("#snowCumulation-period").html("month");
+                $("#rainfall-period").html("month");
+                periodSelect = "year";
+            }
+
+            var dateChanged = false;
+
+            if (oldDate != $('#period').val() || oldPeriodSelect != periodSelect) {
+                dateChanged = true;
+                console.log("Date changed.\n Old: " + oldDate + ", " + oldPeriodSelect + "\n New: " + $('#period').val() + ", " + periodSelect);
+            }
 
             var date = $('#period').val().split('-');
 
@@ -197,7 +226,7 @@
             }
 
             //Temperature anomalies layer
-            if ($("#temperature-anomalies").is(':checked')) {
+            if ($("#temperature-anomalies").is(':checked') && (dateChanged || !map.hasLayer(tempAnomalies))) {
                 map.removeLayer(tempAnomalies);
                 var filename = "";
                 if ($("#month").is(':checked')) {
@@ -255,12 +284,12 @@
                     });
                     map.addLayer(tempAnomalies);
                 });
-            } else {
+            } else if (!$("#temperature-anomalies").is(':checked')) {
                 map.removeLayer(tempAnomalies);
             }
 
             //Snow cumulation layer
-            if ($("#snow-cumulation").is(':checked')) {
+            if ($("#snow-cumulation").is(':checked') && (dateChanged || !map.hasLayer(snowCumulation))) {
                 map.removeLayer(snowCumulation);
                 var snowCumulation_filename = "";
                 if ($("#day").is(':checked')) {
@@ -292,15 +321,15 @@
                         });//.addTo(map);
                     map.addLayer(snowCumulation);  //Add layer to map
                 });
-            } else {
+            } else if (!$("#snow-cumulation").is(':checked')) {
                 map.removeLayer(snowCumulation);
             }
 
             //Rainfall layer
-            if ($("#rainfall").is(':checked')) {
+            if ($("#rainfall").is(':checked') && (dateChanged || !map.hasLayer(rainfall))) {
                 map.removeLayer(rainfall);
                 var filename = "";
-                if ($("#month").is(':checked')) {
+                if ($("#month").is(':checked') || $("#year").is(':checked')) {
                     fileName = dataRepo+"/"+rainfallDataRepoMonthly+"/"+date[0]+"."+date[1]+".json";
                 }
                 if ($("#day").is(':checked')) {
@@ -327,12 +356,12 @@
                     });
                     map.addLayer(rainfall);
                 });
-            } else {
+            } else if (!$("#rainfall").is(':checked')) {
                 map.removeLayer(rainfall);
             }
 
             //Storms layer
-            if ($("#storms").is(':checked')) {
+            if ($("#storms").is(':checked') && (dateChanged || !map.hasLayer(storms))) {
                 map.removeLayer(storms);
                 var storms_filename = "";
                 if ($("#month").is(':checked') || $("#day").is(':checked')) {
@@ -360,25 +389,11 @@
                     });
                     map.addLayer(storms);
                 });
-            } else {
+            } else if (!$("#storms").is(':checked')) {
                 map.removeLayer(storms);
             }
-
-            if ($("#day").is(':checked')) {
-                $("#storm-period").html("month");
-                $("#tempAnom-period").html("day");
-                $("#snowCumulation-period").html("week");
-            }
-            if ($("#month").is(':checked')) {
-                $("#storm-period").html("month");
-                $("#tempAnom-period").html("month");
-                $("#snowCumulation-period").html("month");
-            }
-            if ($("#year").is(':checked')) {
-                $("#storm-period").html("year");
-                $("#tempAnom-period").html("month");
-                $("#snowCumulation-period").html("month");
-            }
+            oldDate = $('#period').val();
+            oldPeriodSelect = periodSelect;
          };
 
          $("#period").change(function(event) {
@@ -419,7 +434,7 @@
         var snowColor = new L.PiecewiseFunction([fewSnow, moreSnow,lotSnow]);
         var rainFallColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(5000, 0));
         var rainFallDevColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(7, 0));
-        var windSpeedColor = new L.HSLHueFunction(new L.Point(75, 100), new L.Point(300, 0));
+        var windSpeedColor = new L.HSLHueFunction(new L.Point(64, 100), new L.Point(250, 0));
 
         //Showing color scale
         var options = {
@@ -483,7 +498,7 @@
 
 
         //Update map at the page loading to fill the parenthesis of the layers label
-        updateMap();
+        //updateMap();
         </script>
     </main>
     <footer>
