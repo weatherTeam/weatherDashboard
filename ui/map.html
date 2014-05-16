@@ -132,6 +132,18 @@
             layer.bindPopup(popupContent);
         }
 
+        function onEachRainfallFeature(feature, layer) {
+            var popupContent = "Station name: " + feature.properties.name + " (" + feature.properties.state + ")<br />" +
+                               "Value: " + ((feature.properties.value)/10).toFixed(2) + "mm<br />" +
+                               "Deviation: " + ((feature.properties.deviation)/10).toFixed(2) + "mm";
+
+            if (feature.properties && feature.properties.popupContent) {
+                popupContent += feature.properties.popupContent;
+            }
+
+            layer.bindPopup(popupContent);
+        }
+
         var temperatureData;
         var snowData;
         var rainData;
@@ -316,10 +328,8 @@
                         },
 
                         onEachFeature: onEachSnowCumulationFeature
-
-                        //onEachFeature: onEachFeature,
-                        });//.addTo(map);
-                    map.addLayer(snowCumulation);  //Add layer to map
+                        });
+                    map.addLayer(snowCumulation);
                 });
             } else if (!$("#snow-cumulation").is(':checked')) {
                 map.removeLayer(snowCumulation);
@@ -352,7 +362,9 @@
                         },
                         pointToLayer: function (feature, latlng) {
                             return L.circleMarker(latlng);
-                        }
+                        },
+
+                        onEachFeature: onEachRainfallFeature
                     });
                     map.addLayer(rainfall);
                 });
@@ -476,14 +488,14 @@
 
             options.displayOptions.electoral.fillColor = rainFallColor;
             options.displayOptions.electoral.color = rainFallColor;
-            options.displayOptions.electoral.displayName = 'Rainfall';
+            options.displayOptions.electoral.displayName = 'Rainfall (/10 mm)';
             var rainLegend = new L.ChoroplethDataLayer(rainData,options);
             layerControl.addOverlay(rainLegend, 'Rainfall legend');
             map.addLayer(rainLegend);
 
             options.displayOptions.electoral.fillColor = rainFallDevColor;
             options.displayOptions.electoral.color = rainFallDevColor;
-            options.displayOptions.electoral.displayName = 'Rainfall deviation';
+            options.displayOptions.electoral.displayName = 'Rainfall deviation (/10 mm)';
             var rainDevLegend = new L.ChoroplethDataLayer(rainData,options);
             layerControl.addOverlay(rainDevLegend, 'Rainfall deviation legend');
             map.addLayer(rainDevLegend);
