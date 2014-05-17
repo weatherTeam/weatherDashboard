@@ -1,0 +1,103 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{tabularx}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\begin{document}
+
+
+\section{Temperature anomalies}
+
+\subsection{Introduction}
+
+Temperature anomalies correspond to the difference between a temperature record/average
+and the average of the temperatures recorded in the same conditions during a given reference period.
+For example, it is possible to compute the temperature anomaly in Switzerland in April 2014, by
+computing the average of the average temperature in April from 1960 to 2000 and subtracting it to the
+average temperature in April 2014. Temperature anomalies are much more useful than absolute temperature values since
+ they are a very good indicator of climate change in the world.
+Some datasets of temperature anomalies already exist, but they offer a
+low resolution (5x5 degrees), which is not enough to deal with small countries like Switzerland.
+Also we wanted to be able to choose a reference period ourselves when computing anomalies, for these reasons,
+we decided to implement our own algorithm.
+
+\subsection{Algorithms}
+
+Our algorithm can be used to compute anomalies and various statistics from the NOAA/NCDC dataset, and both spatial and temporal aggregation
+can be performed. Additionally the algorithm classify the anomalies into 5 categories : NORMAL, HIGH, LOW, VERY HIGH, VERY LOW.
+The algorithm is not specific to temperature and can be reused for other type of records, but anomalies are particularly relevant in the case of temperatures.
+
+It is possible to configure the output of the algorithm using several parameters.
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\textbf{Parameter}      & \textbf{Description}                                                                                                                                                                                                                                                                     \\ \hline
+Input path              & Folder which contains files of raw data from NOAA/NCDC dataset.                                                                                                                                                                                                                          \\ \hline
+Output path             & Folder which will contains the results of the algorithm.                                                                                                                                                                                                                                 \\ \hline
+Temporal granularity    & By setting this parameter to 1, anomalies will be computed by day. By setting it to 2, anomalies will be computed by month.                                                                                                                                                              \\ \hline
+Grid resolution X       & \multirow{2}{*}{\begin{minipage}{0.5in}Allows to aggregate data spatially, setting this parameters to values \textgreater0 will produce a gridded dataset of anomalies, where every cell have a size of X*Y degrees. Setting these values to 0 will compute anomalies per weather station without aggregation.\end{minipage}} \\ \cline{1-1}
+Grid resolution Y       &                                                                                                                                                                                                                                                                                          \\ \hline
+First year of reference & \multirow{2}{*}{Define the bounds of the period to take as a reference when computig the anomalies and the statistics. Overlaps with the period to analyze are possible.}                                                                                                                \\ \cline{1-1}
+Last year of reference  &                                                                                                                                                                                                                                                                                          \\ \hline
+First year to analyse   & \multirow{2}{*}{}                                                                                                                                                                                                                                                                        \\ \cline{1-1}
+Lat year to analyse     &                                                                                                                                                                                                                                                                                          \\ \hline
+\end{tabularx}
+\end{table}
+
+The output of the algorithm consist a list of files, each file corresponding to one time slot (day or month).
+Each line of a file has the following structure :
+
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+\textbf{Content} & Date     & X top-left cell corner & Y top-left cell corner & Anomaly & Anomaly for maximum temperature & Anomaly for minimum temperature & Event  strength \\ \hline
+\textbf{Example} & 20120529 & +16002                 & -155998                & -13     & -11                             & -10                             & VERYCOLD        \\ \hline
+\end{tabular}
+\end{table}
+
+The algorithms consists of 6 chained MapReduce phases;
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[h]
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Step}                     & \textbf{Description}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             \\ \hline
+Per reference station statistics  & The mapper read the temperature and geolocalization values from the NOAA dataset, and check the quality of the records. It drops records with a low quality. One reducer per station then ensure that the station is up during all the reference period and that there are enough records. If it is the case, it will compute the average, minimum and maximum temperature over each time slots (days or months) of the reference period, and finally average them over the whole period for a given month or day. It will also compute the 90-percentile and the 10-percentile for maximum, minimum and average values, which will be used later to classify anomalies. \\ \hline
+Per station statistics            & The mapper read the temperature and geolocalization values from the NOAA,dataset, and check the quality of the records. It drops records with a low quality. One reducer per station will then compute the mean of these values over each time slots of the period to analyse.                                                                                                                                                                                                                                                                                                                                                                                           \\ \hline
+Build grid for reference period   & \multirow{2}{*}{These 2 mapreduce phases simply aggregate the data of the previous steps in a grid. Each coordinate is converted to the top-left corner coordinate of the cell it belongs to, and one reducer per cell then average the various statistics we have in this given cell.}                                                                                                                                                                                                                                                                                                                                                                                  \\ \cline{1-1}
+Build grid for period to analyze. &                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \\ \hline
+Compute anomalies                 & For every cell, and for every time slot, compute the anomaly by computing the difference between the reference values and the new values. Classification is also performed at this step. If the maximum values do not belong to the 90-percentile of the maximum values during the reference period, the event is classified as HOT. If both the maximum values AND the minimum values are above the 90-percentile of their distribution during the reference period, the event is classified as VERY HOT. The same principle is applied with COLD events using the 10-percentile of the reference distributions of miminum values.                                      \\ \hline
+Output                            &                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Post processing and Visualization}
+
+Once the results are obtained, and before they are displayed, we tried to fill the gaps between the stations using linear interpolation.
+
+\subsection{Interpretation}
+
+\end{document}
