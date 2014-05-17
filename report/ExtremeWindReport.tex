@@ -1,11 +1,3 @@
-\documentclass[12pt]{article}
-
-% Language and charset
-\usepackage[utf8]{inputenc}
-\usepackage{hyperref}
-
-\begin{document}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Extreme Events}
 \noindent
 Extreme events are usually characterised by violente winds and heavy rain in some cases. These extreme events can be local like tornado or more spreaded like hurricanes. We try to detect these extreme events by looking for records containing high wind speed and deduce some extreme events based on this information.
@@ -30,12 +22,28 @@ Some extreme events had such a big impact that we noticed that the stations reco
 There are extreme events that can cause none or irrelevant impacts, like event in the middle of the desert, or only in the ocean. There is also event that match the characteristics of an extreme event but are actually pretty low and spreaded. For this reason there can be extreme events on the map without a match with Wikipedia articles.
 
 
-\subsection{Matching of extreme events with Wikipedia}
+\subsection{Extreme events and Wikipedia}
 \begin{itemize}
+\item Hurricane Eloise 1975 September
+\item Hurricane Belle 1976 August
+\item Hurricane Norman 1978 August
+\item Hurricane David 1979 Aug-Sept
+\item Hurricane Frederic 1979 Aug-Sept
+\item Hurricane Alicia 1983 August
 \item Hurricane Diana 1984 September
+\item Hurricane Gloria 1985 September
+\item Hurricane Juan	1985 October
+\item Hurricane Charley 1986 August
+\item Tropical Storm Beryl 1988 August
+\item Hurricane Florence 1988 September	
 \item Hurricane Chantal 1989 August
-\item Hurricane Hugo 1989	September
+\item Hurricane Hugo 1989 September
+\item Hurricane Bob 1991 August
 \item Hurricane Andrew 1992 August
+\item Hurricane Emily 1993 Aug-Sept
+\item Hurricane Erin 1995 August
+\item Hurricane Bertha 1996 July
+\item Hurricane Fran 1996 Aug-Sept
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{MapReduce jobs}
@@ -80,5 +88,3 @@ We now have a set of cluster, each cluster representing an event. We want to ext
 \textbf{Mapper 4:} distributes values between reducers.\\
 \\
 \textbf{Reducer 4:} finds the elements listed in the output list above.
-
-\end{document}
