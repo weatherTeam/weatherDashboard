@@ -470,45 +470,45 @@
         };
 
 
-            options = $.extend(true, {}, options);
+        options = $.extend(true, {}, options);
 
-            options.displayOptions.electoral.fillColor = temperatureColor;
-            options.displayOptions.electoral.color = temperatureColor;
-            options.displayOptions.electoral.displayName = 'Temperature anomalies (/10 °C)';
-            var temperatureLegend = new L.ChoroplethDataLayer(temperatureData,options);
-            layerControl.addOverlay(temperatureLegend, 'Temperature anomalies legend');
-            map.addLayer(temperatureLegend);
+        options.displayOptions.electoral.fillColor = temperatureColor;
+        options.displayOptions.electoral.color = temperatureColor;
+        options.displayOptions.electoral.displayName = 'Temperature anomalies (/10 °C)';
+        var temperatureLegend = new L.ChoroplethDataLayer(temperatureData,options);
+        layerControl.addOverlay(temperatureLegend, 'Temperature anomalies legend');
+        map.addLayer(temperatureLegend);
 
-            options.displayOptions.electoral.fillColor = snowColor;
-            options.displayOptions.electoral.color = snowColor;
-            options.displayOptions.electoral.displayName = 'Snow cumulation (cm)';
-            var snowLegend = new L.ChoroplethDataLayer(snowData,options);
-            layerControl.addOverlay(snowLegend, 'Snow cumulation legend');
-            map.addLayer(snowLegend);
+        options.displayOptions.electoral.fillColor = snowColor;
+        options.displayOptions.electoral.color = snowColor;
+        options.displayOptions.electoral.displayName = 'Snow cumulation (cm)';
+        var snowLegend = new L.ChoroplethDataLayer(snowData,options);
+        layerControl.addOverlay(snowLegend, 'Snow cumulation legend');
+        map.addLayer(snowLegend);
 
-            options.displayOptions.electoral.fillColor = rainFallColor;
-            options.displayOptions.electoral.color = rainFallColor;
-            options.displayOptions.electoral.displayName = 'Rainfall (/10 mm)';
-            var rainLegend = new L.ChoroplethDataLayer(rainData,options);
-            layerControl.addOverlay(rainLegend, 'Rainfall legend');
-            map.addLayer(rainLegend);
+        options.displayOptions.electoral.fillColor = rainFallColor;
+        options.displayOptions.electoral.color = rainFallColor;
+        options.displayOptions.electoral.displayName = 'Rainfall (/10 mm)';
+        var rainLegend = new L.ChoroplethDataLayer(rainData,options);
+        layerControl.addOverlay(rainLegend, 'Rainfall legend');
+        map.addLayer(rainLegend);
 
-            options.displayOptions.electoral.fillColor = rainFallDevColor;
-            options.displayOptions.electoral.color = rainFallDevColor;
-            options.displayOptions.electoral.displayName = 'Rainfall deviation (/10 mm)';
-            var rainDevLegend = new L.ChoroplethDataLayer(rainData,options);
-            layerControl.addOverlay(rainDevLegend, 'Rainfall deviation legend');
-            map.addLayer(rainDevLegend);
+        options.displayOptions.electoral.fillColor = rainFallDevColor;
+        options.displayOptions.electoral.color = rainFallDevColor;
+        options.displayOptions.electoral.displayName = 'Rainfall deviation (/10 mm)';
+        var rainDevLegend = new L.ChoroplethDataLayer(rainData,options);
+        layerControl.addOverlay(rainDevLegend, 'Rainfall deviation legend');
+        map.addLayer(rainDevLegend);
 
-            options.displayOptions.electoral.fillColor = windSpeedColor;
-            options.displayOptions.electoral.color = windSpeedColor;
-            options.displayOptions.electoral.displayName = 'Windspeed (km/h)';
-            var stormsLegend = new L.ChoroplethDataLayer(stormsData,options);
-            layerControl.addOverlay(stormsLegend, 'Windspeed legend');
-            map.addLayer(stormsLegend);
+        options.displayOptions.electoral.fillColor = windSpeedColor;
+        options.displayOptions.electoral.color = windSpeedColor;
+        options.displayOptions.electoral.displayName = 'Windspeed (km/h)';
+        var stormsLegend = new L.ChoroplethDataLayer(stormsData,options);
+        layerControl.addOverlay(stormsLegend, 'Windspeed legend');
+        map.addLayer(stormsLegend);
 
 
-
+        filterWiki("", '', $('#period').val(), $('input[name=time]:checked').val() );
         //Update map at the page loading to fill the parenthesis of the layers label
         //updateMap();
         </script>
