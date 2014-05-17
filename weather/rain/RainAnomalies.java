@@ -100,38 +100,6 @@ public class RainAnomalies {
 		return job;
 	}
 
-	public static Job getJobAvgMonth(String inputPath, String outputPath)
-			throws IOException {
-		Job job = Job.getInstance();
-		job.setJarByClass(RainAnomalies.class);
-		job.setJobName("Average Month Rainfall");
-
-		job.setMapperClass(AvgMonthMapper.class);
-		job.setReducerClass(AvgMonthReducer.class);
-
-		job.setMapOutputKeyClass(Text.class);
-		job.setMapOutputValueClass(IntWritable.class);
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(DoubleWritable.class);
-
-		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
-		fs.delete(new Path(outputPath), true);
-		if (inputPath.endsWith(".txt") || inputPath.endsWith(".gz"))
-			FileInputFormat.addInputPath(job, new Path(inputPath));
-		else {
-			FileStatus[] status_list = fs.listStatus(new Path(inputPath));
-			if (status_list != null) {
-				for (FileStatus status : status_list) {
-					FileInputFormat.addInputPath(job, status.getPath());
-				}
-			}
-		}
-		FileOutputFormat.setOutputPath(job, new Path(outputPath));
-
-		return job;
-	}
-
 
 
 }

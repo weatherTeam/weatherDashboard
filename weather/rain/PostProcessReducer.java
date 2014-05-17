@@ -28,14 +28,14 @@ public class PostProcessReducer extends Reducer<Text, Text, Text, Text> {
 			} else {
 				latitude = line.substring(13, 21).trim();
 				longitude = line.substring(22, 31).trim();
-				state = line.substring(39, 41).trim();
-				name = line.substring(42, 72).trim();
+				state = line.substring(38, 41).trim();
+				name = line.substring(41, 72).trim();
 			}
 		}
 		if (anomalies.size() == 0)
 			return;
 		outputKey
-				.set("StationID:\t" + stationID + "\tLatitude:" + latitude
+				.set("StationID:" + stationID + "\tLatitude:" + latitude
 						+ "\tLongitude:" + longitude + "\tName:" + name + "\tState:"
 						+ state);
 
@@ -45,7 +45,7 @@ public class PostProcessReducer extends Reducer<Text, Text, Text, Text> {
 			String deviation = tokens[1].split("-")[1];
 			String value = tokens[2].split("-")[1];
 			String average = tokens[3].split("-")[1];
-			outputValue.set("Date:\t" + date + "\tDeviation:" + deviation
+			outputValue.set("Date:" + date + "\tDeviation:" + deviation
 					+ "\tValue:" + value + "\tAvg:" + average);
 
 			context.write(outputKey, outputValue);
