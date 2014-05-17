@@ -1,0 +1,76 @@
+\documentclass[12pt]{article}
+
+% Language and charset
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Extreme Events}
+\noindent
+Extreme events are usually characterised by violente winds and heavy rain in some cases. These extreme events can be local like tornado or more spreaded like hurricanes. We try to detect these extreme events by looking for records containing high wind speed and deduce some extreme events based on this information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Wind Threshold}
+In order to identify an extreme event we had to find winds that overtake a certain threshold. The measures being in m/s * 10, we started by setting a value of 280 as used in the \href{http://en.wikipedia.org/wiki/Beaufort_scale}{Beaufort scale}. This scale sets the speed of wind of 103 km/h (~28 m/s) as a boundary to consider the wind to be a violent storm or worse, a hurricane (> 118 km/h).\\
+\\
+An extreme event is not constant by nature and can last for days. The wind speed is also not constant and there is often some drop of speed during the event (while remaining pretty high). If we set the threshold at very high speed only we would not get the overall event but only some extreme part of it, and it would be detected as multiple extreme events. We finally found a threshold that allows us to have a lot of extreme events but in return we also have some less extreme events that are also shown, events with only weak wind and no extreme winds. Therefore we discard events where the max wind speed in under a certain threshold. This allows us to have complete extreme events with high and low wind speeds and not having events with low wind speed only.\\
+We ended up setting the value of the min wind speed to 180 (~65km/h) and the second threshold to 280 (~100km/h) at the expense of the definition of the ?start date? and ?end date? of the event, but which allowed us to better define the amplitude of the event.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inconsistent rain data}
+There are extreme events that are also characterised by heavy rain. However, the retrieval of this information in the data set has caused us some important problems. In fact, the rain information was not always present in the same position as described in the official documentation for the dataset. Running our algorithms on the whole Swiss records worked perfectly, but once we executed it on the US, which is a much larger dataset, we encountered some exceptions. For example, instead of the amount of precipitations, we retrieved strings like \textit{?UML ?}, \textit{?O RM?}, etc. In the case of rainfall anomalies,  we even decided to switch dataset. For extreme events we continued to use the same dataset for compatibility with the wind and handled these exceptions as missing values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Missing information due to the impact of the event}
+Some extreme events had such a big impact that we noticed that the stations recording data had been destroyed by the event. This has been the case for hurricane Katrina in 2005 for example, as the dataset presented an empty gap of almost  one month, on every station in the area of Katerina. For this reason there are extreme events that could not be recorded by the stations and cannot be found on the map. However we cannot deduce that if a lot of records are missing it is due to an extreme event. It could also be the station that has been inactivated or moved.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Extreme events with low impact}
+There are extreme events that can cause none or irrelevant impacts, like event in the middle of the desert, or only in the ocean. There is also event that match the characteristics of an extreme event but are actually pretty low and spreaded. For this reason there can be extreme events on the map without a match with Wikipedia articles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MapReduce jobs}
+\noindent
+The goal of these MapReduce jobs is to find extreme events based principally on wind information. The final output will be composed of:
+\begin{enumerate}
+\item the start date of the event
+\item the end date of the event
+\item the coordinate of the center of the event
+\item the radius of the event
+\item the maximum wind speed recorded during the event
+\item the maximum rain quantity that fall during the event
+\end{enumerate}
+\noindent
+\textbf{Mapper 1:} extract the following information from the input:
+\begin{enumerate}
+\item id of the station
+\item date
+\item geolocation of the station
+\item wind speed
+\item rain precipitation
+\end{enumerate}
+\noindent
+This information is sent to the reducer with one reducer per year/months (so two years give 24 reducer).\\
+\\
+\textbf{Reducer 1:} analyse the wind speed. Output only if the wind is above a certain threshold, which signify that it is an extreme wind speed and therefore an extreme event.\\
+\\
+We now have a huge list of extreme events. We need to know how long these events happened, how many days.\\
+\\
+\textbf{Mapper 2:} send all data on one single mapper. We need all data on a single mapper because there is no way to know when an event is going to start or finish, therefore we cannot separate the data.\\
+\\
+\textbf{Reducer 2:} sort all the date and then look for continuity. If there is a discontinuity of days between two input, we send all the previous event on the same key, which means we had one event. We then start the new event and look on how many days it happened.\\
+\\
+We now have data that are classified by date. But maybe there is multiple event during this time. We have to make clusters of stations depending of their distance between each other\\
+\\
+\textbf{Mapper 3:} send the data with a unique idea per event as key.\\
+\\
+\textbf{Reducer 3:} for each continuous date we have a list of event. Some are part of the same event and happened close to each other, some not. We run a clustering algorithm in order to make different clusters for each event.\\
+\\
+We now have a set of cluster, each cluster representing an event. We want to extract information from these clusters.\\
+\\
+\textbf{Mapper 4:} distributes values between reducers.\\
+\\
+\textbf{Reducer 4:} finds the elements listed in the output list above.
+
+\end{document}
