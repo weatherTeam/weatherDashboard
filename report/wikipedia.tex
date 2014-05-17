@@ -22,7 +22,7 @@ Knowing this, we decided to filter categories based on a defined set keywords: "
 An article belonging to a category which contains one of those keyword is jugged relevant. This allows us to filter out most irrelevant articles, even if there are some false positives (e.g. football players affiliated to a team called ``The Hurricanes'').\\\\
 Implementation wise, this filtering consist of a single MapReduce job where the mapper only emits an article if it is relevant, and the reducer combines the articles it receives into a single XML file for each keyword. 
 After running the job (usually takes less than 5 minutes), we now only have around 200MB of data, which allows us to do document classification in reasonable time, and filter out the remaining off-topic articles.\\ 
-We use Mahout's XMLInputFormat which provides an easy way to split the input into multiple articles delimited by the ``$<$article$>$'' and ``$<$/article$>$'' tag and send them to the mapper.
+We use Mahout's XMLInputFormat which provides an easy way to split the input into multiple articles delimited by the \texttt{<article>} and \texttt{</article>} tags and send them to the mapper.
 \subsubsection{Filtering using document classification}
 ORIANNE
 \subsection{Extracting information}
@@ -35,7 +35,7 @@ To extract dates we use multiple regexes, to cover the range of available date f
 \subsubsection{Extracting locations}
 To extract location, we use a regex based on the lists of continents, countries and american states as well as their corresponding demonyms given in \href{http://en.wikipedia.org/wiki/List_of_adjectival_forms_of_place_names}{this Wikipedia article}.
 \subsection{Displaying information}
-In order to display correctly the information, we first run a small python that creates http link for each article's title ($<$a href='http://en.wikipedia.org/wiki/\$TITLE'$>$ \$TITLE $<$/a$>$), and get the number of references of an articles from Wikipedia using a GET request (https://en.wikipedia.org/wiki/Special:WhatLinksHere/\$TITLE).\\
+In order to display correctly the information, we first run a small python that creates http link for each article's title (\texttt{<a href='http://en.wikipedia.org/wiki/\$TITLE'> \$TITLE </a>}), and get the number of references of an articles from Wikipedia using a GET request (\texttt{https://en.wikipedia.org/wiki/Special:WhatLinksHere/\$TITLE}).\\
 We then sort the articles by their number of reference, to display most important events first\\\\
 On the webpage, we display the information as an HTML table whose rows can be easily filtered to show only relevant events.
 \subsection{Results}
