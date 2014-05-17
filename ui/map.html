@@ -153,6 +153,11 @@
         var periodSelect = "";
         var oldPeriodSelect = "";
 
+        var tempTypeSelect = "";
+        var oldTempTypeSelect = "";
+
+        var oldOnlyExtremeValue = "";
+
         var updateMap = function() {
 
             if ($("#day").is(':checked')) {
@@ -176,12 +181,23 @@
                 $("#rainfall-period").html("month");
                 periodSelect = "year";
             }
+            if ($('#avg').is(':checked') || $('#max').is(':checked') || $('#min').is(':checked')) {
+                tempTypeSelect = $('input[name=tempType]:checked').val();
+                console.log(tempTypeSelect);
+            }
 
-            var dateChanged = false;
+            var paramChanged = false;
 
-            if (oldDate != $('#period').val() || oldPeriodSelect != periodSelect) {
-                dateChanged = true;
-                console.log("Date changed.\n Old: " + oldDate + ", " + oldPeriodSelect + "\n New: " + $('#period').val() + ", " + periodSelect);
+            if (oldDate != $('#period').val()
+                || oldPeriodSelect != periodSelect
+                || oldTempTypeSelect != tempTypeSelect
+                || oldOnlyExtremeValue != $('#extreme').is(':checked')) {
+                paramChanged = true;
+                console.log("Parameter changed.");
+                console.log("Old: " + oldDate + ", " + oldPeriodSelect + ", " + oldTempTypeSelect + ", " + oldOnlyExtremeValue);
+                console.log("New: " + $('#period').val() + ", " + periodSelect + ", " + tempTypeSelect + ", " + $('#extreme').is(':checked'));
+            } else {
+                console.log("No change");
             }
 
             var date = $('#period').val().split('-');
@@ -213,7 +229,7 @@
             }
 
             //Temperature anomalies layer
-            if ($("#temperature-anomalies").is(':checked') && (dateChanged || !map.hasLayer(tempAnomalies))) {
+            if ($("#temperature-anomalies").is(':checked') && (paramChanged || !map.hasLayer(tempAnomalies))) {
                 map.removeLayer(tempAnomalies);
                 var filename = "";
                 if ($("#month").is(':checked')) {
@@ -275,7 +291,7 @@
             }
 
             //Snow cumulation layer
-            if ($("#snow-cumulation").is(':checked') && (dateChanged || !map.hasLayer(snowCumulation))) {
+            if ($("#snow-cumulation").is(':checked') && (paramChanged || !map.hasLayer(snowCumulation))) {
                 map.removeLayer(snowCumulation);
                 var snowCumulation_filename = "";
                 if ($("#day").is(':checked')) {
@@ -310,7 +326,7 @@
             }
 
             //Rainfall layer
-            if ($("#rainfall").is(':checked') && (dateChanged || !map.hasLayer(rainfall))) {
+            if ($("#rainfall").is(':checked') && (paramChanged || !map.hasLayer(rainfall))) {
                 map.removeLayer(rainfall);
                 var filename = "";
                 if ($("#month").is(':checked') || $("#year").is(':checked')) {
@@ -347,7 +363,7 @@
             }
 
             //Storms layer
-            if ($("#storms").is(':checked') && (dateChanged || !map.hasLayer(storms))) {
+            if ($("#storms").is(':checked') && (paramChanged || !map.hasLayer(storms))) {
                 map.removeLayer(storms);
                 var storms_filename = "";
                 if ($("#month").is(':checked') || $("#day").is(':checked')) {
@@ -380,6 +396,8 @@
             }
             oldDate = $('#period').val();
             oldPeriodSelect = periodSelect;
+            oldTempTypeSelect = tempTypeSelect;
+            oldOnlyExtremeValue = $("#extreme").is(':checked');
          };
 
          $("#period").change(function(event) {
