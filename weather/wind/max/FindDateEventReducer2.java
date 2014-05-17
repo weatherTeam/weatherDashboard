@@ -26,6 +26,7 @@ public class FindDateEventReducer2 extends MapReduceBase implements
 		final TreeMap<Integer, ArrayList<String>> xtremEvent = new TreeMap<Integer, ArrayList<String>>();
 		ArrayList<Integer> sortedKeyList = new ArrayList<Integer>();
 		
+		// add all value in a TreeMap in order to sort them by date
 		while (inputValue.hasNext())
 		{
 			String value = inputValue.next().toString();
@@ -40,6 +41,7 @@ public class FindDateEventReducer2 extends MapReduceBase implements
 			}
 		}
 				
+		// transfer the sorted key in an arraylist for easier manipulation
 		for (Map.Entry<Integer, ArrayList<String>> xtrem : xtremEvent.entrySet())
 			sortedKeyList.add(xtrem.getKey());
 		
@@ -52,14 +54,14 @@ public class FindDateEventReducer2 extends MapReduceBase implements
 			{
 				e.printStackTrace();
 			}
-		else if (sortedKeyList.size() == 1)
+		else if (sortedKeyList.size() == 1) // if there is only on event, we just output it
 		{
 			ArrayList<String> eventsToOutput = xtremEvent.get(sortedKeyList.get(0));
 			int key = sortedKeyList.get(0);
 			for (String s : eventsToOutput)
 				output.collect(new IntWritable(key), new Text(s));
 		}
-		else
+		else // if there is multiple event we have to add them in an arraylist of events.
 		{
 			ArrayList<ArrayList<String>> xtremEventClustered = new ArrayList<ArrayList<String>>();
 			boolean outputNow = false;

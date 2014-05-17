@@ -16,7 +16,7 @@ public class FindXtremReducer1 extends MapReduceBase implements
 		Reducer<IntWritable, Text, IntWritable, Text>
 {
 
-	private static final int WIND_TRESHOLD = 250;
+	private static final int WIND_TRESHOLD = 180;
 
 	@Override
 	public void reduce(IntWritable inputKey, Iterator<Text> inputValue,
@@ -24,15 +24,15 @@ public class FindXtremReducer1 extends MapReduceBase implements
 			throws IOException
 	{
 
-		// input = id + date + geoloc + wind + periodQuantityInHoursPrecipitation + millimetersPrecipitation
-
 		final ArrayList<String> xtremWindInfo = new ArrayList<String>();
 
 		while (inputValue.hasNext())
 		{
 			String infoString = inputValue.next().toString();
 			int wind = Integer.parseInt(infoString.substring(36, 40));
-
+			
+			// if the wind is above a certain treshold it is considerated
+			// as an extrem event added to the list to be output.
 			if (wind > WIND_TRESHOLD)
 				xtremWindInfo.add(infoString);
 
