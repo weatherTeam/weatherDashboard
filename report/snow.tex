@@ -5,7 +5,7 @@ The first idea was to collect extreme snow depth events (snow on the floor) in t
 
 To bypass the problem, the idea was to estimate snowfalls from precipitations. When it snows, it is melted and this gives what is called the water-equivalent. To check if there are enough precipitation data, a similar map/reduce has been written to count the records. The NOAA provides a table to convert approximately a water height into a snow equivalent based on the temperature.
 
-\subsection{ Data Analysis}
+\subsection{Data Analysis}
 The first map/reduce job takes in input raw data and output the daily snow accumulation. Some records can be erroneous, missing in which case the data are excluded. To have more precise results, the snow cumulation is computed from the difference of snow depth if it is provided. In the other case, the snowfall is estimated from the precipitation data and the temperature.
 
 To show something interesting on a map, the daily representation does not fit. This is why 2 more jobs have been written to compute the weekly and monthly snow accumulation. It shows how much it snowed during a given week or month and it is possible to see the snowstorms, and also how intensive and extensive they were.\\
