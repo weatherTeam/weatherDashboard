@@ -7,13 +7,13 @@ Below the map we can select which layer we want to show between the one we menti
 \begin{tabular}{|l|c|c|c|c|}\hline \textbf{Layer} & \textbf{Day} & \textbf{Week} & \textbf{Month} & \textbf{Year} \\\hline Temperature anomalies & $\times$ &  & $\times$ &  \\\hline Snow cumulation &  & $\times$ & $\times$ &  \\\hline Rainfall & $\times$ &  & $\times$ &  \\\hline Storms &  &  & $\times$ & $\times$ \\\hline \end{tabular}
 \end{center}
 
-Next to each “computed” layer label, the indication in parenthesis says for what type of period is currently used. For instance, if we select “Day” below the date field, then temperature anomalies and rainfall will obviously show their daily data, but Snow cumulation will show its weekly data and storms its monthly data.
+Next to each “computed” layer label, the indication in parenthesis says what type of period is currently used. For instance, if we select “Day” below the date field, then temperature anomalies and rainfall will obviously show their daily data, but Snow cumulation will show its weekly data and storms its monthly data.
 
-TODO: explain temperature anomalies settings
+When ticking the Temperature anomalies checkbox, additional settings appear. They allow the user to switch between anomalies at average temperatures, maximum temperatures or minimum temperatures. A last option allow us to display only extreme temperature anomalies.
 
-TODO: explain briefly wikipedia
+Finally, there's the Wikipedia articles list. This list contains only articles on US weather events and is automatically updated to match the date entered in the field. This feature allow the user to easily find a match between the data shown in the map and a Wikipedia article.
 
-TODO: explain legends
+TODOORNOTTODO: Do I explain the legend (color keys)?
 
 \subsection{Map engine}
 At first we tried to include maps using OpenLayers 3, which is quite promising but still in beta. We faced some problems due to different projections system which gave us some hard time. Hence we finally switched to Leaflet + Mapbox which works pretty well.
