@@ -1,0 +1,39 @@
+\documentclass{article}
+
+\usepackage{enumerate}
+\usepackage{amsmath} 
+\usepackage[utf8x]{inputenc}
+
+\usepackage{graphicx}
+\setlength{\parindent}{0 pt}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{color}
+
+
+\begin{document}
+
+\section*{Snow accumulation}
+
+\subsection*{Ideas constraint by available data}
+The first idea was to collect extreme snow depth events (snow on the floor) in the US, but a problem appeared pretty soon. Not all weather stations measure it. The first MapReduce Job simply computes how many records there are about snow. It appears that there are only around 10000 records per year in the last decades. But with the age, the number decrease and end to be too small. To find a trend, it was needed to have enough stations from the beginning which was not the case.  \\
+
+To bypass the problem, the idea was to estimate snowfalls from precipitations. When it snows, it is melted and this gives what is called the water-equivalent. To check if there are enough precipitation data, a similar map/reduce has been written to count the records. The NOAA provides a table to convert approximately a water height into a snow equivalent based on the temperature.
+
+\subsection*{ Data Analysis}
+The first map/reduce job takes in input raw data and output the daily snow accumulation. Some records can be erroneous, missing in which case the data are excluded. To have more precise results, the snow cumulation is computed from the difference of snow depth if it is provided. In the other case, the snowfall is estimated from the precipitation data and the temperature.
+
+To show something interesting on a map, the daily representation does not fit. This is why 2 more jobs have been written to compute the weekly and monthly snow accumulation. It shows how much it snowed during a given week or month and it is possible to see the snowstorms, and also how intensive and extensive they were.\\
+
+
+Finally we wanted to show a snow trend over 35 years for the whole country. Two approaches were tested. The first one computes the average snow accumulation for each month of each year. The average was computed over all stations. But there is a problem, snow stations were added and if more station are added in a snowy area, it would produce biased results. The second only takes in account stations where there are snow, when the measure was made. Again it produces biased results. If a whole region does not have snow during a year, or on the contrary, if it snows over a wide area  where snow is usually rare, the result won't take it into account. To obtain correct results, it would have been necessary to take a set of station existing from 1980 to today. Unfortunately, the time was missing to fix it this way. 
+
+
+
+
+%The first mapper take in input a file containing all data about one station. It checks if there is snow depth data in which case, it compute the difference with the last known value if it is not too old. In case there is no measure about the snow depth or if the last measure is too old, it checks if there is any precipitation data and compute the snow equivalent using the temperature. The mapper outputs the result and the key
+%The reducer receive a list of snowfalls for a given day for a given station. It add all the measure and output it. The output corresponds to how much it snowed a given day at a given station.
+
+
+
+
+\end{document}
