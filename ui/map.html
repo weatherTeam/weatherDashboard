@@ -264,26 +264,27 @@
                                     opacity:0
                                 };
                             }
-                            if (feature.properties.type == "VERYHOT") {
+                            if (feature.properties.type == "VERYHOT" || feature.properties.type == "HOT" ) {
                                 return {
                                     stroke:true,
                                     fillColor:color,
                                     fillOpacity:0.9,
+                                    color:color
                                 };
                             }
-                            else if (feature.properties.type == "VERYCOLD") {
+                            else if (feature.properties.type == "VERYCOLD" || feature.properties.type == "COLD") {
                                 return {
-
                                     stroke:true,
                                     fillColor:color,
                                     fillOpacity:0.9,
+                                    color:color
                                 };
                             } else {
                                 return {
 
-                                    fillColor:temperatureColor.evaluate(feat),
+                                    fillColor:color,
                                     fillOpacity:0.5,
-                                    stroke:((feature.properties.type != "NORMAL") ),
+                                    stroke:false,
                                     color : color,
                                 };
                             }
