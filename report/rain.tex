@@ -1,11 +1,3 @@
-\begin{document}
-\begin{center}
-{\LARGE Big Data Project: WeatherDashboard} \vspace{0.5cm} \\
-{\large Amato Van Geyt (235235)}  \vspace{0.5cm}
-\\
-16/12/2013
-\end{center}
-
 \section{Rainfall}
 This part of the project was taken care of by Amato Van Geyt. The goal of this was identifying different anomalies in the rainfall in the USA in a given time period. The time period we choose was 1970 until 2013 as the used datasets seemed to have the most available and reliable data in this period. \\ \\
 The used dataset was initially the original noaa-dataset (\url{ftp://ftp.ncdc.noaa.gov/pub/data/noaa/}) but many problems were encountered with this dataset, especially for the rainfall. First of all was all the data organised by year which made it hard to debug as for finding anomalies we need to be able to quickly compare a certain value with values at the same place but at different times, something this dataset hindered us in. The records themselves were also very chaotically organised and contained much useless information giving cause to long and error-prone processing. The worst of all though was the fact that the rainfall wasn't given per day but for a certain time-period expressed in hours. As this time-period varied a lot among the different weather-stations or even for the same time-period and as there were gaps of data this gave cause to very erratic results. This gave cause to choosing for a new dataset which was aggregated on the previous one. \\ 
@@ -16,7 +8,7 @@ As this did not contain the coordinates of the station and the name of the stati
 \begin{figure}[ht]
 \centering
 \makebox[\textwidth][c]{
-  \includegraphics[width=17cm]{rainfall1.png}
+  \includegraphics[width=17cm]{figures/rainfall1.png}
 }
 \caption{The rainfall anomalies on 31/08/1993}
 \label{fig:rainfall1}
@@ -24,11 +16,8 @@ As this did not contain the coordinates of the station and the name of the stati
 \begin{figure}[ht]
 \centering
 \makebox[\textwidth][c]{
-  \includegraphics[width=17cm]{rainfall2.png}
+  \includegraphics[width=17cm]{figures/rainfall2.png}
 }
 \caption{The wikipedia-report of hurricane Emily}
 \label{fig:rainfall2}
 \end{figure}
-
-
-\end{document} 
