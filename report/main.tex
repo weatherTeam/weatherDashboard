@@ -1,0 +1,56 @@
+\documentclass[a4paper,11pt, oneside]{article}   % list options between brackets
+\usepackage{fullpage}
+
+
+\usepackage{graphicx}
+% type user-defined commands here
+\usepackage{indentfirst}
+
+\usepackage{multirow}
+
+\usepackage{url}
+
+\usepackage[colorlinks]{hyperref}
+\hypersetup{
+   citecolor={black},
+   linkcolor={black},
+   urlcolor={black},
+   pdfpagemode={UseOutlines}
+}
+%\hypersetup{
+%   citecolor={magenta},
+%   linkcolor={blue},
+%   urlcolor={blue},
+%   pdfpagemode={UseOutlines}
+%}
+
+%% Handle links to references better.
+\usepackage[all]{hypcap}
+
+\usepackage{index}
+
+\usepackage{subfigure}
+
+\usepackage{caption}
+\captionsetup{width=0.9\textwidth}
+
+\newcommand{\f}[1]{\mbox{\texttt{#1}}}
+\newcommand{\ttf}[1]{\texttt{#1}}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\begin{document}
+
+\input{./title.tex}
+
+\tableofcontents
+\newpage
+
+
+%\input{./introduction.tex}
+
+\input{./dataRetrieval.tex}
+\input{./nearestNeighbor.tex}
+
+%\input{./conclusion.tex}
+
+\end{document}
