@@ -42,11 +42,11 @@
                     <input type="radio" name="tempType" id="min" value="minAnomaly"> Minimum temperature anomalies<br \>
                     <input type="checkbox" name="extreme" id="extreme" value="extreme"> Display only extreme values
                 </div>
-                <div id="rainfallSettings" style="display: none">
+                <!-- <div id="rainfallSettings" style="display: none">
                     <h3>Rainfall settings</h3>
                     <input type="radio" name="rainType" id="value" checked> Value
                     <input type="radio" name="rainType" id="dev"> Deviation
-                </div>
+                </div> -->
             </form>
             <h2>Wikipedia articles</h2>
             <div id="wikiTable"></div>
@@ -80,7 +80,6 @@
         layerControl.addTo(map);
         legendControl.addTo(map);
 
-        // var allStations = L.geoJson();
         var USStations = L.geoJson();
         var storms = L.geoJson();
         var tempAnomalies = L.geoJson();
@@ -134,8 +133,8 @@
 
         function onEachRainfallFeature(feature, layer) {
             var popupContent = "Station name: " + feature.properties.name + " (" + feature.properties.state + ")<br />" +
-                               "Value: " + ((feature.properties.value)/10).toFixed(2) + "mm<br />" +
-                               "Deviation: " + ((feature.properties.deviation)/10).toFixed(2) + "mm";
+                               "Value: " + ((feature.properties.value)/10).toFixed(2) + "mm<br />"/* +
+                               "Deviation: " + ((feature.properties.deviation)/10).toFixed(2) + "mm"*/;
 
             if (feature.properties && feature.properties.popupContent) {
                 popupContent += feature.properties.popupContent;
@@ -188,30 +187,6 @@
             var date = $('#period').val().split('-');
 
             var dateMoment = moment($('#period').val());
-
-            //All stations layer
-            // if ($("#all-stations").is(':checked') && !map.hasLayer(allStations)) {
-            //     $.getJSON(dataRepo+"/stationslist.json", function(stations) {
-            //         //When GeoJSON is loaded
-            //         allStations = L.geoJson(stations, {
-            //             onEachFeature: onEachStationFeature,
-
-            //             pointToLayer: function (feature, latlng) {
-            //                 return L.circleMarker(latlng, {
-            //                         //fillColor: "#ff7800",
-            //                         color: "#000",
-            //                         weight: 1,
-            //                         opacity: 1,
-            //                         radius: 2,
-            //                         fillOpacity: 0.3
-            //                     });
-            //             }
-            //         });
-            //         map.addLayer(allStations);
-            //     });
-            // } else if(!$("#all-stations").is(':checked')) {
-            //     map.removeLayer(allStations);
-            // }
 
             //US stations layer
             if ($("#us-stations").is(':checked') && !map.hasLayer(USStations)) {
@@ -350,8 +325,8 @@
                     rainfall = L.geoJson(data, {
                         style: function(feature) {
                             var rcolor = rainFallColor.evaluate(feature.properties.value);
-                            if ($("#dev").is(':checked'))
-                                rcolor = rainFallDevColor.evaluate(feature.properties.deviation);
+                            // if ($("#dev").is(':checked'))
+                            //     rcolor = rainFallDevColor.evaluate(feature.properties.deviation);
                             return {
                                 color: "#ff69b4",
                                 fillColor: rcolor,
@@ -424,9 +399,9 @@
             $("#temperatureSettings").toggle();
          });
 
-        $("#rainfall").change(function(event) {
-            $("#rainfallSettings").toggle();
-         });
+        // $("#rainfall").change(function(event) {
+        //     $("#rainfallSettings").toggle();
+        //  });
 
         function getSnowOpacity(snowCumulation){
             var opacity = [0.6, 0.8, 0.9, 1];
@@ -444,7 +419,7 @@
         var lotSnow = new L.HSLHueFunction(new L.Point(200, 50), new L.Point(500, 0));
         var snowColor = new L.PiecewiseFunction([fewSnow, moreSnow,lotSnow]);
         var rainFallColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(5000, 0));
-        var rainFallDevColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(7, 0));
+        // var rainFallDevColor = new L.HSLHueFunction(new L.Point(0, 240), new L.Point(7, 0));
         var windSpeedColor = new L.HSLHueFunction(new L.Point(64, 100), new L.Point(250, 0));
 
         //Showing color scale
@@ -492,12 +467,12 @@
         layerControl.addOverlay(rainLegend, 'Rainfall legend');
         map.addLayer(rainLegend);
 
-        options.displayOptions.electoral.fillColor = rainFallDevColor;
-        options.displayOptions.electoral.color = rainFallDevColor;
-        options.displayOptions.electoral.displayName = 'Rainfall deviation (/10 mm)';
-        var rainDevLegend = new L.ChoroplethDataLayer(rainData,options);
-        layerControl.addOverlay(rainDevLegend, 'Rainfall deviation legend');
-        map.addLayer(rainDevLegend);
+        // options.displayOptions.electoral.fillColor = rainFallDevColor;
+        // options.displayOptions.electoral.color = rainFallDevColor;
+        // options.displayOptions.electoral.displayName = 'Rainfall deviation (/10 mm)';
+        // var rainDevLegend = new L.ChoroplethDataLayer(rainData,options);
+        // layerControl.addOverlay(rainDevLegend, 'Rainfall deviation legend');
+        // map.addLayer(rainDevLegend);
 
         options.displayOptions.electoral.fillColor = windSpeedColor;
         options.displayOptions.electoral.color = windSpeedColor;
