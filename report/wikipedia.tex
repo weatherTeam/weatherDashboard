@@ -17,7 +17,7 @@ It is possible to download a dump of all English Wikipedia articles, without edi
 \subsection{Filtering articles}
 Obviously, most of Wikipedia articles are irrelevant to our task of find information on weather events that is why we must first filter the dataset. 
 \subsubsection{Filtering based on articles' categories}
-The easiest way to prune off topic articles, it to look at their category. Unfortunately, categories on Wikipedia are not hierarchically well organized, so we cannot start from a top category such as ``weather event'' and get a list of every relevant subcategories. Indeed, categories may loop or diverge to another subject.\\\\
+The easiest way to prune off topic articles, is to look at their category. Unfortunately, categories on Wikipedia are not hierarchically well organized, so we cannot start from a top category such as ``weather event'' and get a list of every relevant subcategories. Indeed, categories may loop or diverge to another subject.\\\\
 Knowing this, we decided to filter categories based on a defined set keywords: "blizzard", "cyclone", "hurricane", "typhoon", "derecho", "drought", "nor'easter", "storm", "tornado", "heat wave", "cold wave", "weather event". \\\\
 An article belonging to a category which contains one of those keyword is jugged relevant. This allows us to filter out most irrelevant articles, even if there are some false positives (e.g. football players affiliated to a team called ``The Hurricanes'').\\\\
 Implementation wise, this filtering consist of a single MapReduce job where the mapper only emits an article if it is relevant, and the reducer combines the articles it receives into a single XML file for each keyword. 

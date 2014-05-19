@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Extreme Events}
 \noindent
-Extreme events are usually characterised by violente winds and heavy rain in some cases. These extreme events can be local like tornado or more spreaded like hurricanes. We try to detect these extreme events by looking for records containing high wind speed and deduce some extreme events based on this  information.
+Extreme events are usually characterised by violent winds and heavy rain in some cases. These extreme events can be local like tornado or more spread like hurricanes. We try to detect these extreme events by looking for records containing high wind speed and deduce some extreme events based on this information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Wind Threshold}
@@ -105,13 +105,13 @@ We now have a huge list of extreme events. We need to know how long these events
 \\
 \textbf{Reducer 2:} sort all the date and then look for continuity. If there is a discontinuity of days between two input, we send all the previous event on the same key, which means we had one event. We then start the new event and look on how many days it happened.\\
 \\
-We now have data that are classified by date. But maybe there is multiple event during this time. We have to make clusters of stations depending of their distance between each other\\
+We now have data that are classified by date. But maybe there are multiple events during this time. We have to make clusters of stations depending of their distance between each other\\
 \\
 \textbf{Mapper 3:} send the data with a unique idea per event as key.\\
 \\
 \textbf{Reducer 3:} for each continuous date we have a list of event. Some are part of the same event and happened close to each other, some not. We run a clustering algorithm in order to make different clusters for each event.\\
 \\
-We now have a set of cluster, each cluster representing an event. We want to extract information from these clusters.\\
+We now have a set of clusters, each cluster representing an event. We want to extract information from these clusters.\\
 \\
 \textbf{Mapper 4:} distributes values between reducers.\\
 \\

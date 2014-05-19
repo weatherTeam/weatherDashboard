@@ -1,14 +1,14 @@
-\section{$k$-Nearest Neighbors}
+\section{$k$-Nearest Neighbours}
 
 \subsection{Why?} % (fold) \label{sub:why_}
 
 % subsection why_ (end)
-The main purpose of implementing nearest neighbor, is to find similar weather
+The main purpose of implementing nearest neighbour, is to find similar weather
 periods in the history and possibly find patterns in the climate. This is useful
 in terms of understanding the climate and to forecast specific events. 
 
 As an example, here in Switzerland, it could be useful in terms of avalanche
-danger. If most of the nearest neighbors of the current winter so far, led to
+danger. If most of the nearest neighbours of the current winter so far, led to
 many and massive avalanches, it is reason to believe that also the current
 winter can become a such a winter. By knowing this, it would be possible to take
 action before the events occur. The same method can be used to forecast events
@@ -21,9 +21,9 @@ like floods or drought.
 
 \subsection{Implementation} % (fold) \label{sub:implementation}
 
-The k-nearest neighbor is a fairly simple algorithm. You choose a metric,
+The k-nearest neighbour is a fairly simple algorithm. You choose a metric,
 calculate the distance from the reference node to all the other's, and pick the
-$k$ nearest neighbors. This has been done more or less straight forward.
+$k$ nearest neighbours. This has been done more or less straight forward.
 
 In this case a node is a period of time. We fixed the period to one month, such
 that you can pick one month for a specific year, and then find the most similar
@@ -58,7 +58,7 @@ that has records for both months $k$ and $l$.
  	\begin{center}
  		\includegraphics[width=12cm]{figures/NNmapReduce.pdf}
  	\end{center}
- 	\caption{Implementation of nearest neighbors in map reduce.}
+ 	\caption{Implementation of nearest neighbours in map reduce.}
  	\label{fig:NNmapReduce}
  \end{figure} 
 
@@ -80,19 +80,19 @@ i$. $P$ is similar for total precipitation.
 
 \subsection{Results} % (fold) \label{sub:results}
 
-We ran the nearest neighbor algorithm on the NOAA dataset for USA. The time period
+We ran the nearest neighbour algorithm on the NOAA dataset for USA. The time period
 ranges from 1975 to 2013. In general, and as expected, one can see a strong correlation 
-between successive years. It's quite often that the closest neighbor is the year before
+between successive years. It's quite often that the closest neighbour is the year before
 or after, at least close in time. So if you want to guess how the weather will be for a
 specific month, your best bet would be as it was last year for that month. 
 
-Table (\ref{tab:NN_jul2012}) shows the nearest neighbors for July 2012. Both 2012, 2011 and
-2010 was among the warmest July's in US history. They were also very dry in the western parts and
+Table (\ref{tab:NN_jul2012}) shows the nearest neighbours for July 2012. Both 2012, 2011 and
+2010 were among the warmest July's in US history. They were also very dry in the western parts and
 very wet in the eastern parts. 
 
 \begin{table}[ht]
 \centering
-\caption{Nearest neighbors for July 2012}
+\caption{Nearest neighbours for July 2012}
 \label{tab:NN_jul2012}
 \vspace{0.5cm}
 \begin{tabular}{rl}
@@ -109,15 +109,15 @@ very wet in the eastern parts.
 \end{table}
 
 The graph in figure (\ref{fig:NNgraph}) is one way to visualize the result. Each year is a node, and each
-of the nodes is connected to it's two closest neighbors with an edge. The graph shows
-how similar years cluster together. There is no axes on the graph, so one need additional
+of the nodes is connected to it's two closest neighbours with an edge. The graph shows
+how similar years cluster together. There is no axes on the graph, so one needs additional
 information to check how the weather was for the specific cluster's of nodes. 
 
 \begin{figure}[tb]
  	\begin{center}
  		\includegraphics[width=7cm]{figures/NNgraph.png}
  	\end{center}
- 	\caption{$k$-nearest neighbors for July visualized with $k = 2$}
+ 	\caption{$k$-nearest neighbours for July visualized with $k = 2$}
  	\label{fig:NNgraph}
  \end{figure} 
 
