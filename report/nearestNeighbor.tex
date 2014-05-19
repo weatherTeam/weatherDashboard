@@ -1,4 +1,4 @@
-\section{Nearest Neighbors}
+\section{$k$-Nearest Neighbors}
 
 \subsection{Why?} % (fold) \label{sub:why_}
 
@@ -14,10 +14,10 @@ winter can become a such a winter. By knowing this, it would be possible to take
 action before the events occur. The same method can be used to forecast events
 like floods or drought.  
 
-It can also be used to find patterns in the climate such as cycles and periodic
-structures. 
+%It can also be used to find patterns in the climate such as cycles and periodic
+%structures. 
 
-TODO: Rewrite to better language
+%TODO: Rewrite to better language
 
 \subsection{Implementation} % (fold) \label{sub:implementation}
 
@@ -28,7 +28,7 @@ $k$ nearest neighbors. This has been done more or less straight forward.
 In this case a node is a period of time. We fixed the period to one month, such
 that you can pick one month for a specific year, and then find the most similar
 months for the other years. Often climate data is summarized by month, so this
-makes it easy to find data to compare with.
+makes it easy to find data to compare with and verify results.
 
 Next question is to determine how many intervals the period of time should be
 divided into. Should we compare averages for an hour, a day, a week, or just one
@@ -37,15 +37,76 @@ period of time (a day), then comparing hour by hour could make sense and give
 good results. But for a large region (thousands of stations) and for a longer
 period (a month), this will mostly just return noise. Here, the method is
 implemented with a period option so one can choose how many periods a month
-should be divided into. The final results is run with this set to 1, meaning
-that averages for the whole month is used. 
+should be divided into. With only one period selected, only the average value
+for the whole month is used when calculating the distance to other months.
 
-TODO: add figure shows how this was implemented with map reduce on Hadoop. Write
-some more and clean language.
+In mathematical terms, the final expression for the distance between two months
+$k$ and $l$, divided into periods $p$, is given by
+\begin{equation}
+	\label{eq:NN}
+	D_{k,l,p} = \frac{1}{n}\sum_{i=1}^{n}{\frac{1}{p}\sum_{j=1}^{p}{
+		\sqrt{
+			(T_{k,i,j} - T_{l,i,j})^2 + 
+			(P_{k,i,j} - P_{l,i,j})^2
+		}}},
+\end{equation}
+where $T_{k,i,j}$ is the average temperature for month $k$ at station $i$ in 
+period $j$, $P$ is similar for precipitation and $n$ is the number of stations
+that has records for both months $k$ and $l$.
+
+\begin{figure}[tb]
+ 	\begin{center}
+ 		\includegraphics[width=12cm]{figures/NNmapReduce.pdf}
+ 	\end{center}
+ 	\caption{Implementation of nearest neighbors in map reduce.}
+ 	\label{fig:NNmapReduce}
+ \end{figure} 
+
+To get good results on the NOAA dataset for USA, which consists of thousands 
+of stations, we chose to divide the month into only one period. Thus, equation
+(\ref{eq:NN}) reduces to
+\begin{equation}
+	\label{eq:NN_usa}
+	D_{k,l} = \frac{1}{n}\sum_{i=1}^{n}{
+	\sqrt{
+		(T_{k,i} - T_{l,i})^2 + 
+		(P_{k,i} - P_{l,i})^2
+	}},
+\end{equation}
+where $T_{k,i}$ is the average temperature for the whole month $k$ at station $
+i$. $P$ is similar for total precipitation. 
+
 % subsection implementation (end)
 
 \subsection{Results} % (fold) \label{sub:results}
 
-TODO: Present some results with some figures to show that it works.
+We ran the nearest neighbor algorithm on the NOAA dataset for USA. The time period
+ranges from 1975 to 2013. 
+
+In general, and as expected, one can see a strong correlation between successive years.
+It's quite often that the closest neighbor is the year before.
+
+Table (\ref{tab:NN_jul2012}) shows the nearest neighbors for July 2012. We see here that
+
+TODO: finish results
+
+\begin{table}[ht]
+\centering
+\caption{Nearest neighbors for july 2012}
+\label{tab:NN_jul2012}
+\vspace{0.5cm}
+\begin{tabular}{rl}
+  \hline
+  Year & Score \\ 
+  \hline
+  2011 & 0.4985 \\ 
+  2010 & 0.5299 \\ 
+  2008 & 0.5916 \\ 
+  1982 & 0.6027 \\ 
+  2006 & 0.6027 \\ 
+  \hline
+\end{tabular}
+\end{table}
+
 
 % subsection results (end)
