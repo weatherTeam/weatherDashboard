@@ -1,11 +1,19 @@
+\documentclass[12pt]{article}
+
+% Language and charset
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{multicol}
+
+\begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Extreme Events}
 \noindent
-Extreme events are usually characterised by violente winds and heavy rain in some cases. These extreme events can be local like tornado or more spreaded like hurricanes. We try to detect these extreme events by looking for records containing high wind speed and deduce some extreme events based on this information.
+Extreme events are usually characterised by violente winds and heavy rain in some cases. These extreme events can be local like tornado or more spreaded like hurricanes. We try to detect these extreme events by looking for records containing high wind speed and deduce some extreme events based on this  information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Wind Threshold}
-In order to identify an extreme event we had to find winds that overtake a certain threshold. The measures being in m/s * 10, we started by setting a value of 280 as used in the \href{http://en.wikipedia.org/wiki/Beaufort_scale}{Beaufort scale}. This scale sets the speed of wind of 103 km/h (~28 m/s) as a boundary to consider the wind to be a violent storm or worse, a hurricane (> 118 km/h).\\
+In order to identify an extreme event we had to find winds that overtake a certain threshold. The measures being in m/s * 10, we started by setting a value of 280 as used in the \href{http://en.wikipedia.org/wiki/Beaufort_scale}{Beaufort scale}. This scale sets the speed of wind of 103 km/h (28 m/s) as a boundary to consider the wind to be a violent storm or worse, a hurricane ($>$ 118 km/h).\\
 \\
 An extreme event is not constant by nature and can last for days. The wind speed is also not constant and there is often some drop of speed during the event (while remaining pretty high). If we set the threshold at very high speed only we would not get the overall event but only some extreme part of it, and it would be detected as multiple extreme events. We finally found a threshold that allows us to have a lot of extreme events but in return we also have some less extreme events that are also shown, events with only weak wind and no extreme winds. Therefore we discard events where the max wind speed in under a certain threshold. This allows us to have complete extreme events with high and low wind speeds and not having events with low wind speed only.\\
 We ended up setting the value of the min wind speed to 180 (~65km/h) and the second threshold to 280 (~100km/h) at the expense of the definition of the ?start date? and ?end date? of the event, but which allowed us to better define the amplitude of the event.
@@ -24,6 +32,7 @@ There are extreme events that can cause none or irrelevant impacts, like event i
 
 
 \subsection{Extreme events and Wikipedia}
+\begin{multicols}{2}
 \begin{itemize}
 \item Hurricane Eloise 1975 September
 \item Hurricane Belle 1976 August
@@ -58,7 +67,20 @@ There are extreme events that can cause none or irrelevant impacts, like event i
 \item Hurricane Rita 2005 September
 \item Hurricane Ophelia 2005 September
 \item Hurricane Wilma 2005 October
+\item Tropical Storm Alberto 2006 June
+\item Hurricane Ernesto 2006 August
+\item Hurricane Humberto 2007 September
+\item Great Coastal Gale of 2007 December
+\item Hurricane Ike 2008 September
+\item Hurricane Gustav 2008 September
+\item Derecho Southern Midwest derecho 2009 May
+\item Hurricane Irene 2011 August
+\item Tropical Storm Lee 2011 September
+\item Hurricane Isaac 2012 August
+\item Hurricane sandy 2012 October
+\item Tornado Outbreak 2013 November
 \end{itemize}
+\end{multicols}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{MapReduce jobs}
 \noindent
@@ -102,3 +124,5 @@ We now have a set of cluster, each cluster representing an event. We want to ext
 \textbf{Mapper 4:} distributes values between reducers.\\
 \\
 \textbf{Reducer 4:} finds the elements listed in the output list above.
+
+\end{document}
