@@ -13,9 +13,9 @@ In this section, we will describe each step of the procedure from the Wikipedia 
      \label{fig:wikiflow}
 \end{figure}
 \subsection{Available data}
-It is possible to download a dump of all English Wikipedia articles, without edit history, from \href{https://meta.wikimedia.org/wiki/Data_dump_torrents#enwiki}{this webpage}. We used the dump from February 3rd, 2014, the latest available when we started the project. It consists of a single XML file which is 10GB compressed, 40GB uncompressed. 
+It is possible to download a dump of all English Wikipedia articles, without edit history, from \href{https://meta.wikimedia.org/wiki/Data_dump_torrents#enwiki}{a Wikipedia page (link)}. We used the dump from February 3rd, 2014, the latest available when we started the project. It consists of a single XML file, which is 10GB compressed, 40GB uncompressed. 
 \subsection{Filtering articles}
-Obviously, most of Wikipedia articles are irrelevant to our task of find information on weather events, that is why we must first filter the dataset. 
+Obviously, most of Wikipedia articles are irrelevant to our task of find information on weather events that is why we must first filter the dataset. 
 \subsubsection{Filtering based on articles' categories}
 The easiest way to prune off topic articles, it to look at their category. Unfortunately, categories on Wikipedia are not hierarchically well organized, so we cannot start from a top category such as ``weather event'' and get a list of every relevant subcategories. Indeed, categories may loop or diverge to another subject.\\\\
 Knowing this, we decided to filter categories based on a defined set keywords: "blizzard", "cyclone", "hurricane", "typhoon", "derecho", "drought", "nor'easter", "storm", "tornado", "heat wave", "cold wave", "weather event". \\\\
