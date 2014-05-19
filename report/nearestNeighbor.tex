@@ -81,23 +81,23 @@ i$. $P$ is similar for total precipitation.
 \subsection{Results} % (fold) \label{sub:results}
 
 We ran the nearest neighbor algorithm on the NOAA dataset for USA. The time period
-ranges from 1975 to 2013. 
+ranges from 1975 to 2013. In general, and as expected, one can see a strong correlation 
+between successive years. It's quite often that the closest neighbor is the year before
+or after, at least close in time. So if you want to guess how the weather will be for a
+specific month, your best bet would be as it was last year for that month. 
 
-In general, and as expected, one can see a strong correlation between successive years.
-It's quite often that the closest neighbor is the year before.
-
-Table (\ref{tab:NN_jul2012}) shows the nearest neighbors for July 2012. We see here that
-
-TODO: finish results
+Table (\ref{tab:NN_jul2012}) shows the nearest neighbors for July 2012. Both 2012, 2011 and
+2010 was among the warmest July's in US history. They were also very dry in the western parts and
+very wet in the eastern parts. 
 
 \begin{table}[ht]
 \centering
-\caption{Nearest neighbors for july 2012}
+\caption{Nearest neighbors for July 2012}
 \label{tab:NN_jul2012}
 \vspace{0.5cm}
 \begin{tabular}{rl}
   \hline
-  Year & Score \\ 
+  Year & Distance \\ 
   \hline
   2011 & 0.4985 \\ 
   2010 & 0.5299 \\ 
@@ -108,5 +108,17 @@ TODO: finish results
 \end{tabular}
 \end{table}
 
+The graph in figure (\ref{fig:NNgraph}) is one way to visualize the result. Each year is a node, and each
+of the nodes is connected to it's two closest neighbors with an edge. The graph shows
+how similar years cluster together. There is no axes on the graph, so one need additional
+information to check how the weather was for the specific cluster's of nodes. 
 
-% subsection results (end)
+\begin{figure}[tb]
+ 	\begin{center}
+ 		\includegraphics[width=7cm]{figures/NNgraph.png}
+ 	\end{center}
+ 	\caption{$k$-nearest neighbors for July visualized with $k = 2$}
+ 	\label{fig:NNgraph}
+ \end{figure} 
+
+%  results (end)
