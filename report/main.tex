@@ -1,0 +1,58 @@
+\documentclass[a4paper,11pt, oneside]{article}   % list options between brackets
+\usepackage{fullpage}
+\usepackage[utf8]{inputenc}
+
+\usepackage{graphicx}
+% type user-defined commands here
+\usepackage{indentfirst}
+
+\usepackage{multirow}
+
+\usepackage{url}
+\usepackage{float}
+
+\usepackage[colorlinks]{hyperref}
+\hypersetup{
+   citecolor={black},
+   linkcolor={black},
+   urlcolor={black},
+   pdfpagemode={UseOutlines}
+}
+
+%% Handle links to references better.
+\usepackage[all]{hypcap}
+
+\usepackage{index}
+
+\usepackage{subfigure}
+
+\usepackage{caption}
+\captionsetup{width=0.9\textwidth}
+
+\newcommand{\f}[1]{\mbox{\texttt{#1}}}
+\newcommand{\ttf}[1]{\texttt{#1}}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\begin{document}
+
+\input{./title.tex}
+
+\tableofcontents
+\newpage
+
+
+%\input{./introduction.tex}
+
+\input{./dataRetrieval.tex}
+\input{./wikipedia.tex}
+\input{./temperatureAnomalies.tex}
+\input{./rain.tex}
+\input{./snow.tex}
+\input{./ExtremeWindReport.tex}
+\input{./nearestNeighbor.tex}
+\input{./userInterface.tex}
+\input{./tasksDistribution.tex}
+
+%\input{./conclusion.tex}
+
+\end{document}

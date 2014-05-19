@@ -2,3 +2,15 @@
 *.json
 
 *.csv
+
+*.aux
+
+*.log
+
+*.out
+
+*.gz
+
+*.toc
+
+*.pdf
