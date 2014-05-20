@@ -1,18 +1,15 @@
 
+
 *.json
+
 
 *.csv
 
+
+*.txt
+
 *.aux
-
 *.log
-
-*.out
-
-*.gz
-
-*.toc
-
 *.pdf
-
-*.bak
+*.toc
+*.out
