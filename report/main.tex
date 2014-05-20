@@ -1,0 +1,72 @@
+\documentclass[a4paper,11pt, oneside]{article}   % list options between brackets
+\usepackage{fullpage}
+\usepackage{longtable}
+\usepackage[utf8]{inputenc}
+
+\usepackage{graphicx}
+% type user-defined commands here
+\usepackage{indentfirst}
+
+\usepackage{multirow}
+\usepackage{multicol}
+
+\usepackage{url}
+\usepackage{float}
+
+\usepackage[colorlinks]{hyperref}
+\hypersetup{
+   citecolor={black},
+   linkcolor={black},
+   urlcolor={black},
+   pdfpagemode={UseOutlines}
+}
+
+%% Handle links to references better.
+\usepackage[all]{hypcap}
+
+\usepackage{index}
+
+\usepackage{subfigure}
+
+\usepackage{caption}
+\captionsetup{width=0.9\textwidth}
+
+\newcommand{\f}[1]{\mbox{\texttt{#1}}}
+\newcommand{\ttf}[1]{\texttt{#1}}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\begin{document}
+
+\input{./title.tex}
+
+\tableofcontents
+\newpage
+% Update image of Wikipedia page 4; different in slides
+% Part of Orianne still needs to be included
+% Last part of Temperature is missing.
+% Weird start and end date at the wind-report, line 11
+% Quite some people still need to fill their things in at tasksDistribution.tex.
+
+%\input{./introduction.tex}
+
+\input{./tasksDistribution.tex}
+\input{./dataRetrieval.tex}
+\input{./wikipedia.tex}
+\input{./temperatureAnomalies.tex}
+\input{./rain.tex}
+\input{./snow.tex}
+\input{./ExtremeWindReport.tex}
+\input{./nearestNeighbor.tex}
+\input{./userInterface.tex}
+
+%\input{./conclusion.tex}
+
+\begin{thebibliography}{9}
+\bibitem{nearestNeighbor}
+	Mohammed Sharif, Donald H Burn (2005)
+	\emph{Simulating climate change scenarios using an improved
+	K-nearest neighbor model}
+	(Journal of Hydrology 325 (2006) 179–196)
+\end{thebibliography}
+
+\end{document}
