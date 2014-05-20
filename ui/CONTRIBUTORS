@@ -3,8 +3,14 @@ Contributors of the folder ui
 David Sandoz:
 - Everything not listed below
 
-Aubry Cholleton :
-- temperature anomalies visualizations and rainfall integration
+Aubry Cholleton:
+- Temperature anomalies visualizations and rainfall integration
 
-Quentin Mazars :
-- wikipedia related scripts
+Quentin Mazars:
+- Wikipedia related scripts
+
+Jonthan Duss:
+- Snow cumulation visulaization
+
+Anders Hennum:
+- Nearest neighbor graphs
