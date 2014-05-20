@@ -1,0 +1,16 @@
+Contributors of the folder tools
+
+Aubry Cholleton :
+- buildGeoJsonEPSG3857.py
+- createGriddedJSON.py
+- createJsonCustomProjectionJSON.py
+- createJson.py
+- extractStationsPositions.py
+- linearinterp.py
+
+David Sandoz :
+- /ncdc
+- stormsHadoopOutput2GeoJSON.py
+
+Jonthan Duss :
+
