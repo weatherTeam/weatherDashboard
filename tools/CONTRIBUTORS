@@ -9,7 +9,7 @@ Aubry Cholleton :
 - linearinterp.py
 
 David Sandoz :
-- /ncdc
+- ncdc/*
 - stormsHadoopOutput2GeoJSON.py
 
 Jonthan Duss :
