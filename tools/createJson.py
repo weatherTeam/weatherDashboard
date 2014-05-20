@@ -1,6 +1,7 @@
 from json import dumps, loads
 import os
 
+# Author Aubry Cholleton
 
 inputFolder = 'inputData'
 #step=0.25
@@ -39,4 +40,3 @@ for root, directories, files in os.walk(inputFolder):
 
 			outputfile.write(dumps(stats))
 			outputfile.close()
-				

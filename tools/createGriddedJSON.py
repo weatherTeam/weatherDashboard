@@ -7,6 +7,8 @@ from scipy.interpolate import griddata
 from json import dumps, loads
 import os
 
+# Author Aubry Cholleton
+
 stations = np.genfromtxt("stations.txt", dtype = str)
 print stations
 
@@ -39,4 +41,3 @@ for root, directories, files in os.walk(inputFolder):
 
 			outputfile.write(dumps(stats))
 			outputfile.close()
-				

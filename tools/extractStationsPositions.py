@@ -1,5 +1,7 @@
 import ogr, osr
 
+# Author Aubry Cholleton
+
 # https://pypi.python.org/pypi/GDAL/
 # http://gis.stackexchange.com/questions/78838/how-to-convert-projected-coordinates-to-lat-lon-using-python
 
@@ -25,7 +27,7 @@ for line in inputfile:
 	lon = line[65:72]
 	alt = line[73:79]
 	ctry = line[43:48]
-	
+
 	if ctry == "SW SZ" or 1:
 	#if ctry == "US US":
 		if id == "999999":

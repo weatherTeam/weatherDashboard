@@ -1,5 +1,6 @@
 from json import dumps, loads
 import ogr, osr
+# Author Aubry Cholleton
 
 # https://pypi.python.org/pypi/GDAL/
 # http://gis.stackexchange.com/questions/78838/how-to-convert-projected-coordinates-to-lat-lon-using-python

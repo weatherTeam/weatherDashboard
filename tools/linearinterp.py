@@ -5,6 +5,8 @@ from mpl_toolkits.basemap import Basemap
 from scipy.interpolate import griddata
 #from matplotlib.mlab import griddata
 
+# Author Aubry Cholleton
+
 filename = "012004"
 anomalies = np.genfromtxt(filename, dtype = str, usecols=(1, 2), delimiter = '\t')
 stations = np.genfromtxt("stations.txt", dtype = str)
@@ -98,6 +100,3 @@ plt.show()
 #fig.savefig('test.png')
 #with open('test.png', 'w') as outfile:
 #    fig.canvas.print_png(outfile)
-
-
-	
