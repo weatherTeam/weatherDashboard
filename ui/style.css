@@ -1,0 +1,169 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    padding: 0px;
+    margin: 0px;
+    background-image: url('agsquare.png');
+}
+
+header {
+}
+
+nav {
+    width: 100%;
+    background-color: #76b6e3;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+nav a, nav menuitem {
+    color: #f5efea;
+    display: inline-block;
+    padding: 5px 10px 5px 10px;
+}
+
+nav a:hover, nav menuitem:hover {
+    color: #e6e4bd;
+    cursor: pointer;
+}
+nav a.currentPage {
+    background-color: #e6e4bd;
+    color: #76b6e3;
+}
+
+main {
+    height: 80%;
+}
+
+footer {
+    padding: 50px 10px 30px 10px;
+    text-align: center;
+    font-size: 0.8em;
+    color: #999;
+}
+
+h1 {
+    display: inline-block;
+    font-size: 36px;
+}
+h1+a {
+    display: inline-block;
+}
+
+h1, h2 {
+    padding: 10px;
+    margin: 0px;
+}
+
+a {
+    font-weight: bold;
+    text-decoration: none;
+    color: #999;
+}
+
+#map {
+    height: 600px;
+}
+
+.dataTables_wrapper {
+    margin: auto;
+    width: 80%;
+    text-align: center;
+}
+
+.dataTables_length, .dataTables_filter, .dataTables_paginate {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.dataTables_filter input {
+    width: 200px;
+}
+
+.dataTables_paginate a {
+    display: inline-block;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.dataTables_paginate a:hover, table a:hover {
+    cursor: pointer;
+    color: #333;
+}
+
+table {
+    border-collapse: collapse;
+    width: 80%;
+    margin: auto;
+    margin-top: 10px;
+}
+
+table td, table th {
+    border-top: 1px solid #999;
+    border-bottom: 1px solid #999;
+    padding: 10px;
+}
+
+#form {
+    text-align: center;
+    margin: 10px;
+}
+#form fieldset {
+    width: 50%;
+    margin: auto;
+}
+.box {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 29px;
+    text-align: center;
+    margin:1%;
+
+}
+.btn {
+    font-family: Georgia;
+    color: #ffffff;
+    font-size: 39px;
+    background: #3498db;
+    padding: 18px 25px 18px 25px;
+    border: solid #1f628d 0px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background: #146191;
+    text-decoration: none;
+}
+
+.link {
+    stroke: #666;
+    opacity: 0.6;
+    stroke-width: 1.5px;
+}
+.node circle {
+    stroke: #fff;
+    opacity: 0.6;
+    stroke-width: 1.5px;
+}
+text {
+    font: 14px serif;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+#graph_wrapper {
+    float: left;
+    width: 100%;
+}
+#graph {
+    width:900px;
+    height: 600px;
+    margin: 0 auto;
+}
+#select-wrapper {
+    height: 20px;
+    width: 100%;
+    float: left;
+}
+#select-month {
+    width: 200px;
+    height: 40px;
+    margin:0 auto;
+}
