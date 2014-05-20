@@ -6,7 +6,7 @@
 
 %\begin{document}
 \section{Wikipedia}
-Written by Quentin Mazars-Simon.
+Written by Quentin Mazars-Simon and Orianne Rollier.
 
 In this section, we will describe each step of the procedure from the Wikipedia data dump to displaying the information on the website.
 \begin{figure}[H]
@@ -26,7 +26,17 @@ Implementation wise, this filtering consist of a single MapReduce job where the 
 After running the job (usually takes less than 5 minutes), we now only have around 200MB of data, which allows us to do document classification in reasonable time, and filter out the remaining off-topic articles.\\ 
 We use Mahout's XMLInputFormat which provides an easy way to split the input into multiple articles delimited by the \texttt{<article>} and \texttt{</article>} tags and send them to the mapper.
 \subsubsection{Filtering using document classification}
-ORIANNE
+As already mentioned previously, some articles not related to weather passed through the filtering done with the article's categories. One of the main issue is the presence of a high number of articles related to sport (because of the team names). To overcome this problem, we decided to classify the articles according to predefined classes. \\\\
+Before classifying the text was preprocessed mainly to remove citation, references and html entities which are more altering the text than bringing sense to it. \\
+For the classification itself, the method used is based on the tfidfs of the articles. The class chosen is the one for which the tfidf vector is the closest to the article's tfidf vector according to the cosine similarity. The classes used are articles related to "wind" (blizzard, cyclone, hurricane, typhoon, derecho, nor'easter, storm, tornado), "hot" weather (drought, heat wave), "cold" weather (cold wave) and sports. The training was done over a sample of 111 articles distributed in the following way: 42 for wind, 20 for rain, 20 for hot, 10 for cold 39 for sports. This uneven distribution is due to a lack of articles in certain categories.\\
+The library used here is scikit learn.\\\\
+Here are the different steps of the classification:
+\begin{enumerate}
+  \item Vocabulary construction: This steps consisted in extracting best words to represent the corpus. There are the features used to represent articles in the vector space. To find them we just took the most frequent ones after removing stop words and tokenizing the text. This was all done by the CountVectorizer object of scikit learn. (From this step and the next only approx. 70\% of the samples is used.)
+  \item Training: Now that we have a vocabulary to represent articles, using TfidfTransform, the tfidf of each article is computed and fed to the Nearest Centroid Classifier. This classifier when it uses tfidf and cosine similarity is called a Ricchio classifier.
+  \item Validation: Having a trained classifer, it can be tested on the remaining 30\% of the samples. After picking randomly 30 samples and classify them we find that one article was misclassified (one from wind as sports). 
+  \item Application: As a final step we applied the classifier to the whole set of remaining wikipedia articles around 20 percent were removed. Of course, as already seen in the validation step, articles there are false positive and false negatives. A next step would be to improve the classifier.
+\end{enumerate}
 \subsection{Extracting information}
 Now that we have only relevant articles, we can start extracting information. \\
 The general idea is to first locate the article's infobox which, if it exists, usually provides detailed information on date and location of the event (date formed, date dissipated, areas). If there is no infobox, or we still need more information, we try to extract it from the article's title, and finally, as a last resort we try to find the information in article's body.\\\\
